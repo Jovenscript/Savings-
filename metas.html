@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gems Elite - Metas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0221">
+<link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        .metas-hero {
+            padding: 0 !important;
+            margin-left: 250px;
+            position: relative;
+            height: 100vh;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        /* EFEITO DE CÂMERA CINEMATOGRÁFICA (ILUSÃO 3D) */
+        @keyframes cameraPan {
+            0% { transform: scale(1.05) translate(0, 0); }
+            50% { transform: scale(1.12) translate(-2%, 1%); }
+            100% { transform: scale(1.05) translate(0, 0); }
+        }
+
+        #metaBackground {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6;
+            z-index: 1;
+            transition: background-image 0.8s ease-in-out;
+            animation: cameraPan 40s infinite ease-in-out; /* Movimento contínuo */
+            will-change: transform;
+        }
+
+        .meta-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%);
+            z-index: 2;
+        }
+
+        .meta-content {
+            position: relative;
+            z-index: 3;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4rem;
+            color: white;
+            text-align: center;
+        }
+
+        .meta-title { font-size: 3.5rem; font-weight: bold; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .meta-desc { font-size: 1.2rem; color: #ccc; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+        .meta-nav {
+            position: absolute;
+            right: 2rem; top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            list-style: none;
+        }
+
+        .meta-nav li {
+            color: rgba(255,255,255,0.5);
+            padding: 15px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+        }
+
+        .meta-nav li.active { 
+            color: var(--primary-cyan, #00f5d4); 
+            font-weight: bold; 
+            transform: scale(1.15); 
+            text-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
+        }
+
+        .meta-stats { display: flex; justify-content: center; gap: 3rem; margin-top: 2rem; }
+        .stat-number { display: block; font-size: 2.2rem; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 0.85rem; color: var(--primary-purple, #9d4edd); letter-spacing: 1px; font-weight: bold; }
+
+        /* CORREÇÃO DO BUG MOBILE (Textos sobrepostos) */
+        @media (max-width: 1024px) {
+            .metas-hero { margin-left: 0; }
+            
+            /* Joga o menu para o topo, logo abaixo da barra do navegador */
+            .meta-nav { 
+                top: 80px; 
+                right: 0; 
+                width: 100%; 
+                display: flex; 
+                justify-content: center; 
+                transform: none; 
+                padding: 0;
+                background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            }
+            .meta-nav li { padding: 10px 15px; font-size: 0.75rem; }
+            
+            /* Empurra os textos para a base da tela */
+            .meta-content { 
+                padding: 2rem 1.5rem; 
+                justify-content: flex-end; 
+                padding-bottom: 6rem; /* Espaço para o menu inferior se existir */
+            }
+            
+            .meta-title { font-size: 2.2rem; margin-top: 0; }
+            .meta-desc { font-size: 1rem; }
+            
+            /* Ajusta os números para não quebrarem a tela */
+            .meta-stats { gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
+            .stat-number { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <button id="hamburgerBtn">☰</button>
+    <div id="mobileOverlay"></div>
+
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="logo">GEMSELITE</div>
+            <ul class="nav-links" style="margin-top: 2rem;">
+                <li><a href="index.html">Dashboard</a></li>
+                <li><a href="transacoes.html">Transações</a></li>
+                <li><a href="planejamento.html">Planejamento</a></li>
+                <li><a href="calendario-financeiro.html">Calendário</a></li>
+                <li class="active"><a href="metas.html">Metas</a></li>
+                <li style="margin-top: 30px;"><a href="#" id="btnLogout" style="color: #ff4b4b; font-weight: bold;">Sair do Sistema</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content metas-hero">
+            <div id="metaBackground"></div>
+            <div class="meta-overlay"></div>
+
+            <ul class="meta-nav" id="metaNav">
+                <li onclick="changeMeta(0)" class="nav-item active">Casa</li>
+                <li onclick="changeMeta(1)" class="nav-item">BMW 320i</li>
+                <li onclick="changeMeta(2)" class="nav-item">Casamento</li>
+            </ul>
+
+            <div class="meta-content">
+                <div style="margin-bottom: auto;">
+                    </div>
+
+                <div>
+                    <h1 id="metaTitle">Casa Luxuosa</h1>
+                    <p id="metaDesc">Projeto Jaraguá do Sul · Minimalista</p>
+                    
+                    <div class="meta-stats">
+                        <div class="stat-box"><span class="stat-number" id="stat1">R$ 850k</span><span class="stat-label">ALVO</span></div>
+                        <div class="stat-box"><span class="stat-number" id="stat2">12%</span><span class="stat-label">PROGRESSO</span></div>
+                        <div class="stat-box"><span class="stat-number" id="stat3">2030</span><span class="stat-label">PREVISÃO</span></div>
+                    </div>
+                    
+                    <button class="btn-meta" style="margin-top: 30px; padding: 15px 40px; border-radius: 30px; border: 1px solid var(--primary-cyan); background: transparent; color: var(--primary-cyan); font-weight: bold; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);">
+                        ACOMPANHAR NO DASHBOARD
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="metas.js"></script>
+    <script src="mobile.js"></script>
+    <script src="pwa.js"></script>
+</body>
+</html>

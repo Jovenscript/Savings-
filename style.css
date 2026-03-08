@@ -1,0 +1,287 @@
+:root {
+    --bg-dark: #0d0221;
+    --panel-bg: rgba(255, 255, 255, 0.03);
+    --primary-purple: #9d4edd;
+    --primary-cyan: #00f5d4; 
+    --text-main: #ffffff;
+    --text-muted: #e0aaff;
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --danger-red: #f15bb5; 
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', sans-serif; 
+}
+
+body { 
+    background-color: var(--bg-dark); 
+    color: var(--text-main); 
+    min-height: 100vh; 
+    overflow-x: hidden; 
+}
+
+.app-container { 
+    display: flex; 
+    width: 100%; 
+    min-height: 100vh; 
+}
+
+/* =========================================
+   MENU LATERAL (PADRÃO DESKTOP)
+========================================= */
+.sidebar { 
+    width: 250px; 
+    background: rgba(13, 2, 33, 0.98); 
+    border-right: 1px solid var(--glass-border); 
+    padding: 2rem; 
+    position: fixed; 
+    height: 100vh; 
+    z-index: 10000; 
+    transition: transform 0.3s ease-in-out; 
+}
+
+.logo { 
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    background: linear-gradient(90deg, #fff, var(--primary-purple)); 
+    background-clip: text; 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
+
+.nav-links { list-style: none; margin-top: 2rem; }
+.nav-links a { color: var(--text-muted); text-decoration: none; display: block; padding: 12px 0; font-size: 1.1rem; transition: color 0.3s;}
+.nav-links li.active a, .nav-links a:hover { color: var(--primary-purple); font-weight: bold; }
+
+/* =========================================
+   CONTEÚDO PRINCIPAL
+========================================= */
+.main-content { 
+    flex: 1; 
+    margin-left: 250px; 
+    padding: 2rem; 
+    max-width: 100vw;
+}
+
+/* =========================================
+   DASHBOARD - PROTEÇÃO DE TAMANHO
+========================================= */
+.dashboardSwiper { width: 100%; height: auto !important; padding-bottom: 40px; overflow: hidden; }
+.dashboardSwiper .swiper-slide { width: 100% !important; height: auto !important; opacity: 1 !important; box-sizing: border-box; }
+.full-page-card { display: flex; flex-direction: column; justify-content: center; min-height: 550px; }
+
+/* =========================================
+   CALENDÁRIO - LAYOUT EM BLOCOS
+========================================= */
+.calendar-page-layout { display: flex; gap: 3rem; margin-top: 20px; flex-wrap: wrap; }
+.calendar-left-side { flex: 1.5; min-width: 350px; display: flex; flex-direction: column; align-items: center; }
+.calendar-right-side { flex: 1; min-width: 300px; max-width: 450px; }
+
+.swiper-button-next, .swiper-button-prev { color: var(--primary-cyan) !important; transition: 0.3s; }
+.calendar-nav-btn { position: relative; width: 50px; height: 50px; margin: 0 10px; cursor: pointer; }
+
+.calendarSwiper { width: 100%; max-width: 450px; height: 550px; margin-top: 10px; }
+.calendarSwiper .swiper-slide { width: 320px !important; height: 480px !important; opacity: 0.3; transition: 0.4s; display: flex; flex-direction: column; }
+.calendarSwiper .swiper-slide-active { opacity: 1; transform: scale(1.05); }
+
+.month-controls { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 450px; padding: 1rem; border: 1px solid var(--glass-border); border-radius: 15px; margin-bottom: 20px; background: var(--panel-bg); }
+.month-controls button { background: none; border: none; color: var(--primary-purple); font-size: 1.5rem; cursor: pointer; transition: 0.3s;}
+.month-controls button:hover { color: var(--primary-cyan); transform: scale(1.2); }
+
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; width: 100%; max-width: 450px; }
+.grid-day { aspect-ratio: 1; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; font-weight: bold; transition: 0.3s; }
+.grid-day:hover { background: rgba(157, 78, 221, 0.3); border-color: var(--primary-purple); }
+.grid-day.selected-day { border: 2px solid var(--primary-cyan); color: var(--primary-cyan); box-shadow: 0 0 10px rgba(0, 245, 212, 0.3); }
+.indicador-ponto { width: 6px; height: 6px; background: var(--primary-purple); border-radius: 50%; position: absolute; bottom: 5px; }
+
+.scroll-interno { overscroll-behavior: contain; }
+.scroll-interno::-webkit-scrollbar { width: 4px; }
+.scroll-interno::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 4px; }
+
+/* =========================================
+   ELEMENTOS GERAIS E FORMULÁRIOS
+========================================= */
+/* Estilo exclusivo para Inputs de texto/número */
+/* =========================================
+   ELEMENTOS GERAIS E FORMULÁRIOS (BLINDADOS)
+========================================= */
+.glass-panel { 
+    background: var(--panel-bg); 
+    backdrop-filter: blur(20px); 
+    border: 1px solid var(--glass-border); 
+    border-radius: 20px; 
+    padding: 1.5rem; 
+    margin-bottom: 1.5rem; 
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2); 
+}
+
+.glass-panel h3 { 
+    font-size: 0.85rem; 
+    color: var(--primary-purple); 
+    text-transform: uppercase; 
+    margin-bottom: 1.5rem; 
+    letter-spacing: 1px; 
+}
+
+/* Todos os Inputs e Selects com vidro roxo/rosa */
+input, select { 
+    width: 100%; 
+    background: rgba(157, 78, 221, 0.15); 
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(241, 91, 181, 0.4); 
+    color: #fff; 
+    padding: 12px; 
+    border-radius: 10px; 
+    margin-top: 10px; 
+    outline: none; 
+    transition: 0.3s; 
+    font-weight: bold;
+}
+
+input:focus, select:focus { 
+    border-color: var(--danger-red); 
+    box-shadow: 0 0 15px rgba(241, 91, 181, 0.4); 
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+
+/* Mágica exclusiva do Select (Remove a seta padrão e põe a rosa) */
+select {
+    cursor: pointer;
+    appearance: none; 
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f15bb5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+}
+
+/* FORÇA BRUTA PARA O NAVEGADOR NÃO PINTAR A LISTA DE BRANCO */
+select option { 
+    background-color: var(--bg-dark) !important; 
+    color: #ffffff !important; 
+    font-weight: bold;
+    padding: 10px;
+}
+
+select optgroup {
+    background-color: var(--primary-purple) !important;
+    color: #ffffff !important;
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Força TODOS os botões de envio a serem roxos, mesmo se faltar a classe no HTML */
+.btn-primary, button[type="submit"] { 
+    background: var(--primary-purple); 
+    color: #fff; 
+    border: none; 
+    padding: 15px; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    width: 100%; 
+    margin-top: 15px; 
+    transition: 0.3s; 
+}
+
+.btn-primary:hover, button[type="submit"]:hover { 
+    box-shadow: 0 0 20px rgba(157, 78, 221, 0.6); 
+    transform: scale(0.98); 
+}
+
+/* =========================================
+   METAS E PROGRESSO
+========================================= */
+.progress-bar { 
+    height: 8px; 
+    background: rgba(255, 255, 255, 0.1); 
+    border-radius: 4px; 
+    margin: 10px 0; 
+    overflow: hidden; 
+}
+
+.progress-fill { 
+    height: 100%; 
+    background: var(--primary-cyan); 
+    box-shadow: 0 0 10px var(--primary-cyan); 
+    transition: width 0.5s ease-in-out; 
+}
+
+.text-green { color: var(--primary-cyan); }
+.text-red { color: var(--danger-red); }
+
+/* (DAQUI PRA BAIXO CONTINUA O SEU @media DO MOBILE NORMALMENTE) */
+
+/* =========================================
+   ESTILOS DO MENU HAMBÚRGUER (OCULTOS NO PC)
+========================================= */
+#hamburgerBtn { display: none; position: fixed; top: 15px; left: 15px; z-index: 10001; background: var(--primary-purple); color: white; border: none; border-radius: 8px; padding: 10px 15px; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
+#mobileOverlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); z-index: 9999; backdrop-filter: blur(5px); opacity: 0; transition: 0.3s; pointer-events: none; }
+#mobileOverlay.active { opacity: 1; pointer-events: all; }
+
+/* =========================================
+   MÍDIAS DE RESPONSIVIDADE
+========================================= */
+
+@media (max-width: 1100px) {
+    .calendar-page-layout { flex-direction: column; align-items: center; }
+    .calendar-left-side, .calendar-right-side { width: 100%; max-width: 500px; min-width: auto; }
+}
+
+@media (max-width: 768px) {
+    /* 1. Ativa a Cortina e o Botão Hambúrguer */
+    #hamburgerBtn { display: block; }
+    #mobileOverlay { display: block; }
+
+    /* 2. Esconde o menu para a esquerda e joga os itens pra baixo do botão */
+    .sidebar { 
+        transform: translateX(-100%); /* Fica invisível para a esquerda */
+        padding-top: 80px; 
+        border-right: 1px solid var(--primary-purple);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+    }
+    
+    /* Quando o JS adicionar a classe "active", o menu desliza para a tela */
+    .sidebar.active { transform: translateX(0); }
+
+    /* 3. Ajustes do Conteúdo Principal */
+    .main-content { 
+        margin-left: 0; /* Remove aquele buraco enorme na lateral */
+        padding: 1rem; 
+        padding-top: 80px; /* Dá espaço pro botão lá em cima */
+        width: 100vw;
+    }
+
+    /* =========================================
+       CORREÇÃO DO DASHBOARD "GIGANTE"
+    ========================================= */
+    .full-page-card {
+        min-height: auto; /* Corta a altura exagerada */
+        padding: 1.5rem 1rem; /* Reduz o espaçamento interno */
+        margin-bottom: 10px;
+    }
+
+    .dashboardSwiper { padding-bottom: 20px; }
+
+    /* Força os inputs a não vazarem da tela */
+    input, select, .btn-primary { max-width: 100%; }
+
+    /* =========================================
+       CALENDÁRIO MOBILE
+    ========================================= */
+    .calendar-page-layout { gap: 1.5rem; }
+    .calendar-nav-btn { display: none; } 
+    .calendarSwiper { height: 420px; max-width: 100%; }
+    .calendarSwiper .swiper-slide { width: 280px !important; height: 380px !important; }
+    .month-controls h2 { font-size: 1.2rem; }
+    .glass-panel { padding: 1.2rem; }
+}
+
+@media (max-width: 400px) {
+    .calendarSwiper { height: 380px; }
+    .calendarSwiper .swiper-slide { width: 240px !important; height: 340px !important; }
+}

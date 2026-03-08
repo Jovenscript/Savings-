@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gems Elite - Dashboard</title>
+    <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d0221">
+<link rel="apple-touch-icon" href="icon-192.png">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button id="hamburgerBtn">☰</button>
+    <div id="mobileOverlay"></div>
+
+    <div class="app-container">
+        
+        <nav class="sidebar">
+            <div class="logo">GEMSELITE</div>
+            <ul class="nav-links">
+                <li class="active"><a href="index.html">Dashboard</a></li>
+                <li><a href="transacoes.html">Transações</a></li>
+                <li><a href="planejamento.html">Planejamento</a></li>
+                <li><a href="calendario-financeiro.html">Calendário</a></li>
+                <li><a href="metas.html">Metas</a></li>
+                <li><a href="#" id="btnLogout" style="color: #ff4b4b;">Sair do Sistema</a></li>
+                
+                <li style="margin-top: 30px;"><a href="#" id="resetAppBtn" style="color: var(--danger-red); font-weight: bold;">🗑️ Resetar App</a></li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            
+            <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1 style="color: #fff; font-size: 2rem;">Visão Central</h1>
+                    <p style="color: var(--text-muted);">Acompanhamento estratégico e inteligente.</p>
+                </div>
+                
+                <div style="min-width: 180px;">
+                    <label for="userSwitch" style="font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">Filtrar Visão:</label>
+                    <select id="userSwitch" style="margin-top: 5px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--primary-cyan); border-radius: 8px; padding: 5px 10px;">
+                        <option value="ambos">Casal (Visão Geral)</option>
+                        <option value="Caroline">Caroline</option>
+                        <option value="Marlon">Marlon</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="swiper dashboardSwiper" style="padding-bottom: 40px; padding-top: 10px;">
+                <div class="swiper-wrapper">
+                    
+                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
+                        <div class="calendar-page-layout"> 
+                            <div class="glass-panel" style="flex: 1; min-width: 100%; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-color: var(--primary-purple);">
+                                <h3 style="color: var(--text-muted);">Patrimônio Líquido</h3>
+                                <h2 id="totalBalance" style="font-size: 3rem; color: var(--text-main); margin: 10px 0;">R$ 0,00</h2>
+                                <p style="color: var(--primary-cyan); font-weight: bold; font-size: 0.9rem;">↑ Saldo consolidado atual</p>
+                                
+                                <h3 style="margin-top: 2rem; color: var(--danger-red);">🔔 Radares do Calendário</h3>
+                                <div id="calendarAlerts" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary-cyan); font-size: 0.95rem; line-height: 1.5;">
+                                    Analisando contas...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
+                        <div class="glass-panel full-page-card" style="margin: 0 auto; height: 100%; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-color: var(--primary-cyan);">
+                            <h3 style="text-align: center; font-size: 1.2rem; margin-bottom: 10px;">Análise de Despesas do Mês</h3>
+                            
+                            <div style="position: relative; height: 230px; width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="donutChart"></canvas>
+                            </div>
+                            <p id="semGastosAviso" style="text-align: center; color: var(--text-muted); font-size: 0.9rem; display: none; margin-top: 15px;">Ainda não há despesas registradas neste mês.</p>
+
+                            <div style="margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span style="color: var(--text-muted); font-size: 0.9rem;">Entradas do Mês:</span>
+                                    <strong id="resumoEntradas" style="color: var(--primary-cyan);">R$ 0,00</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: var(--text-muted); font-size: 0.9rem;">Saídas do Mês:</span>
+                                    <strong id="resumoSaidas" style="color: var(--danger-red);">R$ 0,00</strong>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
+                        <div class="glass-panel full-page-card" id="mainGoal" style="margin: 0 auto; height: 100%; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
+                            <div style="text-align: center; color: var(--text-muted); font-style: italic;">Carregando metas...</div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
+                        <div class="glass-panel full-page-card" style="margin: 0 auto; height: 100%; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
+                            <h3 style="text-align: center; font-size: 1.2rem; margin-bottom: 5px;">Evolução do Patrimônio</h3>
+                            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 20px;">Crescimento acumulado nos últimos 6 meses</p>
+                            
+                            <div style="position: relative; height: 260px; width: 100%;">
+                                <canvas id="balanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+                <div class="swiper-pagination"></div>
+            </div>
+
+            <div class="glass-panel" style="margin-top: 1rem; border: 1px dashed var(--primary-cyan); text-align: center; background: rgba(0, 245, 212, 0.02);">
+                <h3 style="color: #fff; margin-bottom: 10px;">🔄 Sincronizar Aparelhos</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+                    Gere um backup dos seus dados para enviar e importar no celular parceiro.
+                </p>
+                
+                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                    <button id="btnExportar" class="btn-primary" style="background: transparent; border: 1px solid var(--primary-cyan); color: var(--primary-cyan); padding: 10px 20px; flex: 1; min-width: 200px;">
+                        📤 Exportar Backup
+                    </button>
+
+                    <label class="btn-primary" style="cursor: pointer; padding: 10px 20px; flex: 1; min-width: 200px; margin-top: 0; background: var(--primary-purple);">
+                        📥 Importar Dados
+                        <input type="file" id="btnImportar" accept=".json" style="display: none;">
+                    </label>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="app.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="sync.js"></script>
+    <script src="mobile.js"></script> 
+    <script src="pwa.js"></script>
+</body>
+</html>
