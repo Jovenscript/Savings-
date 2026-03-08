@@ -1,5 +1,5 @@
 // Nome e versão do Cache. Se você mudar algo grande no app no futuro, mude para 'gems-elite-v2' para atualizar os celulares.
-const CACHE_NAME = 'gems-elite-v1';
+const CACHE_NAME = 'gems-elite-v2';
 
 // Lista de todos os arquivos que precisam funcionar sem internet
 const urlsToCache = [
@@ -57,4 +57,5 @@ self.addEventListener('activate', event => {
             );
         })
     );
+
 });
