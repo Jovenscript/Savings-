@@ -1,3 +1,5 @@
+// js/planejamento.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     let dataFiltro = new Date(); 
@@ -7,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNextMonth = document.getElementById('btnNextMonthPlan');
     const mesAtualTitulo = document.getElementById('mesAtualTituloPlan');
     const formOrcamento = document.getElementById('formOrcamento');
-    const btnSmartFill = document.getElementById('btnSmartFill'); // Novo botão mapeado
+    const btnSmartFill = document.getElementById('btnSmartFill');
 
     btnPrevMonth.addEventListener('click', () => {
         dataFiltro.setMonth(dataFiltro.getMonth() - 1);
@@ -74,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         saveData(dados);
         carregarTela();
         
-        // Mantive a sua lógica original de feedback de sucesso no botão
         const btn = formOrcamento.querySelector('button[type="submit"]');
         const textoOriginal = btn.innerText;
         btn.innerText = "✅ Salvo com sucesso!";
@@ -137,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             porcentagem = 100; 
         }
 
-        // Função auxiliar simples para formatar moeda
         const formatarGrana = (valor) => {
             return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         };
@@ -178,11 +178,9 @@ function executarPreenchimentoInteligente() {
     const somaPorCategoria = {};
     let despesasEncontradas = 0;
 
-    // Analisa os gastos dos últimos 90 dias
     contas.forEach(conta => {
         if (conta.tipo && conta.tipo.toLowerCase() === 'receita') return;
 
-        // Usa o campo dataExata que você já possui no banco
         const dataConta = new Date(conta.dataExata || conta.data); 
         
         if (!isNaN(dataConta.getTime()) && dataConta >= noventaDiasAtras && dataConta <= hoje) {
@@ -202,7 +200,6 @@ function executarPreenchimentoInteligente() {
         return;
     }
 
-    // Mapeamento EXATO das suas categorias para os inputs do HTML
     const mapaInputs = {
         '🏠 Moradia / Contas': 'limiteMoradia',
         '🛒 Supermercado': 'limiteMercado',
@@ -225,15 +222,12 @@ function executarPreenchimentoInteligente() {
             const inputElement = document.getElementById(idInput);
             
             if (inputElement) {
-                // Preenche o campo arredondando para cima
                 inputElement.value = Math.ceil(mediaMensal).toFixed(2);
                 
-                // Aplica o Efeito Visual (Glow)
                 inputElement.style.transition = "box-shadow 0.4s ease, border-color 0.4s ease";
                 inputElement.style.borderColor = "var(--primary-cyan, #00f5d4)";
                 inputElement.style.boxShadow = "0 0 15px rgba(0, 245, 212, 0.4)";
                 
-                // Remove o brilho após 2.5 segundos
                 setTimeout(() => {
                     inputElement.style.boxShadow = "none";
                     inputElement.style.borderColor = ""; 
