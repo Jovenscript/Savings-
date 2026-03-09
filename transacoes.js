@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MÁQUINA 1: LEITURA EM LOTE DA FATURA (INTACTA)
+    // MÁQUINA 1: LEITURA EM LOTE DA FATURA
     // ==========================================
     const inputFatura = document.getElementById('uploadFatura');
     const ocrStatus = document.getElementById('ocrStatus');
@@ -96,12 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!jaExiste) {
                         dados.contas.push({
-                            id: Date.now() + Math.random(),
+                            id: Date.now() + Math.random(), // ID Único gerado
                             descricao: descricao,
                             valor: valorNumerico,
                             dataExata: dataDia11,
                             categoria: "💳 Cartão de Crédito",
-                            tipo: "despesa"
+                            tipo: "despesa",
+                            pago: false // 🚀 ADICIONADO: Nasce como pendente no calendário
                         });
                         transacoesAdicionadas++;
                     } else {
@@ -121,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MÁQUINA 2: LEITURA DE COMPROVANTE INDIVIDUAL (PARA PREGUIÇOSOS)
+    // MÁQUINA 2: LEITURA DE COMPROVANTE INDIVIDUAL
     // ==========================================
     const inputComprovante = document.getElementById('uploadComprovante');
     const ocrStatusComprovante = document.getElementById('ocrStatusComprovante');
@@ -148,20 +149,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 linhas.forEach(linha => {
                     const linhaUpper = linha.toUpperCase();
 
-                    // 1. Caçando o maior Valor (Geralmente é o Total pago)
                     const matchValor = linha.match(/(?:R\$)?\s*(\d{1,3}(?:\.\d{3})*,\d{2})/);
                     if (matchValor) {
                         let tempVal = parseFloat(matchValor[1].replace(/\./g, '').replace(',', '.'));
                         if (tempVal > valorIdentificado) valorIdentificado = tempVal;
                     }
 
-                    // 2. Caçando Parcelas (Ex: "3x", "12X", "em 5x")
                     const matchParcela = linha.match(/(\d+)\s*[xX]/);
                     if (matchParcela) {
                         parcelasIdentificadas = parseInt(matchParcela[1]);
                     }
 
-                    // 3. Caçando o Nome da Loja / Descrição Inteligente
                     if (linhaUpper.includes("MERCADO LIVRE") || linhaUpper.includes("MERCADOLIVRE") || linhaUpper.includes("MERCADO PAGO")) {
                         descIdentificada = "Mercado Livre";
                     } else if (linhaUpper.includes("IFOOD") || linhaUpper.includes("I FOOD")) {
@@ -181,24 +179,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
-                // Injeta as informações descobertas direto no formulário manual!
                 document.getElementById('valorManual').value = valorIdentificado > 0 ? valorIdentificado : '';
                 document.getElementById('descManual').value = descIdentificada;
                 document.getElementById('parcelasManual').value = parcelasIdentificadas;
                 document.getElementById('catManual').value = categoriaSugerida;
                 
-                // Define a data de hoje para facilitar
                 const hoje = new Date().toISOString().split('T')[0];
                 document.getElementById('dataManual').value = hoje;
 
-                // Define como despesa
                 const tipoSelect = document.getElementById('tipoManual');
                 if(tipoSelect) {
                     tipoSelect.value = 'despesa';
                     tipoSelect.dispatchEvent(new Event('change'));
                 }
 
-                // Efeito visual de sucesso
                 ocrStatusComprovante.style.color = 'var(--primary-cyan)';
                 ocrStatusComprovante.innerText = '✅ Pronto! Revise os dados abaixo e clique em "Adicionar".';
                 
@@ -241,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const index = dados.contas.findIndex(c => c.id === idEmEdicao);
                 if (index !== -1) {
                     dados.contas[index] = { 
-                        ...dados.contas[index], 
+                        ...dados.contas[index], // Mantém as propriedades antigas, incluindo se está pago!
                         dataExata: dataStr, 
                         descricao: descBase, 
                         valor: valorTotal, 
@@ -272,7 +266,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         valor: valorPorParcela,
                         dataExata: dataFinal,
                         categoria: cat,
-                        tipo: tipoLancamento
+                        tipo: tipoLancamento,
+                        pago: tipoLancamento === 'despesa' ? false : true // 🚀 ADICIONADO: Despesas nascem pendentes
                     });
                 }
             }
@@ -378,10 +373,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const sinal = isReceita ? '+' : '-';
             const catDefault = isReceita ? '💰 Entrada' : '💸 Saída';
             
+            // Ícone extra na tabela para você saber se já pagou!
+            const statusPago = item.tipo === 'despesa' ? (item.pago ? ' ✅' : ' ⏳') : '';
+            
             return `
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                     <td style="padding: 15px;">${dataBr}</td>
-                    <td style="padding: 15px; font-weight: bold; color: #fff;">${item.descricao}</td>
+                    <td style="padding: 15px; font-weight: bold; color: #fff;">${item.descricao}${statusPago}</td>
                     <td style="padding: 15px;"><span style="background: rgba(255,255,255,0.05); color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.85rem;">${item.categoria || catDefault}</span></td>
                     <td style="padding: 15px; color: ${corValor}; font-weight: bold;">${sinal} ${valorFormatado}</td>
                     <td style="padding: 15px;">
