@@ -1,5 +1,11 @@
 // js/app.js
 
+// 🛡️ ESCUDO DE PROTEÇÃO (Evita que um celular zerado apague a nuvem)
+let escudoAtivado = false;
+if (!localStorage.getItem('gemsEliteData')) {
+    escudoAtivado = true; // Bloqueia o upload se a memória do celular estiver vazia
+}
+
 // ==========================================
 // 1. BANCO DE DADOS LOCAL + CACHE INTELIGENTE
 // ==========================================
@@ -12,8 +18,12 @@ function saveData(data) {
     // Salva no celular instantaneamente
     localStorage.setItem('gemsEliteData', JSON.stringify(data));
 
-    // Despacha para o Firebase em segundo plano
-    sincronizarComFirebase(data);
+    // Despacha para o Firebase APENAS se o escudo estiver desativado!
+    if (!escudoAtivado) {
+        sincronizarComFirebase(data);
+    } else {
+        console.log("🛡️ Upload bloqueado. O app está aguardando o download da nuvem primeiro...");
+    }
 }
 
 function formatCurrency(value) {
@@ -63,8 +73,21 @@ async function ligarRadarEmTempoReal() {
                         if (dadosNuvem && dadosNuvem !== dadosLocais) {
                             localStorage.setItem('gemsEliteData', dadosNuvem);
                             console.log("🔄 Dados novos do parceiro detectados! Atualizando...");
+                            
+                            // 🔓 O celular recebeu os dados! Removemos o escudo.
+                            if (escudoAtivado) {
+                                escudoAtivado = false;
+                                console.log("🔓 Escudo desativado. Celular liberado para enviar dados.");
+                            }
+                            
                             window.location.reload(); 
+                        } else if (escudoAtivado && dadosNuvem) {
+                            // Se a nuvem e o local são iguais, mas o escudo estava ativo, libera também.
+                            escudoAtivado = false;
                         }
+                    } else {
+                        // Se a nuvem estiver realmente vazia e limpa, remove o escudo para poder criar dados
+                        escudoAtivado = false;
                     }
                 });
             }
