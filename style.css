@@ -36,12 +36,12 @@ body {
     width: 250px; 
     background: rgba(13, 2, 33, 0.98); 
     border-right: 1px solid var(--glass-border); 
-    padding: 2rem; 
+    padding: 2rem 1.5rem; 
     position: fixed; 
     height: 100vh; 
     z-index: 10000; 
     transition: transform 0.3s ease-in-out; 
-    overflow-y: auto; /* Permite rolar o menu se ficar muito grande */
+    overflow-y: auto; 
 }
 
 .logo { 
@@ -51,11 +51,12 @@ body {
     background-clip: text; 
     -webkit-background-clip: text; 
     -webkit-text-fill-color: transparent; 
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
 .nav-links { list-style: none; margin-top: 1rem; }
 
-/* 🚀 NOVA CLASSE: CATEGORIAS DO MENU SUPER APP */
 .nav-category { 
     font-size: 0.75rem; 
     color: var(--primary-cyan); 
@@ -81,28 +82,35 @@ body {
     max-width: 100vw;
 }
 
-/* 🚀 NOVA CLASSE: O CARROSSEL GIGANTE DO SUPER APP 🚀 */
-.superAppSwiper { width: 100%; height: 85vh; padding-bottom: 40px; }
-.superAppSwiper .swiper-slide { width: 100%; height: 100%; opacity: 1 !important; box-sizing: border-box; display: flex; align-items: flex-start; justify-content: center; }
+/* 🚀 O CUBO MÁGICO 3D (Super App) 🚀 */
+.superAppSwiper { 
+    width: 100%; 
+    max-width: 420px; /* Largura ideal para parecer um cubo */
+    height: 600px;    /* Altura das faces do cubo */
+    margin: 0 auto;   /* Centraliza na tela */
+    padding-bottom: 50px; 
+}
+.superAppSwiper .swiper-slide { 
+    width: 100%; 
+    height: 100%; 
+    box-sizing: border-box; 
+    display: flex; 
+    align-items: flex-start; 
+    justify-content: center; 
+}
 .swiper-pagination-bullet { background: var(--text-muted); opacity: 0.5; width: 10px; height: 10px; }
 .swiper-pagination-bullet-active { background: var(--primary-cyan); opacity: 1; box-shadow: 0 0 10px var(--primary-cyan); transform: scale(1.2); }
 
 /* =========================================
-   DASHBOARD ANTIGO (MANTIDO PARA NÃO QUEBRAR O RESTO)
+   DASHBOARD ANTIGO E CALENDÁRIO
 ========================================= */
 .dashboardSwiper { width: 100%; height: auto !important; padding-bottom: 40px; overflow: hidden; }
 .dashboardSwiper .swiper-slide { width: 100% !important; height: auto !important; opacity: 1 !important; box-sizing: border-box; }
 .full-page-card { display: flex; flex-direction: column; justify-content: center; min-height: 550px; }
 
-/* =========================================
-   CONVIDADOS (MATCH) - EFEITO TINDER
-========================================= */
 .tinderSwiper { width: 90%; max-width: 320px; height: 420px; margin: 20px auto; }
 .tinderSwiper .swiper-slide { width: 100% !important; height: 100% !important; opacity: 1 !important; transition: 0.3s; display: flex; flex-direction: column; }
 
-/* =========================================
-   CALENDÁRIO - LAYOUT EM BLOCOS
-========================================= */
 .calendar-page-layout { display: flex; gap: 3rem; margin-top: 20px; flex-wrap: wrap; }
 .calendar-left-side { flex: 1.5; min-width: 350px; display: flex; flex-direction: column; align-items: center; }
 .calendar-right-side { flex: 1; min-width: 300px; max-width: 450px; }
@@ -132,23 +140,28 @@ body {
    ELEMENTOS GERAIS E FORMULÁRIOS
 ========================================= */
 .glass-panel { 
-    background: var(--panel-bg); 
+    background: rgba(13, 2, 33, 0.6); 
     backdrop-filter: blur(20px); 
+    -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border); 
     border-radius: 20px; 
     padding: 1.5rem; 
     margin-bottom: 1.5rem; 
-    box-shadow: 0 8px 32px rgba(0,0,0,0.2); 
-    width: 100%; /* Garante que os painéis não vazem da tela no Super App */
-    max-width: 600px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5); 
+    width: 100%; 
+    height: 100%; /* Força as faces do cubo a preencherem o espaço */
+    display: flex;
+    flex-direction: column;
 }
 
 .glass-panel h3 { 
-    font-size: 0.85rem; 
-    color: var(--primary-purple); 
+    font-size: 1rem; 
+    color: var(--primary-cyan); 
     text-transform: uppercase; 
     margin-bottom: 1.5rem; 
     letter-spacing: 1px; 
+    border-bottom: 1px dashed rgba(0, 245, 212, 0.3); 
+    padding-bottom: 10px;
 }
 
 input, select, textarea { 
@@ -193,10 +206,8 @@ select optgroup { background-color: var(--primary-purple) !important; color: #ff
 /* =========================================
    METAS E PROGRESSO
 ========================================= */
-.progress-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; margin: 10px 0; overflow: hidden; }
-.progress-fill { height: 100%; background: var(--primary-cyan); box-shadow: 0 0 10px var(--primary-cyan); transition: width 0.5s ease-in-out; }
-.text-green { color: var(--primary-cyan); }
-.text-red { color: var(--danger-red); }
+.progress-bar { height: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 5px; margin: 10px 0; overflow: hidden; box-shadow: inset 0 0 5px rgba(0,0,0,0.5); }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary-purple), var(--primary-cyan)); box-shadow: 0 0 10px var(--primary-cyan); transition: width 0.5s ease-in-out; }
 
 /* =========================================
    MÍDIAS DE RESPONSIVIDADE
@@ -219,11 +230,8 @@ select optgroup { background-color: var(--primary-purple) !important; color: #ff
 
     .main-content { margin-left: 0; padding: 1rem; padding-top: 80px; width: 100vw; }
 
-    .full-page-card { min-height: auto; padding: 1.5rem 1rem; margin-bottom: 10px; }
-    .dashboardSwiper { padding-bottom: 20px; }
-
-    /* 🚀 ALTURA PARA O SUPER APP NO MOBILE */
-    .superAppSwiper { height: 75vh; }
+    /* Ajuste do Cubo no Mobile */
+    .superAppSwiper { height: 550px; padding-bottom: 30px; }
 
     .tinderSwiper { height: 400px; max-width: 100%; }
     .tinderSwiper .swiper-slide { width: 260px !important; height: 360px !important; }
@@ -236,11 +244,4 @@ select optgroup { background-color: var(--primary-purple) !important; color: #ff
     .calendarSwiper .swiper-slide { width: 280px !important; height: 380px !important; }
     .month-controls h2 { font-size: 1.2rem; }
     .glass-panel { padding: 1.2rem; }
-}
-
-@media (max-width: 400px) {
-    .calendarSwiper { height: 380px; }
-    .calendarSwiper .swiper-slide { width: 240px !important; height: 340px !important; }
-    .tinderSwiper { height: 380px; }
-    .tinderSwiper .swiper-slide { width: 240px !important; height: 340px !important; }
 }
