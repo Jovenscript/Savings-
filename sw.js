@@ -2,7 +2,6 @@
 
 const CACHE_NAME = 'gems-elite-v2';
 
-// Lista de arquivos atualizada com o módulo de casamento
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -15,10 +14,8 @@ const ASSETS_TO_CACHE = [
     './style.css',
     './app.js',
     './auth.js',
-    './pwa.js',
     './manifest.json',
-    './icon-192.png',
-    './icon-512.png'
+    './pwa.js'
 ];
 
 self.addEventListener('install', (event) => {
