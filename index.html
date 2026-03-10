@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 🛡️ PAREDE DE SEGURANÇA: Bloqueia a visão de tudo até o sistema decidir */
+        /* 🛡️ BLOQUEIO TOTAL (Fallback de Segurança) */
         #bloqueioTotal {
             position: fixed; inset: 0; background: #0d0221; z-index: 200000;
-            display: flex; align-items: center; justify-content: center; color: #fff; font-family: sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            color: #fff; font-family: sans-serif; transition: opacity 0.5s;
         }
 
         #appMainContainer { opacity: 0; transition: opacity 1s; }
@@ -23,51 +24,65 @@
         }
         .ob-content { 
             background: #161b22; border: 1px solid var(--primary-purple); border-radius: 24px; 
-            padding: 40px; width: 90%; max-width: 450px; text-align: center;
+            padding: 40px; width: 95%; max-width: 450px; text-align: center;
             box-shadow: 0 0 60px rgba(157, 78, 221, 0.2);
         }
         .ob-input, .ob-select {
             width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); 
-            border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem;
+            border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem; outline: none;
         }
-        .color-preview { width: 30px; height: 30px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; }
+        .ob-input:focus { border-color: var(--primary-cyan); }
+        .color-preview { width: 35px; height: 35px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; transition: 0.3s; }
+
+        /* EFEITO DE VIDRO NAS METAS (Glassmorphism) */
+        .glass-meta {
+            backdrop-filter: blur(10px) saturate(180%);
+            -webkit-backdrop-filter: blur(10px) saturate(180%);
+            background-color: rgba(17, 25, 40, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.125);
+        }
     </style>
 </head>
 <body>
 
-    <div id="bloqueioTotal">Carregando Gems Elite...</div>
+    <div id="bloqueioTotal">
+        <div class="logo" style="font-size: 2rem; margin-bottom: 20px; letter-spacing: 5px;">GEMSELITE</div>
+        <div style="width: 40px; height: 40px; border: 3px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    </div>
 
     <div id="onboardingModal">
         <div class="ob-content" id="step1">
             <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 10px;">Gems Elite 💎</h2>
-            <p style="color: #8b949e; margin-bottom: 25px;">Personalize sua experiência.</p>
+            <p style="color: #8b949e; margin-bottom: 25px;">Personalize sua experiência exclusiva.</p>
             
-            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Seu Nome:</label>
+            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px; font-size: 0.9rem;">Como devemos te chamar?</label>
             <input type="text" id="obName" class="ob-input" placeholder="Ex: Marlon & Carol">
 
-            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Cor do Sistema:</label>
-            <select id="obColor" class="ob-select" onchange="document.getElementById('cp').style.background = this.value">
-                <option value="#00f5d4">Ciano Neon</option>
-                <option value="#9d4edd">Roxo Royal</option>
-                <option value="#f15bb5">Rosa Shock</option>
-                <option value="#fee440">Amarelo Ouro</option>
-                <option value="#57cc99">Verde Esmeralda</option>
-                <option value="#00b4d8">Azul Mar</option>
-            </select>
-            <div id="cp" class="color-preview" style="background: #00f5d4; margin-bottom: 20px;"></div>
+            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px; font-size: 0.9rem;">Sua Cor de Identidade:</label>
+            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                <select id="obColor" class="ob-select" style="margin-bottom: 0;" onchange="document.getElementById('cp').style.background = this.value">
+                    <option value="#00f5d4">Ciano Neon</option>
+                    <option value="#9d4edd">Roxo Royal</option>
+                    <option value="#f15bb5">Rosa Shock</option>
+                    <option value="#fee440">Amarelo Ouro</option>
+                    <option value="#57cc99">Verde Esmeralda</option>
+                    <option value="#ff4b4b">Vermelho Alerta</option>
+                </select>
+                <div id="cp" class="color-preview" style="background: #00f5d4;"></div>
+            </div>
 
-            <button class="btn-primary" onclick="irParaStep2()" style="width:100%; padding: 18px;">Próximo ❯</button>
+            <button class="btn-primary" onclick="irParaStep2()" style="width:100%; padding: 18px; border-radius: 15px;">Próximo ❯</button>
         </div>
 
         <div class="ob-content" id="step2" style="display:none;">
-            <h2 style="color:#fff; margin-bottom: 10px;">Quais seus Sonhos?</h2>
-            <p style="color: #8b949e; margin-bottom: 20px;">Diga 3 metas para a IA gerar suas fotos.</p>
+            <h2 style="color:#fff; margin-bottom: 10px;">Visão de Futuro</h2>
+            <p style="color: #8b949e; margin-bottom: 20px;">Quais são seus 3 maiores sonhos agora?</p>
             
-            <input type="text" id="dream1" class="ob-input" placeholder="Meta 1">
-            <input type="text" id="dream2" class="ob-input" placeholder="Meta 2">
-            <input type="text" id="dream3" class="ob-input" placeholder="Meta 3">
+            <input type="text" id="dream1" class="ob-input" placeholder="Sonho 1 (Ex: Intercâmbio)">
+            <input type="text" id="dream2" class="ob-input" placeholder="Sonho 2 (Ex: BMW M3)">
+            <input type="text" id="dream3" class="ob-input" placeholder="Sonho 3 (Ex: Casa de Praia)">
 
-            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px;">Gerar meu Sistema ✨</button>
+            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px; border-radius: 15px;">Gerar meu Gems Elite ✨</button>
         </div>
     </div>
 
@@ -75,9 +90,9 @@
         <nav class="sidebar"></nav>
         <main class="main-content">
             <header>
-                <h1 id="tituloBoasVindas" style="color:#fff;">Cubo de Controle</h1>
+                <h1 id="tituloBoasVindas" style="color:#fff; font-size: 2rem;">Olá! 👋</h1>
             </header>
-            <div class="swiper superAppSwiper">
+            <div class="swiper superAppSwiper" style="padding-bottom: 40px;">
                 <div class="swiper-wrapper" id="wrapperDashboard">
                     </div>
                 <div class="swiper-pagination"></div>
@@ -92,49 +107,61 @@
     <script src="dashboard.js"></script>
 
     <script>
+        // Lógica de Inicialização Inteligente
         document.addEventListener('DOMContentLoaded', () => {
-            // Pequeno delay para o Firebase/Auth carregar o e-mail
-            setTimeout(() => {
-                const verificar = setInterval(() => {
-                    const userEmail = localStorage.getItem('gemsEliteLogin');
-                    
-                    if (typeof getData === 'function' && userEmail) {
-                        clearInterval(verificar);
-                        const dados = getData();
-                        
-                        const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
-                        const eFundador = fundadores.includes(userEmail);
+            const verificarStatus = setInterval(() => {
+                const userEmail = localStorage.getItem('gemsEliteLogin');
+                
+                // Se não tiver login, manda pro login.html
+                if (!userEmail && window.location.pathname.indexOf('login.html') === -1) {
+                    clearInterval(verificarStatus);
+                    window.location.href = 'login.html';
+                    return;
+                }
 
-                        if (eFundador) {
-                            // FUNDADORES: Libera direto
-                            document.getElementById('bloqueioTotal').style.display = 'none';
-                            document.getElementById('appMainContainer').classList.add('liberado');
-                            aplicarCores('#00f5d4');
-                            if (typeof atualizarTelaBaseadoNoUsuario === 'function') atualizarTelaBaseadoNoUsuario(dados);
-                        } else if (!dados.config || !dados.config.setupConcluido) {
-                            // NOVO: Mostra Onboarding (Mantém bloqueio do fundo)
+                if (typeof getData === 'function') {
+                    clearInterval(verificarStatus);
+                    const dados = getData();
+                    const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
+                    
+                    // Se for um dos fundadores: Libera tudo direto
+                    if (fundadores.includes(userEmail)) {
+                        liberarApp(dados, '#00f5d4');
+                    } 
+                    // Se for novo usuário sem configuração: Abre Onboarding
+                    else if (!dados.config || !dados.config.setupConcluido) {
+                        document.getElementById('bloqueioTotal').style.opacity = '0';
+                        setTimeout(() => {
                             document.getElementById('bloqueioTotal').style.display = 'none';
                             document.getElementById('onboardingModal').style.display = 'flex';
-                        } else {
-                            // CONFIGURADO: Libera
-                            aplicarCores(dados.config.corPreferida);
-                            document.getElementById('bloqueioTotal').style.display = 'none';
-                            document.getElementById('appMainContainer').classList.add('liberado');
-                            atualizarTelaBaseadoNoUsuario(dados);
-                        }
+                        }, 500);
+                    } 
+                    // Usuário já configurado: Libera com as cores dele
+                    else {
+                        liberarApp(dados, dados.config.corPreferida);
                     }
-                }, 300);
-            }, 500);
+                }
+            }, 300);
         });
+
+        function liberarApp(dados, cor) {
+            aplicarCores(cor);
+            document.getElementById('bloqueioTotal').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('bloqueioTotal').style.display = 'none';
+                document.getElementById('appMainContainer').classList.add('liberado');
+                atualizarTelaBaseadoNoUsuario(dados);
+            }, 500);
+        }
 
         function aplicarCores(cor) {
             document.documentElement.style.setProperty('--primary-cyan', cor);
-            // Cria um tom escuro da mesma cor para o gradiente
-            document.documentElement.style.setProperty('--primary-purple', cor + '88'); 
+            // Cor secundária automática (30% de brilho a menos)
+            document.documentElement.style.setProperty('--primary-purple', cor + 'aa'); 
         }
 
         function irParaStep2() {
-            if(!document.getElementById('obName').value.trim()) return alert("Diga seu nome!");
+            if(!document.getElementById('obName').value.trim()) return alert("Por favor, digite seu nome!");
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
         }
@@ -155,14 +182,14 @@
                 document.getElementById('dream1').value,
                 document.getElementById('dream2').value,
                 document.getElementById('dream3').value
-            ].filter(s => s !== '');
+            ].filter(s => s.trim() !== '');
 
             if(sonhos.length > 0) {
                 dados.apresentacaoMetas = sonhos.map((s, i) => ({
                     id: `meta_${i}`,
                     title: s,
-                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury style cinematic 8k")}?width=1080&height=1920&nologo=true`,
-                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
+                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " high-end luxury cinematic 8k photorealistic glass texture")}?width=1080&height=1920&nologo=true`,
+                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Meta"
                 }));
                 dados.valoresMetas = {};
                 sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
@@ -170,15 +197,19 @@
 
             window.escudoAtivado = false;
             saveData(dados);
-            alert("✨ Tudo pronto! Bem-vindo ao Gems Elite.");
+            alert("✨ Perfil criado com sucesso!");
             window.location.reload();
         }
 
         function atualizarTelaBaseadoNoUsuario(dados) {
-            const nome = dados.config?.nomeUsuario || 'Membro';
+            const nome = dados.config?.nomeUsuario || 'Membro Elite';
             const titulo = document.getElementById('tituloBoasVindas');
             if(titulo) titulo.innerText = `Olá, ${nome} 👋`;
         }
     </script>
+    
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </body>
 </html>
