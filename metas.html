@@ -6,8 +6,8 @@
     <title>Gems Elite - Metas</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d0221">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#0d0221">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" href="icon-192.png">
     <style>
         .metas-hero {
@@ -34,7 +34,7 @@
             opacity: 0.6;
             z-index: 1;
             transition: background-image 0.8s ease-in-out;
-            animation: cameraPan 40s infinite ease-in-out; /* Movimento contínuo */
+            animation: cameraPan 40s infinite ease-in-out; 
             will-change: transform;
         }
 
@@ -57,7 +57,7 @@
             text-align: center;
         }
 
-        .meta-title { font-size: 3.5rem; font-weight: bold; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .meta-title { font-size: 3.5rem; font-weight: bold; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.5); display: inline-block; }
         .meta-desc { font-size: 1.2rem; color: #ccc; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
 
         .meta-nav {
@@ -86,37 +86,35 @@
         }
 
         .meta-stats { display: flex; justify-content: center; gap: 3rem; margin-top: 2rem; }
+        .stat-box { position: relative; }
         .stat-number { display: block; font-size: 2.2rem; font-weight: bold; color: #fff; }
         .stat-label { font-size: 0.85rem; color: var(--primary-purple, #9d4edd); letter-spacing: 1px; font-weight: bold; }
 
-        /* CORREÇÃO DO BUG MOBILE (Textos sobrepostos) */
+        .btn-edit-meta {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--primary-cyan);
+            color: var(--primary-cyan);
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 15px;
+            vertical-align: middle;
+            transition: 0.3s;
+        }
+        .btn-edit-meta:hover { background: var(--primary-cyan); color: #000; transform: scale(1.1); }
+
+        /* CORREÇÃO DO BUG MOBILE */
         @media (max-width: 1024px) {
             .metas-hero { margin-left: 0; }
-            
-            /* Joga o menu para o topo, logo abaixo da barra do navegador */
             .meta-nav { 
-                top: 80px; 
-                right: 0; 
-                width: 100%; 
-                display: flex; 
-                justify-content: center; 
-                transform: none; 
-                padding: 0;
-                background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+                top: 80px; right: 0; width: 100%; display: flex; justify-content: center; 
+                transform: none; padding: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
             }
             .meta-nav li { padding: 10px 15px; font-size: 0.75rem; }
-            
-            /* Empurra os textos para a base da tela */
-            .meta-content { 
-                padding: 2rem 1.5rem; 
-                justify-content: flex-end; 
-                padding-bottom: 6rem; /* Espaço para o menu inferior se existir */
-            }
-            
+            .meta-content { padding: 2rem 1.5rem; justify-content: flex-end; padding-bottom: 6rem; }
             .meta-title { font-size: 2.2rem; margin-top: 0; }
             .meta-desc { font-size: 1rem; }
-            
-            /* Ajusta os números para não quebrarem a tela */
             .meta-stats { gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
             .stat-number { font-size: 1.5rem; }
         }
@@ -127,35 +125,31 @@
     <div id="mobileOverlay"></div>
 
     <div class="app-container">
-        <nav class="sidebar">
-          
-        </nav>
+        <nav class="sidebar"></nav>
 
         <main class="main-content metas-hero">
             <div id="metaBackground"></div>
             <div class="meta-overlay"></div>
 
-            <ul class="meta-nav" id="metaNav">
-                <li onclick="changeMeta(0)" class="nav-item active">Casa</li>
-                <li onclick="changeMeta(1)" class="nav-item">BMW 320i</li>
-                <li onclick="changeMeta(2)" class="nav-item">Casamento</li>
-            </ul>
+            <ul class="meta-nav" id="metaNav"></ul>
 
             <div class="meta-content">
-                <div style="margin-bottom: auto;">
-                    </div>
+                <div style="margin-bottom: auto;"></div>
 
                 <div>
-                    <h1 id="metaTitle">Casa Luxuosa</h1>
-                    <p id="metaDesc">Projeto Jaraguá do Sul · Minimalista</p>
+                    <div>
+                        <h1 id="metaTitle" class="meta-title">Carregando...</h1>
+                        <button class="btn-edit-meta" onclick="editarMetaAtual()" title="Editar Meta">✏️</button>
+                    </div>
+                    <p id="metaDesc">Aguarde...</p>
                     
                     <div class="meta-stats">
-                        <div class="stat-box"><span class="stat-number" id="stat1">R$ 850k</span><span class="stat-label">ALVO</span></div>
-                        <div class="stat-box"><span class="stat-number" id="stat2">12%</span><span class="stat-label">PROGRESSO</span></div>
-                        <div class="stat-box"><span class="stat-number" id="stat3">2030</span><span class="stat-label">PREVISÃO</span></div>
+                        <div class="stat-box"><span class="stat-number" id="stat1">--</span><span class="stat-label">ALVO</span></div>
+                        <div class="stat-box"><span class="stat-number" id="stat2">--</span><span class="stat-label">PROGRESSO</span></div>
+                        <div class="stat-box"><span class="stat-number" id="stat3">--</span><span class="stat-label">PREVISÃO</span></div>
                     </div>
                     
-                    <button class="btn-meta" style="margin-top: 30px; padding: 15px 40px; border-radius: 30px; border: 1px solid var(--primary-cyan); background: transparent; color: var(--primary-cyan); font-weight: bold; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);">
+                    <button class="btn-meta" onclick="window.location.href='index.html'" style="margin-top: 30px; padding: 15px 40px; border-radius: 30px; border: 1px solid var(--primary-cyan); background: transparent; color: var(--primary-cyan); font-weight: bold; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);">
                         ACOMPANHAR NO DASHBOARD
                     </button>
                 </div>
@@ -163,15 +157,10 @@
         </main>
     </div>
 
-<script type="module" src="auth.js"></script>
+    <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     <script src="metas.js"></script> 
     <script src="mobile.js"></script>
     <script src="pwa.js"></script>
 </body>
 </html>
-
-
-
-
-
