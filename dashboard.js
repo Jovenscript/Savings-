@@ -1,6 +1,6 @@
 // js/dashboard.js
 let meuDonutChart = null; 
-let meuLineChart = null; // Variável para controlar o gráfico de linha
+let meuLineChart = null; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const userSwitch = document.getElementById('userSwitch');
@@ -38,22 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     updateDashboard();
 
-    // DASHBOARD SWIPER (O CARROSSEL 3D)
-    let swiper;
-    if (document.querySelector(".dashboardSwiper")) {
-        swiper = new Swiper(".dashboardSwiper", {
-            effect: "coverflow",
+    // 🚀 O NOVO MOTOR DO SUPER APP (Substituindo o antigo Coverflow)
+    if (document.querySelector(".superAppSwiper")) {
+        new Swiper(".superAppSwiper", {
+            direction: "horizontal",
+            spaceBetween: 30,
             grabCursor: true,
-            centeredSlides: true,
-            slidesPerView: "auto",
-            initialSlide: 0,
-            coverflowEffect: {
-                rotate: 40, 
-                stretch: 0,
-                depth: 150, 
-                modifier: 1,
-                slideShadows: true, 
-            },
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true,
@@ -203,38 +193,99 @@ function updateDashboard() {
         
         mainGoalEl.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: var(--primary-cyan); margin: 0;">${meta.nome}</h2>
-                <button onclick="editarMeta()" class="btn-primary" style="padding: 8px 15px; margin: 0; font-size: 0.8rem; width: auto; background: transparent; border: 1px solid var(--primary-cyan); color: var(--primary-cyan);">Ajustar Cofre</button>
+                <h3 style="color: var(--primary-cyan); margin: 0; font-size: 1rem;">${meta.nome}</h3>
+                <button onclick="editarMeta()" class="btn-primary" style="padding: 5px 10px; margin: 0; font-size: 0.7rem; width: auto; background: transparent; border: 1px solid var(--primary-cyan); color: var(--primary-cyan);">Ajustar Cofre</button>
             </div>
             
-            <div style="margin-bottom: 25px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold;">
-                    <span>Progresso Total da Meta</span>
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem;">
+                    <span>Progresso Total</span>
                     <span style="color: var(--primary-purple)">${porcTotal.toFixed(1)}%</span>
                 </div>
-                <div class="progress-bar" style="height: 12px; background: rgba(255,255,255,0.05);">
+                <div class="progress-bar" style="height: 10px; background: rgba(255,255,255,0.05);">
                     <div class="progress-fill" style="width: ${porcTotal > 100 ? 100 : porcTotal}%; background: var(--primary-purple); box-shadow: 0 0 10px var(--primary-purple);"></div>
                 </div>
-                <small style="color: var(--text-muted)">${typeof formatCurrency === 'function' ? formatCurrency(meta.guardado) : meta.guardado} de ${typeof formatCurrency === 'function' ? formatCurrency(meta.meta) : meta.meta} guardados.</small>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">${typeof formatCurrency === 'function' ? formatCurrency(meta.guardado) : meta.guardado} de ${typeof formatCurrency === 'function' ? formatCurrency(meta.meta) : meta.meta}.</small>
             </div>
 
             <div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem;">
                     <span>Meta Deste Mês</span>
                     <span style="color: var(--primary-cyan)">${porcMes.toFixed(1)}%</span>
                 </div>
-                <div class="progress-bar" style="height: 12px; background: rgba(255,255,255,0.05);">
+                <div class="progress-bar" style="height: 10px; background: rgba(255,255,255,0.05);">
                     <div class="progress-fill" style="width: ${porcMes > 100 ? 100 : porcMes}%; background: var(--primary-cyan); box-shadow: 0 0 10px var(--primary-cyan);"></div>
                 </div>
-                <small style="color: var(--text-muted)">Guardado: ${typeof formatCurrency === 'function' ? formatCurrency(meta.guardadoMes) : meta.guardadoMes} / Objetivo Mês: ${typeof formatCurrency === 'function' ? formatCurrency(meta.metaMensal) : meta.metaMensal}.</small>
+                <small style="color: var(--text-muted); font-size: 0.75rem;">Guardado: ${typeof formatCurrency === 'function' ? formatCurrency(meta.guardadoMes) : meta.guardadoMes} / Objetivo Mês: ${typeof formatCurrency === 'function' ? formatCurrency(meta.metaMensal) : meta.metaMensal}.</small>
             </div>
         `;
     }
 
-    // Processa os Gráficos
+    // Processa os Gráficos originais e as novas funções do Super App
     renderDonutChart(contasDoMes);
     if (document.getElementById('balanceChart')) {
         renderLineChartDinâmico(todasAsMovimentacoes);
+    }
+    atualizarAgendaRapida(data);
+    atualizarContagemCasamento();
+}
+
+// 🚀 NOVA FUNÇÃO: Atualiza a agenda de contas rápidas na Página 2
+function atualizarAgendaRapida(data) {
+    const agendaDiv = document.getElementById('agendaRapida');
+    if (!agendaDiv) return;
+
+    let planejamento = data.planejamento || [];
+    
+    // Filtra as contas que não estão pagas
+    const contasPendentes = planejamento.filter(c => c.tipo === 'saida' && c.ativo !== false && !c.pago);
+
+    // Ordena pelo dia de vencimento
+    contasPendentes.sort((a, b) => (parseInt(a.diaVencimento) || 0) - (parseInt(b.diaVencimento) || 0));
+
+    // Pega só as 5 primeiras
+    const proximasContas = contasPendentes.slice(0, 5);
+
+    if (proximasContas.length === 0) {
+        agendaDiv.innerHTML = `<div style="text-align: center; color: var(--primary-cyan); margin-top: 30px; padding: 20px; background: rgba(0, 245, 212, 0.1); border-radius: 10px;">🎉 Tudo pago! Não há faturas pendentes.</div>`;
+        return;
+    }
+
+    let html = '';
+    proximasContas.forEach(c => {
+        html += `
+            <div style="padding: 12px; background: rgba(0,0,0,0.4); border-left: 3px solid var(--danger-red); border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="color: #fff; font-size: 0.95rem; display: block;">${c.descricao}</strong>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">Vence dia ${c.diaVencimento}</span>
+                </div>
+                <div style="font-weight: bold; color: var(--danger-red); font-size: 1rem;">
+                    ${typeof formatCurrency === 'function' ? formatCurrency(c.valor) : `R$ ${c.valor}`}
+                </div>
+            </div>
+        `;
+    });
+
+    agendaDiv.innerHTML = html;
+}
+
+// 🚀 NOVA FUNÇÃO: Atualiza a contagem do casamento na Página 3
+function atualizarContagemCasamento() {
+    const elContagem = document.getElementById('contagemCasamento');
+    if (!elContagem) return;
+
+    const dataCasamento = new Date('2026-08-29T00:00:00');
+    const hoje = new Date();
+    
+    const diferencaTempo = dataCasamento.getTime() - hoje.getTime();
+    const diasFaltantes = Math.ceil(diferencaTempo / (1000 * 3600 * 24));
+
+    if (diasFaltantes > 0) {
+        elContagem.innerText = `${diasFaltantes} Dias`;
+    } else if (diasFaltantes === 0) {
+        elContagem.innerText = "É HOJE!";
+    } else {
+        elContagem.innerText = "Já Casamos! ❤️";
     }
 }
 
@@ -291,7 +342,7 @@ function renderDonutChart(contasDoMes) {
     });
 }
 
-// NOVO: Gráfico de Linha Dinâmico (Evolução Real dos últimos 6 meses)
+// Gráfico de Linha Dinâmico (Evolução Real dos últimos 6 meses)
 function renderLineChartDinâmico(todasAsMovimentacoes) {
     const ctxElement = document.getElementById('balanceChart');
     if (!ctxElement) return;
