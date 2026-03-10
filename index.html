@@ -21,19 +21,18 @@
         .ob-title { color: #fff; font-size: 2rem; margin-bottom: 10px; }
         .ob-subtitle { color: var(--text-muted); margin-bottom: 25px; }
         
-        /* NOVO: Input de Nome */
         .ob-input {
             width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.5); 
             border: 1px solid var(--primary-cyan); color: #fff; margin-bottom: 30px; 
-            font-size: 1.2rem; outline: none; text-align: center; font-weight: bold;
+            font-size: 1rem; outline: none; text-align: left; font-weight: bold;
         }
         .ob-input:focus { box-shadow: 0 0 15px rgba(0, 245, 212, 0.4); }
 
-        .ob-module-btn, .ob-dream-btn {
+        .ob-module-btn {
             background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff;
             padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; width: 100%; text-align: left; font-size: 1.1rem;
         }
-        .ob-module-btn.active, .ob-dream-btn.active {
+        .ob-module-btn.active {
             background: rgba(0, 245, 212, 0.1); border-color: var(--primary-cyan); box-shadow: inset 0 0 10px rgba(0, 245, 212, 0.2);
         }
         
@@ -49,9 +48,9 @@
             <h2 class="ob-title">Boas-vindas! 💎</h2>
             
             <p class="ob-subtitle" style="margin-bottom: 10px;">Como podemos chamar você?</p>
-            <input type="text" id="obName" class="ob-input" placeholder="Digite seu nome">
+            <input type="text" id="obName" class="ob-input" placeholder="Digite seu nome (Ex: João, Casal Silva...)">
 
-            <p class="ob-subtitle" style="margin-bottom: 15px;">O que você quer organizar hoje?</p>
+            <p class="ob-subtitle" style="margin-bottom: 15px; margin-top: -10px;">O que você quer organizar hoje?</p>
             
             <button class="ob-module-btn active" data-mod="financas" style="pointer-events: none; opacity: 0.7;">
                 📊 Controle Financeiro (Obrigatório)
@@ -67,15 +66,14 @@
         </div>
 
         <div class="ob-content" id="step2">
-            <h2 class="ob-title">Seus Grandes Sonhos</h2>
-            <p class="ob-subtitle">Escolha até 3 metas de vida para o sistema montar seu painel preditivo.</p>
+            <h2 class="ob-title">Seus Maiores Sonhos</h2>
+            <p class="ob-subtitle">Escreva 3 grandes metas. A nossa Inteligência Artificial vai procurar fotos 4K e criar seus painéis de vidro.</p>
             
-            <button class="ob-dream-btn" onclick="toggleDream(this, 'Casa Própria', 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80')">🏠 Comprar uma Casa</button>
-            <button class="ob-dream-btn" onclick="toggleDream(this, 'Comprar Carro', 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1920&q=80')">🚗 Comprar um Carro</button>
-            <button class="ob-dream-btn" onclick="toggleDream(this, 'Viagem Internacional', 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1920&q=80')">✈️ Viagem Inesquecível</button>
-            <button class="ob-dream-btn" onclick="toggleDream(this, 'Casamento', 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1920&q=80')">💍 Fazer Festa de Casamento</button>
+            <input type="text" id="dream1" class="ob-input" placeholder="1. Ex: Viagem para as Maldivas" style="margin-bottom: 10px;">
+            <input type="text" id="dream2" class="ob-input" placeholder="2. Ex: Porsche 911 Carrera" style="margin-bottom: 10px;">
+            <input type="text" id="dream3" class="ob-input" placeholder="3. Ex: Mansão com Piscina" style="margin-bottom: 10px;">
 
-            <button class="btn-primary" onclick="finalizarOnboarding()" style="margin-top: 30px;">Gerar Meu Aplicativo ✨</button>
+            <button class="btn-primary" onclick="finalizarOnboarding()" style="margin-top: 20px;">Gerar Painéis com IA ✨</button>
         </div>
     </div>
 
@@ -196,7 +194,6 @@
 
     <script>
         let moduloSelecionados = ['financas'];
-        let sonhosSelecionados = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             const checkData = setInterval(() => {
@@ -204,30 +201,47 @@
                     clearInterval(checkData);
                     const dados = getData();
                     
-                    // Se não tiver setup concluído, mostra o Modal
+                    // 🛡️ PASSAPORTE VIP (Marlon & Carol)
+                    // Se a conta já tiver transações ou casamento configurado, ignora o onboarding!
+                    const isUsuarioAntigo = (dados.contas && dados.contas.length > 0) || (dados.casamento);
+                    
+                    if (isUsuarioAntigo && (!dados.config || !dados.config.setupConcluido)) {
+                        dados.config = {
+                            setupConcluido: true,
+                            nomeUsuario: 'Marlon & Carol',
+                            modulosAtivos: ['financas', 'metas', 'casamento']
+                        };
+                        window.escudoAtivado = false; // Quebra o escudo pra nuvem salvar
+                        if (typeof saveData === 'function') saveData(dados);
+                        atualizarTelaBaseadoNoUsuario(dados);
+                        return; // Pula o resto da execução!
+                    }
+
+                    // Se for usuário NOVO e zerado, mostra o Onboarding
                     if (!dados.config || !dados.config.setupConcluido) {
                         document.getElementById('appMainContainer').style.filter = 'blur(10px)';
                         document.getElementById('onboardingModal').style.display = 'flex';
                     } else {
-                        // NOVO: Atualiza a saudação com o nome do usuário
-                        const nomeUsuario = dados.config.nomeUsuario || '';
-                        if (nomeUsuario) {
-                            const titulo = document.getElementById('tituloBoasVindas');
-                            if (titulo) titulo.innerText = `Olá, ${nomeUsuario} 👋`;
-                        }
-
-                        // Esconde casamento se não ativou
-                        if (!dados.config.modulosAtivos.includes('casamento')) {
-                            const slideCas = document.getElementById('slideCasamento');
-                            if(slideCas) slideCas.remove();
-                        }
+                        atualizarTelaBaseadoNoUsuario(dados);
                     }
                 }
             }, 200);
         });
 
+        function atualizarTelaBaseadoNoUsuario(dados) {
+            const nomeUsuario = dados.config.nomeUsuario || '';
+            if (nomeUsuario) {
+                const titulo = document.getElementById('tituloBoasVindas');
+                if (titulo) titulo.innerText = `Olá, ${nomeUsuario} 👋`;
+            }
+
+            if (!dados.config.modulosAtivos.includes('casamento')) {
+                const slideCas = document.getElementById('slideCasamento');
+                if(slideCas) slideCas.remove();
+            }
+        }
+
         function irParaStep2() {
-            // Valida o Nome antes de avançar!
             const nomeDigitado = document.getElementById('obName').value.trim();
             if (!nomeDigitado) {
                 alert("Por favor, digite o seu nome para continuarmos!");
@@ -235,8 +249,7 @@
                 return;
             }
 
-            // Salva os módulos clicados
-            moduloSelecionados = ['financas']; // Sempre ativo
+            moduloSelecionados = ['financas']; 
             document.querySelectorAll('.ob-module-btn.active').forEach(btn => {
                 if(btn.dataset.mod !== 'financas') moduloSelecionados.push(btn.dataset.mod);
             });
@@ -245,55 +258,51 @@
             document.getElementById('step2').style.display = 'block';
         }
 
-        function toggleDream(btn, title, img) {
-            if (btn.classList.contains('active')) {
-                btn.classList.remove('active');
-                sonhosSelecionados = sonhosSelecionados.filter(s => s.title !== title);
-            } else {
-                if (sonhosSelecionados.length >= 3) {
-                    alert("Você só pode escolher até 3 sonhos para focar agora!");
-                    return;
-                }
-                btn.classList.add('active');
-                sonhosSelecionados.push({ title: title, img: img });
-            }
-        }
-
         function finalizarOnboarding() {
             const dados = typeof getData === 'function' ? getData() : {};
             const nomeDigitado = document.getElementById('obName').value.trim();
             
-            // 1. Salva o Nome e Módulos Ativos
             dados.config = {
                 setupConcluido: true,
                 nomeUsuario: nomeDigitado,
                 modulosAtivos: moduloSelecionados
             };
 
-            // 2. Se escolheu Metas, injeta os itens com as fotos
-            if (sonhosSelecionados.length > 0) {
+            const d1 = document.getElementById('dream1').value.trim();
+            const d2 = document.getElementById('dream2').value.trim();
+            const d3 = document.getElementById('dream3').value.trim();
+            const sonhosDigitados = [d1, d2, d3].filter(d => d !== '');
+
+            // O MOTOR DE IA QUE GERA A IMAGEM BASEADA NO TEXTO
+            if (sonhosDigitados.length > 0) {
                 let metasProntas = [];
                 let valoresZerados = {};
 
-                sonhosSelecionados.forEach((s, index) => {
+                sonhosDigitados.forEach((textoSonho, index) => {
                     const idCriado = "meta_" + index;
+                    
+                    // A Mágica: Transforma o texto em um prompt fotorealista e manda pra IA renderizar!
+                    const promptIA = encodeURIComponent(textoSonho + ", highly detailed, cinematic lighting, 4k resolution, luxury, realistic photography");
+                    const urlImagemIA = `https://image.pollinations.ai/prompt/${promptIA}?width=1920&height=1080&nologo=true`;
+
                     metasProntas.push({
                         id: idCriado,
-                        title: s.title,
+                        title: textoSonho,
                         desc: "Plano Oficial",
-                        img: s.img,
-                        defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir Ano"
+                        img: urlImagemIA,
+                        defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                     });
-                    valoresZerados[idCriado] = { s1: "R$ 0", s2: "0%", s3: "Definir Ano" };
+                    valoresZerados[idCriado] = { s1: "R$ 0", s2: "0%", s3: "Definir" };
                 });
 
                 dados.apresentacaoMetas = metasProntas;
                 dados.valoresMetas = valoresZerados;
             }
 
+            window.escudoAtivado = false; // 🔓 DESLIGA O ESCUDO PARA SALVAR NA NUVEM! (Evita o loop)
             if (typeof saveData === 'function') saveData(dados);
             
-            alert(`✨ Tudo pronto, ${nomeDigitado}! O Gems Elite foi moldado para você.`);
+            alert(`✨ O Gems Elite está gerando o sistema para você, ${nomeDigitado}!`);
             window.location.reload();
         }
     </script>
