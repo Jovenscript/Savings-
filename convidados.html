@@ -8,8 +8,9 @@
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
+    <meta name="theme-color" content="#0d0221">
     <style>
-        :root { --tinder-yes: #00f5d4; --tinder-no: #ff4b4b; }
+        :root { --tinder-yes: #00f5d4; --tinder-no: #ff4b4b; --tinder-wait: #fb8500; }
         .swiper { width: 90%; max-width: 320px; height: 420px; margin: 20px auto; }
         .guest-card {
             border-radius: 20px; display: flex; flex-direction: column; justify-content: center;
@@ -17,7 +18,9 @@
             border: 1px solid rgba(255, 255, 255, 0.1); text-align: center;
         }
         .guest-name { font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
-        .tinder-controls { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; }
+        
+        .tinder-controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 30px; }
+        
         .t-btn {
             width: 65px; height: 65px; border-radius: 50%; border: 2px solid;
             background: rgba(255,255,255,0.03); font-size: 1.6rem; cursor: pointer; transition: 0.3s;
@@ -25,8 +28,15 @@
         }
         .t-btn.no { color: var(--tinder-no); border-color: var(--tinder-no); }
         .t-btn.yes { color: var(--tinder-yes); border-color: var(--tinder-yes); }
+        
+        /* NOVO: O botão de espera (um pouco menor para ficar bonito no meio) */
+        .t-btn.wait { width: 55px; height: 55px; color: var(--tinder-wait); border-color: var(--tinder-wait); font-size: 1.4rem;}
+
+        .t-btn:hover { transform: scale(1.1); background: rgba(255,255,255,0.1); }
+
         .admin-section { margin-top: 2rem; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 2rem; }
-        textarea { width: 100%; height: 100px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: #fff; padding: 10px; margin-top: 10px; resize: none; }
+        textarea { width: 100%; height: 100px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); border-radius: 10px; color: #fff; padding: 10px; margin-top: 10px; resize: none; outline: none; }
+        textarea:focus { border-color: var(--primary-cyan); }
     </style>
 </head>
 <body>
@@ -35,9 +45,7 @@
 
     <div class="app-container">
         
-        <nav class="sidebar">
-            
-        </nav>
+        <nav class="sidebar"></nav>
 
         <main class="main-content">
             <header style="text-align: center;">
@@ -50,8 +58,9 @@
             </div>
 
             <div class="tinder-controls">
-                <button class="t-btn no" onclick="decidirStatus('no')">✖</button>
-                <button class="t-btn yes" onclick="decidirStatus('yes')">❤</button>
+                <button class="t-btn no" onclick="decidirStatus('no')" title="Não vai">✖</button>
+                <button class="t-btn wait" onclick="decidirStatus('wait')" title="Colocar em Espera">⏳</button>
+                <button class="t-btn yes" onclick="decidirStatus('yes')" title="Presença Confirmada">❤</button>
             </div>
 
             <section class="admin-section">
@@ -70,20 +79,27 @@
                     </div>
                 </div>
             </section>
+
             <section class="status-section" style="margin-top: 2rem;">
-                <div class="dashboard-grid">
+                
+                <div class="glass-panel" style="border-top: 3px solid var(--tinder-wait); max-width: 100%;">
+                    <h3>⏳ Em Espera (<span id="countWait" style="color: var(--tinder-wait);">0</span>)</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -10px; margin-bottom: 15px;">Pessoas que não deram certeza. Aprove ou negue aqui mesmo.</p>
+                    <div id="listaEmEspera" class="scroll-interno" style="max-height: 250px; overflow-y: auto; padding-right: 10px;"></div>
+                </div>
+
+                <div class="dashboard-grid" style="margin-top: 20px;">
                     <div class="glass-panel" style="border-top: 3px solid var(--tinder-yes);">
-                        <h3>✅ Presença Confirmada (<span id="countYes" style="color: var(--tinder-yes);">0</span>)</h3>
-                        <div id="listaConfirmados" class="scroll-interno" style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
-                            </div>
+                        <h3>✅ Confirmados (<span id="countYes" style="color: var(--tinder-yes);">0</span>)</h3>
+                        <div id="listaConfirmados" class="scroll-interno" style="max-height: 250px; overflow-y: auto; padding-right: 10px;"></div>
                     </div>
                     
                     <div class="glass-panel" style="border-top: 3px solid var(--tinder-no);">
                         <h3>❌ Não Vão (<span id="countNo" style="color: var(--tinder-no);">0</span>)</h3>
-                        <div id="listaRecusados" class="scroll-interno" style="max-height: 250px; overflow-y: auto; padding-right: 10px;">
-                            </div>
+                        <div id="listaRecusados" class="scroll-interno" style="max-height: 250px; overflow-y: auto; padding-right: 10px;"></div>
                     </div>
                 </div>
+                
             </section>
         </main>
     </div>
@@ -96,5 +112,3 @@
     <script src="pwa.js"></script>
 </body>
 </html>
-
-
