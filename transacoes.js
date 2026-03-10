@@ -2,15 +2,11 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ==========================================
-    // SISTEMA DE FILTRO DE MÊS E TELA
+    // SISTEMA DE FILTRO DE MÊS
     // ==========================================
     const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     let dataFiltro = new Date(); 
     dataFiltro.setDate(1);
-
-    // Seta a data de hoje ao abrir o formulário
-    const inputDataManual = document.getElementById('dataManual');
-    if (inputDataManual) inputDataManual.value = new Date().toISOString().split('T')[0];
 
     const btnPrevMonth = document.getElementById('btnPrevMonthTrans');
     const btnNextMonth = document.getElementById('btnNextMonthTrans');
@@ -37,16 +33,108 @@ document.addEventListener('DOMContentLoaded', () => {
         tipoManualSelect.dispatchEvent(new Event('change'));
     }
 
-    // Carrega a tabela inicial
-    const checkDados = setInterval(() => {
-        if (typeof getData === 'function') {
-            clearInterval(checkDados);
-            renderizarTabela();
-        }
-    }, 200);
+    const inputDataManual = document.getElementById('dataManual');
+    if (inputDataManual && !inputDataManual.value) {
+        inputDataManual.value = new Date().toISOString().split('T')[0];
+    }
 
     // ==========================================
-    // MÁQUINA 1: LEITURA EM LOTE DA FATURA (IA)
+    // 🎙️ "SIRI" FINANCEIRA: LANÇAMENTO POR VOZ
+    // ==========================================
+    const btnVoz = document.getElementById('btnVoz');
+    const statusVoz = document.getElementById('statusVoz');
+
+    if (btnVoz) {
+        // Verifica se o navegador do celular suporta reconhecimento de voz
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'pt-BR';
+            recognition.continuous = false; // Ouve só uma frase e para
+
+            btnVoz.addEventListener('click', () => {
+                statusVoz.style.display = 'block';
+                btnVoz.style.background = 'var(--danger-red)';
+                btnVoz.style.color = '#fff';
+                recognition.start();
+            });
+
+            recognition.onresult = (event) => {
+                const fraseFalada = event.results[0][0].transcript.toLowerCase();
+                statusVoz.innerText = `🗣️ Você disse: "${fraseFalada}"`;
+                
+                processarFraseVoz(fraseFalada);
+
+                setTimeout(() => { 
+                    statusVoz.style.display = 'none'; 
+                    statusVoz.innerText = '🎙️ Ouvindo... Pode falar algo como "Gastei 50 reais de gasolina".';
+                    btnVoz.style.background = 'rgba(0, 245, 212, 0.2)';
+                    btnVoz.style.color = 'var(--primary-cyan)';
+                }, 4000);
+            };
+
+            recognition.onerror = (event) => {
+                statusVoz.innerText = '❌ Erro no microfone: ' + event.error;
+                setTimeout(() => { statusVoz.style.display = 'none'; }, 3000);
+            };
+        } else {
+            btnVoz.addEventListener('click', () => {
+                alert("Infelizmente, o seu navegador não suporta reconhecimento de voz. Tente usar o Google Chrome.");
+            });
+        }
+    }
+
+    function processarFraseVoz(frase) {
+        // 1. EXTRAIR VALOR
+        // Procura por números. Ex: "150", "150 reais", "quinze reais e trinta"
+        let valorEncontrado = 0;
+        
+        // Converte palavras comuns de números para dígitos
+        let fraseNumerica = frase.replace(' um ', ' 1 ').replace(' dois ', ' 2 ').replace(' dez ', ' 10 ').replace(' vinte ', ' 20 ').replace(' cinquenta ', ' 50 ').replace(' cem ', ' 100 ');
+        
+        const numeroMatch = fraseNumerica.match(/\d+(?:[\.,]\d{1,2})?/); // Pega números como 150 ou 15.30
+        if (numeroMatch) {
+            valorEncontrado = parseFloat(numeroMatch[0].replace(',', '.'));
+        }
+
+        // 2. EXTRAIR CATEGORIA (Palavras-chave)
+        let categoriaDetectada = "💸 Outros";
+        let tipoDetectado = "despesa";
+
+        if (frase.includes('mercado') || frase.includes('supermercado') || frase.includes('compra')) categoriaDetectada = "🛒 Supermercado";
+        if (frase.includes('ifood') || frase.includes('almoço') || frase.includes('lanche') || frase.includes('pizza')) categoriaDetectada = "🍔 Lanches & Delivery";
+        if (frase.includes('gasolina') || frase.includes('posto')) categoriaDetectada = "⛽ Combustível";
+        if (frase.includes('uber') || frase.includes('transporte')) categoriaDetectada = "🚗 Uber / Transporte";
+        if (frase.includes('farmácia') || frase.includes('remédio') || frase.includes('médico')) categoriaDetectada = "💊 Saúde / Farmácia";
+        if (frase.includes('luz') || frase.includes('água') || frase.includes('aluguel') || frase.includes('internet')) categoriaDetectada = "🏠 Moradia / Contas";
+        
+        if (frase.includes('salário') || frase.includes('ganhei') || frase.includes('recebi')) {
+            categoriaDetectada = "💰 Salário";
+            tipoDetectado = "receita";
+        }
+
+        // 3. MONTAR A DESCRIÇÃO
+        // Pega a frase inteira e deixa a primeira letra maiúscula
+        let descricaoLimpa = frase.charAt(0).toUpperCase() + frase.slice(1);
+
+        // 4. PREENCHER O FORMULÁRIO SOZINHO
+        document.getElementById('descManual').value = descricaoLimpa;
+        if (valorEncontrado > 0) document.getElementById('valorManual').value = valorEncontrado;
+        document.getElementById('catManual').value = categoriaDetectada;
+        
+        const tipoSelect = document.getElementById('tipoManual');
+        if(tipoSelect) {
+            tipoSelect.value = tipoDetectado;
+            tipoSelect.dispatchEvent(new Event('change'));
+        }
+
+        // Dá um pequeno pulo na tela pro botão de salvar
+        document.getElementById('btnSalvarManual').focus();
+    }
+
+    // ==========================================
+    // MÁQUINA 1: LEITURA EM LOTE DA FATURA
     // ==========================================
     const inputFatura = document.getElementById('uploadFatura');
     const ocrStatus = document.getElementById('ocrStatus');
@@ -134,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MÁQUINA 2: LEITURA DE COMPROVANTE INDIVIDUAL (IA)
+    // MÁQUINA 2: LEITURA DE COMPROVANTE INDIVIDUAL
     // ==========================================
     const inputComprovante = document.getElementById('uploadComprovante');
     const ocrStatusComprovante = document.getElementById('ocrStatusComprovante');
@@ -221,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // FORMULÁRIO MANUAL (INCLUI EDIÇÃO E AGENDAMENTO FUTURO)
+    // FORMULÁRIO MANUAL E PARCELAMENTOS
     // ==========================================
     const formManual = document.getElementById('formManual');
     const btnSalvarManual = document.getElementById('btnSalvarManual');
@@ -244,11 +332,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!dados.contas) dados.contas = [];
 
             if (idEmEdicao) {
-                // EDIÇÃO DE TRANSAÇÃO EXISTENTE
                 const index = dados.contas.findIndex(c => c.id === idEmEdicao);
                 if (index !== -1) {
                     dados.contas[index] = { 
-                        ...dados.contas[index], 
+                        ...dados.contas[index],
                         dataExata: dataStr, 
                         descricao: descBase, 
                         valor: valorTotal, 
@@ -262,7 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnCancelarEdicao.style.display = "none";
                 document.getElementById('tituloManual').innerText = "✍️ Lançamento Manual / Agendamento";
             } else {
-                // CRIAÇÃO NOVA (Parcelamento ou Agendamento Futuro)
                 const valorPorParcela = valorTotal / qtdParcelas;
                 let [ano, mes, dia] = dataStr.split('-').map(Number);
 
@@ -308,9 +394,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ==========================================
-    // FUNÇÕES DE AÇÃO DA TABELA (EDITAR/APAGAR)
-    // ==========================================
     window.editarTransacao = function(id) {
         const dados = typeof getData === 'function' ? getData() : { contas: [] };
         const t = (dados.contas || []).find(c => c.id === id);
@@ -322,10 +405,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dataManual').value = t.dataExata;
             document.getElementById('descManual').value = t.descricao;
             document.getElementById('valorManual').value = t.valor;
-            document.getElementById('catManual').value = t.categoria || "💸 Outros";
+            document.getElementById('catManual').value = t.categoria || "🏠 Moradia / Contas";
             
             campoParcelas.value = 1;
-            campoParcelas.parentElement.style.display = 'none'; // Esconde parcela na edição
+            campoParcelas.parentElement.style.display = 'none';
 
             idEmEdicao = id;
             document.getElementById('tituloManual').innerText = "✏️ Editando Transação";
@@ -349,9 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    // ==========================================
-    // 🧹 REGRA DOS 3 PILARES: REMOÇÃO DE DUPLICATAS
-    // ==========================================
     window.limparDuplicatasInteligente = function() {
         const dados = typeof getData === 'function' ? getData() : { contas: [] };
         if (!dados.contas || dados.contas.length === 0) {
@@ -364,13 +444,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dados.contas.forEach(t => {
             const isDuplicata = transacoesUnicas.some(u => {
-                // Pilar 1: Mesma Data
                 const mesmaData = u.dataExata === t.dataExata;
-                // Pilar 2: Mesmo Valor (com tolerância de casas decimais)
                 const mesmoValor = Math.abs(parseFloat(u.valor) - parseFloat(t.valor)) < 0.01;
-                // Pilar 3: Mesmo Nome exato (ignorando letras maiúsculas e minúsculas)
                 const mesmoNome = (u.descricao || "").toLowerCase().trim() === (t.descricao || "").toLowerCase().trim();
-
                 return mesmaData && mesmoValor && mesmoNome;
             });
 
@@ -384,16 +460,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (transacoesDuplicadas.length > 0) {
             dados.contas = transacoesUnicas;
             if (typeof saveData === 'function') saveData(dados);
-            alert(`✅ Limpeza Concluída!\n\n${transacoesDuplicadas.length} registros perfeitamente idênticos (mesma data, mesmo valor E mesmo nome) foram removidos.`);
+            alert(`✅ Limpeza Concluída!\n\n${transacoesDuplicadas.length} registros perfeitamente idênticos foram removidos.`);
             renderizarTabela();
         } else {
-            alert("✨ Tudo limpo! O sistema não encontrou nenhuma transação duplicada com base na regra de Data + Valor + Nome.");
+            alert("✨ Tudo limpo! Não há transações duplicadas.");
         }
     };
 
-    // ==========================================
-    // RENDERIZAR TABELA E SOMAR VALORES
-    // ==========================================
+    const checkDadosTabela = setInterval(() => {
+        if (typeof getData === 'function') {
+            clearInterval(checkDadosTabela);
+            renderizarTabela();
+        }
+    }, 200);
+
     function renderizarTabela() {
         const corpoTabela = document.getElementById('corpoTabela');
         const tabelaRodape = document.getElementById('tabelaRodape');
@@ -435,11 +515,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const sinal = isReceita ? '+' : '-';
             const catDefault = isReceita ? '💰 Entrada' : '💸 Saída';
             
-            // 📅 Badge visual se a data for no futuro (Agendamento)
             const isFuturo = item.dataExata > hojeIso;
             const badgeFuturo = isFuturo ? `<span style="background: #fb8500; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: bold;">📅 Agendado</span>` : '';
-            
-            // Ícone se já foi pago no calendário
             const statusPago = item.tipo === 'despesa' ? (item.pago ? ' ✅' : ' ⏳') : '';
             
             return `
