@@ -4,130 +4,114 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkBD = setInterval(() => {
         if (typeof getData === 'function') {
             clearInterval(checkBD);
-            renderGems();
-            atualizarRegressiva();
+            calcularInteligencia();
         }
     }, 200);
 });
 
 // ==========================================
-// RENDERIZAR O PAINEL DE MISSÃO
+// MOTOR DE CÁLCULO E RENDERIZAÇÃO
 // ==========================================
-function renderGems() {
-    const container = document.getElementById('categoryContainer');
+function calcularInteligencia() {
+    const listContainer = document.getElementById('supplierList');
     const dados = typeof getData === 'function' ? getData() : {};
     let itens = (dados.casamento && dados.casamento.orcamento) ? dados.casamento.orcamento : [];
     
-    // 1. Agrupar os itens por Categoria
-    const categorias = {
-        "🍽️ Buffet & Festa": [],
-        "📸 Foto & Vídeo": [],
-        "👗 Trajes & Beleza": [],
-        "🎵 Música & Iluminação": [],
-        "🌸 Decoração": [],
-        "⛪ Cerimônia": [],
-        "✈️ Lua de Mel": [],
-        "📦 Outros": [] // Para itens antigos que não tinham categoria
-    };
+    let totalCusto = 0;
+    let totalPago = 0;
+    let qtdQuitados = 0;
 
-    let totalGeral = 0;
-    let pagoGeral = 0;
-
-    itens.forEach((item, index) => {
-        totalGeral += parseFloat(item.total) || 0;
-        pagoGeral += parseFloat(item.pago) || 0;
-        
-        // Mantém a referência do index original para poder editar/apagar
-        const itemComIndex = { ...item, originalIndex: index };
-        
-        const catDoItem = item.categoria || "📦 Outros";
-        if (categorias[catDoItem]) {
-            categorias[catDoItem].push(itemComIndex);
-        } else {
-            categorias["📦 Outros"].push(itemComIndex);
-        }
+    // 1. Organiza a lista: Pendentes no topo, Quitados no final
+    let itensMapeados = itens.map((item, index) => {
+        return { ...item, originalIndex: index };
     });
 
-    // 2. Desenhar as Gavetas (Accordions)
-    container.innerHTML = '';
-    
-    for (const [nomeCategoria, listaItens] of Object.entries(categorias)) {
-        if (listaItens.length === 0) continue; // Esconde a gaveta se não tiver item
+    itensMapeados.sort((a, b) => {
+        const aQuitado = (a.pago >= a.total && a.total > 0);
+        const bQuitado = (b.pago >= b.total && b.total > 0);
+        if (aQuitado === bQuitado) return 0;
+        return aQuitado ? 1 : -1; // Joga pra baixo se for true
+    });
 
-        let totalDaCat = 0;
-        let pagoDaCat = 0;
-        let htmlItens = '';
+    // 2. Renderiza a Lista Limpa
+    listContainer.innerHTML = '';
 
-        listaItens.forEach(item => {
-            totalDaCat += parseFloat(item.total) || 0;
-            pagoDaCat += parseFloat(item.pago) || 0;
-            const perc = item.total > 0 ? Math.round((item.pago / item.total) * 100) : 0;
-            
-            htmlItens += `
-                <div class="gem-card">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start">
-                        <h4 style="margin:0; font-size: 1.1rem; color: #fff;">${item.name}</h4>
-                        <button onclick="removerGema(${item.originalIndex})" style="background:none; border:none; color:var(--danger-red); cursor:pointer; font-size:1.2rem;" title="Apagar Item">✕</button>
-                    </div>
-                    <div style="color:var(--primary-cyan); font-weight:bold; margin-top:5px; font-size:1.1rem">${formatCurrency(item.total)}</div>
-                    
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="color: var(--text-muted); font-size: 0.8rem; margin-top: 10px;">JÁ PAGO:</span>
-                        <input type="number" class="pay-input" value="${item.pago}" onchange="atualizarPagamento(${item.originalIndex}, this.value)" placeholder="R$ 0,00">
-                    </div>
-                    
-                    <div class="gem-progress" style="width: ${perc}%"></div>
-                </div>
-            `;
-        });
+    if (itensMapeados.length === 0) {
+        listContainer.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 40px; border: 1px dashed var(--glass-border); border-radius: 16px;">Nenhum fornecedor cadastrado.</div>`;
+    }
 
-        const percCat = totalDaCat > 0 ? Math.round((pagoDaCat / totalDaCat) * 100) : 0;
-
-        // Monta a estrutura da gaveta
-        const catGroup = document.createElement('div');
-        catGroup.className = 'cat-group';
+    itensMapeados.forEach(item => {
+        const valTotal = parseFloat(item.total) || 0;
+        const valPago = parseFloat(item.pago) || 0;
+        const valFalta = valTotal - valPago;
+        const isQuitado = valPago >= valTotal && valTotal > 0;
         
-        catGroup.innerHTML = `
-            <div class="cat-header" onclick="this.parentElement.classList.toggle('active')">
-                <h3>${nomeCategoria}</h3>
-                <div class="cat-summary">
-                    <div class="cat-summary-total">${formatCurrency(totalDaCat)}</div>
-                    <div class="cat-summary-progress">Pago: ${percCat}%</div>
+        totalCusto += valTotal;
+        totalPago += valPago;
+        if (isQuitado) qtdQuitados++;
+
+        const categoriaDisplay = item.categoria ? item.categoria.split(' ')[0] : '📦 Outros'; // Pega só o ícone e primeira palavra
+
+        const htmlCard = `
+            <div class="supplier-card ${isQuitado ? 'quitado' : ''}">
+                
+                <div class="s-info">
+                    <div class="s-name">
+                        ${item.name} 
+                        ${isQuitado ? '✅' : ''}
+                    </div>
+                    <span class="s-cat">${categoriaDisplay}</span>
                 </div>
-            </div>
-            <div class="cat-body">
-                ${htmlItens}
+
+                <div class="s-finance">
+                    <div class="s-total">${formatCurrency(valTotal)}</div>
+                    ${!isQuitado ? `<div class="s-pendente">Falta: ${formatCurrency(valFalta)}</div>` : `<div style="color: var(--primary-cyan); font-size: 0.85rem; margin-top: 2px;">Quitado</div>`}
+                </div>
+
+                <div class="s-action">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                        <span style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 2px;">JÁ PAGO</span>
+                        <input type="number" class="pay-input" value="${item.pago}" onchange="atualizarPagamento(${item.originalIndex}, this.value)" placeholder="R$ 0,00" ${isQuitado ? 'disabled style="opacity: 0.5;"' : ''}>
+                    </div>
+                    <button class="btn-delete" onclick="removerItem(${item.originalIndex})" title="Apagar Contrato">🗑️</button>
+                </div>
+
             </div>
         `;
-        container.appendChild(catGroup);
-    }
-
-    // Se não tiver nada cadastrado
-    if (itens.length === 0) {
-        container.innerHTML = `<div style="text-align:center; color: var(--text-muted); padding: 40px;">Nenhum fornecedor cadastrado. Clique em "Adicionar" para começar.</div>`;
-    }
-
-    // 3. Atualizar o REACTOR ARC (Anel de Energia)
-    const percGeral = totalGeral > 0 ? Math.round((pagoGeral / totalGeral) * 100) : 0;
-    document.getElementById('percTotal').innerText = percGeral + '%';
-    document.getElementById('valTotal').innerText = `${formatCurrency(pagoGeral)} / ${formatCurrency(totalGeral)}`;
-    
-    // Cálculo matemático para desenhar o anel perfeitamente
-    const circulo = document.getElementById('anelProgresso');
-    if (circulo) {
-        const raio = circulo.r.baseVal.value;
-        const circunferencia = raio * 2 * Math.PI;
         
-        circulo.style.strokeDasharray = `${circunferencia} ${circunferencia}`;
-        const offset = circunferencia - (percGeral / 100) * circunferencia;
-        circulo.style.strokeDashoffset = offset;
+        listContainer.insertAdjacentHTML('beforeend', htmlCard);
+    });
 
-        // Se passar de 100% (Erro de cálculo do usuário), fica vermelho alerta
-        if (percGeral > 100) {
-            circulo.style.stroke = 'var(--danger-red)';
-        } else {
-            circulo.style.stroke = 'var(--primary-cyan)';
-        }
+    // 3. Atualiza a Ilha de Foco (Estatísticas)
+    const faltaPagarGeral = totalCusto - totalPago;
+    
+    document.getElementById('valTotalCusto').innerText = formatCurrency(totalCusto);
+    document.getElementById('valJaPago').innerText = formatCurrency(totalPago);
+    document.getElementById('valFaltaPagar').innerText = formatCurrency(faltaPagarGeral > 0 ? faltaPagarGeral : 0);
+    document.getElementById('contadorQuitados').innerText = `${qtdQuitados} Fornecedores Quitados`;
+
+    // 4. Calcula a Meta do Mês Baseada no Tempo
+    const dataCasamento = new Date('2026-08-29T00:00:00');
+    const hoje = new Date();
+    
+    // Diferença em meses aproximada
+    let mesesDiff = (dataCasamento.getFullYear() - hoje.getFullYear()) * 12;
+    mesesDiff -= hoje.getMonth();
+    mesesDiff += dataCasamento.getMonth();
+    
+    if (mesesDiff <= 0) mesesDiff = 1; // Se tiver no mês, divide por 1 pra não dar erro
+    
+    document.getElementById('mesesRestantes').innerText = mesesDiff;
+
+    // A Mágica: Divide o saldo devedor pelo número de meses que faltam
+    const metaMensal = faltaPagarGeral > 0 ? (faltaPagarGeral / mesesDiff) : 0;
+    
+    const divMeta = document.getElementById('metaDoMes');
+    if (metaMensal > 0) {
+        divMeta.innerText = formatCurrency(metaMensal);
+    } else {
+        divMeta.innerText = "Tudo Quitado! 🎉";
+        divMeta.style.color = "var(--primary-purple)";
     }
 }
 
@@ -145,7 +129,7 @@ window.fecharModal = () => document.getElementById('modalAdd').style.display = '
 window.salvarNovoItem = () => {
     const nome = document.getElementById('addNome').value.trim();
     const total = parseFloat(document.getElementById('addTotal').value) || 0;
-    const categoria = document.getElementById('addCat').value; // Puxa a categoria nova
+    const categoria = document.getElementById('addCat').value; 
 
     if(!nome || total <= 0) {
         alert("Preencha o nome do fornecedor e o valor total do contrato!");
@@ -156,7 +140,6 @@ window.salvarNovoItem = () => {
     if(!dados.casamento) dados.casamento = { convidados: [], orcamento: [] };
     if(!dados.casamento.orcamento) dados.casamento.orcamento = [];
 
-    // Salva incluindo a categoria
     dados.casamento.orcamento.push({ 
         name: nome, 
         total: total, 
@@ -167,14 +150,13 @@ window.salvarNovoItem = () => {
     if (typeof saveData === 'function') saveData(dados);
     
     fecharModal();
-    renderGems();
+    calcularInteligencia();
 };
 
 window.atualizarPagamento = function(index, valor) {
     const dados = typeof getData === 'function' ? getData() : {};
     let valFloat = parseFloat(valor) || 0;
     
-    // Trava para não deixar o cara dizer que pagou R$ 10.000 num contrato de R$ 5.000 (Evita bugar o anel)
     const totalDoItem = dados.casamento.orcamento[index].total;
     if (valFloat > totalDoItem) valFloat = totalDoItem;
     if (valFloat < 0) valFloat = 0;
@@ -182,37 +164,18 @@ window.atualizarPagamento = function(index, valor) {
     dados.casamento.orcamento[index].pago = valFloat;
     
     if (typeof saveData === 'function') saveData(dados);
-    renderGems();
+    calcularInteligencia();
     
-    // Se o pagamento bateu o total, chuva de confetes! 🎉
     if (valFloat === totalDoItem && totalDoItem > 0) {
         if (typeof dispararConfetes === 'function') dispararConfetes();
     }
 };
 
-window.removerGema = (index) => {
-    if(confirm("Deseja cancelar/remover o contrato com este fornecedor?")) {
+window.removerItem = (index) => {
+    if(confirm("Apagar este contrato permanentemente?")) {
         const dados = typeof getData === 'function' ? getData() : {};
         dados.casamento.orcamento.splice(index, 1);
         if (typeof saveData === 'function') saveData(dados);
-        renderGems();
+        calcularInteligencia();
     }
 };
-
-// ==========================================
-// CONTAGEM REGRESSIVA (O "SIM!")
-// ==========================================
-function atualizarRegressiva() {
-    const dataCasamento = new Date('2026-08-29T00:00:00');
-    // Força a meia-noite da data atual para não dar diferença por causa de hora
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0); 
-    
-    const diffTime = Math.abs(dataCasamento - hoje);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-    
-    const displayElement = document.getElementById('daysCount');
-    if (displayElement) {
-        displayElement.innerText = diffDays > 0 ? diffDays : "CHEGOU!";
-    }
-}
