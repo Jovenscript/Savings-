@@ -214,6 +214,35 @@ select optgroup { background-color: var(--primary-purple) !important; color: #ff
 .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary-purple), var(--primary-cyan)); box-shadow: 0 0 10px var(--primary-cyan); transition: width 0.5s ease-in-out; }
 
 /* =========================================
+   BOTÃO FLUTUANTE (FAST ACTION)
+========================================= */
+.fab-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary-cyan);
+    color: var(--bg-dark);
+    font-size: 2rem;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 245, 212, 0.5);
+    cursor: pointer;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fab-button:hover, .fab-button:active {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 245, 212, 0.8);
+}
+
+/* =========================================
    MÍDIAS DE RESPONSIVIDADE
 ========================================= */
 #hamburgerBtn { display: none; position: fixed; top: 15px; left: 15px; z-index: 10001; background: var(--primary-purple); color: white; border: none; border-radius: 8px; padding: 10px 15px; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
@@ -248,5 +277,7 @@ select optgroup { background-color: var(--primary-purple) !important; color: #ff
     .calendarSwiper .swiper-slide { width: 280px !important; height: 380px !important; }
     .month-controls h2 { font-size: 1.2rem; }
     .glass-panel { padding: 1.2rem; }
+    
+    /* Afasta o botão flutuante um pouco da beirada no celular */
+    .fab-button { bottom: 20px; right: 20px; }
 }
-
