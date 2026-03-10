@@ -6,13 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const userSwitch = document.getElementById('userSwitch');
     const data = getData();
     
-    // 1. ESCUDO DE CONFIGURAÇÃO
     if (!data.config) {
         data.config = { currentUser: 'ambos' };
         saveData(data);
     }
 
-    // 2. O ESCUDO DAS METAS 
     if (!data.metas) data.metas = [];
     
     if (data.metas.length === 0) {
@@ -38,12 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     updateDashboard();
 
-    // 🚀 O NOVO MOTOR DO SUPER APP (Substituindo o antigo Coverflow)
+    // 🧊 O NOVO MOTOR: EFEITO CUBO 3D 🧊
     if (document.querySelector(".superAppSwiper")) {
         new Swiper(".superAppSwiper", {
-            direction: "horizontal",
-            spaceBetween: 30,
+            effect: "cube", // A Mágica Acontece Aqui!
             grabCursor: true,
+            cubeEffect: {
+                shadow: true,
+                slideShadows: true,
+                shadowOffset: 20,
+                shadowScale: 0.94,
+            },
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true,
@@ -61,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// FUNÇÃO EDITAR METAS 
 window.editarMeta = function() {
     const data = getData();
     if(!data.metas || data.metas.length === 0) return;
@@ -112,16 +114,13 @@ function updateDashboard() {
     let entradasMes = 0;
     let saidasMes = 0;
 
-    // Calcula o Saldo Geral e os Totais do Mês
     todasAsMovimentacoes.forEach(curr => {
         const isReceita = curr.tipo && curr.tipo.toLowerCase() === 'receita';
         const valor = parseFloat(curr.valor) || 0;
         
-        // Saldo Geral
         if (isReceita) saldo += valor;
         else saldo -= valor;
 
-        // Totais apenas do Mês Atual
         const dataRef = curr.dataExata || curr.data || "";
         if (dataRef.startsWith(prefixoMes)) {
             if (isReceita) entradasMes += valor;
@@ -132,13 +131,11 @@ function updateDashboard() {
     const totalBalanceEl = document.getElementById('totalBalance');
     if (totalBalanceEl) totalBalanceEl.innerText = typeof formatCurrency === 'function' ? formatCurrency(saldo) : `R$ ${saldo.toFixed(2)}`;
 
-    // Atualiza o Resumo de Entradas e Saídas no HTML
     const resumoEntradasEl = document.getElementById('resumoEntradas');
     const resumoSaidasEl = document.getElementById('resumoSaidas');
     if (resumoEntradasEl) resumoEntradasEl.innerText = typeof formatCurrency === 'function' ? formatCurrency(entradasMes) : `R$ ${entradasMes.toFixed(2)}`;
     if (resumoSaidasEl) resumoSaidasEl.innerText = typeof formatCurrency === 'function' ? formatCurrency(saidasMes) : `R$ ${saidasMes.toFixed(2)}`;
 
-    // SISTEMA INTELIGENTE DE ALERTAS
     const contasFuturas = data.contas || [];
     const alertasDiv = document.getElementById('calendarAlerts');
     const dataHojeZero = new Date();
@@ -158,7 +155,6 @@ function updateDashboard() {
             const diffDias = Math.ceil(diffTempo / (1000 * 3600 * 24));
 
             const descUpper = conta.descricao ? conta.descricao.toUpperCase() : '';
-            // Ignora receitas no alerta de radar
             if (conta.tipo !== 'receita' && diffDias > 0 && diffDias <= 90) {
                 if (parseFloat(conta.valor) > 500 || descUpper.includes("IPVA") || descUpper.includes("IPTU") || descUpper.includes("SEGURO")) {
                     temAlertaPesado = true;
@@ -184,7 +180,6 @@ function updateDashboard() {
         }
     }
 
-    // ATUALIZAÇÃO DA ÁREA DE METAS
     const mainGoalEl = document.getElementById('mainGoal');
     if (mainGoalEl && data.metas && data.metas.length > 0) {
         const meta = data.metas[0];
@@ -221,7 +216,6 @@ function updateDashboard() {
         `;
     }
 
-    // Processa os Gráficos originais e as novas funções do Super App
     renderDonutChart(contasDoMes);
     if (document.getElementById('balanceChart')) {
         renderLineChartDinâmico(todasAsMovimentacoes);
@@ -230,20 +224,13 @@ function updateDashboard() {
     atualizarContagemCasamento();
 }
 
-// 🚀 NOVA FUNÇÃO: Atualiza a agenda de contas rápidas na Página 2
 function atualizarAgendaRapida(data) {
     const agendaDiv = document.getElementById('agendaRapida');
     if (!agendaDiv) return;
 
     let planejamento = data.planejamento || [];
-    
-    // Filtra as contas que não estão pagas
     const contasPendentes = planejamento.filter(c => c.tipo === 'saida' && c.ativo !== false && !c.pago);
-
-    // Ordena pelo dia de vencimento
     contasPendentes.sort((a, b) => (parseInt(a.diaVencimento) || 0) - (parseInt(b.diaVencimento) || 0));
-
-    // Pega só as 5 primeiras
     const proximasContas = contasPendentes.slice(0, 5);
 
     if (proximasContas.length === 0) {
@@ -265,18 +252,15 @@ function atualizarAgendaRapida(data) {
             </div>
         `;
     });
-
     agendaDiv.innerHTML = html;
 }
 
-// 🚀 NOVA FUNÇÃO: Atualiza a contagem do casamento na Página 3
 function atualizarContagemCasamento() {
     const elContagem = document.getElementById('contagemCasamento');
     if (!elContagem) return;
 
     const dataCasamento = new Date('2026-08-29T00:00:00');
     const hoje = new Date();
-    
     const diferencaTempo = dataCasamento.getTime() - hoje.getTime();
     const diasFaltantes = Math.ceil(diferencaTempo / (1000 * 3600 * 24));
 
@@ -289,7 +273,6 @@ function atualizarContagemCasamento() {
     }
 }
 
-// Gráfico de Rosca (Despesas do Mês)
 function renderDonutChart(contasDoMes) {
     const ctxElement = document.getElementById('donutChart');
     const avisoSemGastos = document.getElementById('semGastosAviso');
@@ -342,7 +325,6 @@ function renderDonutChart(contasDoMes) {
     });
 }
 
-// Gráfico de Linha Dinâmico (Evolução Real dos últimos 6 meses)
 function renderLineChartDinâmico(todasAsMovimentacoes) {
     const ctxElement = document.getElementById('balanceChart');
     if (!ctxElement) return;
@@ -352,24 +334,21 @@ function renderLineChartDinâmico(todasAsMovimentacoes) {
     const dadosPatrimonio = [];
     const nomesMeses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-    // 1. Constrói a linha do tempo (Últimos 6 meses até hoje)
     let dataAtual = new Date();
     for (let i = 5; i >= 0; i--) {
         let d = new Date(dataAtual.getFullYear(), dataAtual.getMonth() - i, 1);
         let ano = d.getFullYear();
         let mes = String(d.getMonth() + 1).padStart(2, '0');
         
-        mesesChaves.push(`${ano}-${mes}`); // Ex: '2026-01'
-        labelsGrafico.push(`${nomesMeses[d.getMonth()]}/${ano.toString().slice(-2)}`); // Ex: 'Jan/26'
+        mesesChaves.push(`${ano}-${mes}`);
+        labelsGrafico.push(`${nomesMeses[d.getMonth()]}/${ano.toString().slice(-2)}`);
     }
 
-    // 2. Calcula o Patrimônio Acumulado até o final de cada um desses meses
     mesesChaves.forEach(mesChave => {
         let saldoAteOMes = todasAsMovimentacoes.reduce((acc, curr) => {
             const dataRef = curr.dataExata || curr.data || "";
-            const prefixoConta = dataRef.substring(0, 7); // Pega só YYYY-MM da conta
+            const prefixoConta = dataRef.substring(0, 7);
             
-            // Se a transação aconteceu ANTES ou DURANTE o mês que estamos analisando
             if (prefixoConta <= mesChave) {
                 const isReceita = curr.tipo && curr.tipo.toLowerCase() === 'receita';
                 const valor = parseFloat(curr.valor) || 0;
