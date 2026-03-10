@@ -51,17 +51,25 @@
                     </div>
                 </div>
 
-                <div class="glass-panel" id="painelManual" style="margin-bottom: 30px; border-color: var(--primary-purple);">
+                <div class="glass-panel" id="painelManual" style="margin-bottom: 30px; border-color: var(--primary-purple); position: relative;">
                     
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px; gap: 10px;">
                         <h3 id="tituloManual" style="margin: 0;">✍️ Lançamento Manual / Agendamento</h3>
                         
-                        <div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <button id="btnVoz" title="Falar Lançamento" style="background: rgba(0, 245, 212, 0.2); border: 1px solid var(--primary-cyan); color: var(--primary-cyan); border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 0 10px rgba(0, 245, 212, 0.3);">
+                                🎙️
+                            </button>
+
                             <input type="file" id="uploadComprovante" accept="image/*" style="display: none;">
-                            <label for="uploadComprovante" class="btn-primary" style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer; background: rgba(157, 78, 221, 0.2); border: 1px solid var(--primary-purple); color: #fff; padding: 6px 15px; font-size: 0.85rem; border-radius: 20px; box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);">
-                                🧾 Escanear Comprovante (Pix/Nota)
+                            <label for="uploadComprovante" class="btn-primary" style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer; background: rgba(157, 78, 221, 0.2); border: 1px solid var(--primary-purple); color: #fff; padding: 6px 15px; font-size: 0.85rem; border-radius: 20px; margin-top: 0;">
+                                🧾 Escanear Comprovante
                             </label>
                         </div>
+                    </div>
+
+                    <div id="statusVoz" style="margin-bottom: 15px; color: var(--primary-cyan); font-weight: bold; font-size: 0.85rem; display: none;">
+                        🎙️ Ouvindo... Pode falar algo como "Gastei 50 reais de gasolina".
                     </div>
 
                     <div id="ocrStatusComprovante" style="margin-bottom: 15px; color: var(--primary-purple); font-weight: bold; font-size: 0.85rem; display: none;">
