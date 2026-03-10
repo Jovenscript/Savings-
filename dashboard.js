@@ -1,6 +1,7 @@
 // js/dashboard.js
 let meuDonutChart = null; 
 let meuLineChart = null; 
+let superAppSwiper = null; // Variável global para o cubo
 
 document.addEventListener('DOMContentLoaded', () => {
     const userSwitch = document.getElementById('userSwitch');
@@ -36,10 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     updateDashboard();
 
-    // 🧊 O NOVO MOTOR: EFEITO CUBO 3D 🧊
+    // 🧊 MOTOR DO CUBO BLINDADO CONTRA VOLTA DE PÁGINA 🧊
     if (document.querySelector(".superAppSwiper")) {
-        new Swiper(".superAppSwiper", {
-            effect: "cube", // A Mágica Acontece Aqui!
+        if (superAppSwiper) superAppSwiper.destroy(true, true);
+        
+        superAppSwiper = new Swiper(".superAppSwiper", {
+            effect: "cube",
             grabCursor: true,
             cubeEffect: {
                 shadow: true,
@@ -50,7 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true,
-            }
+            },
+            observer: true,       // Mágica 1: Observa mudanças e recarrega
+            observeParents: true  // Mágica 2: Evita bugar ao sair e voltar
         });
     }
 
