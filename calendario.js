@@ -1,299 +1,172 @@
+// convidados.js
+
+let tinderSwiper = null;
+
 document.addEventListener('DOMContentLoaded', () => {
-    const wrapper = document.getElementById('calendarWrapper');
-    const formRecorrente = document.getElementById('formRecorrente');
-    const formTitle = document.getElementById('formTitle');
-    const mesAtualTitulo = document.getElementById('mesAtualTitulo');
+    const checkDados = setInterval(() => {
+        if (typeof getData === 'function') {
+            clearInterval(checkDados);
+            renderCards();
+        }
+    }, 200);
+
+    const form = document.getElementById('formManualGuest');
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const input = document.getElementById('manualName');
+            adicionarNomes([input.value]);
+            input.value = '';
+        });
+    }
+});
+
+function renderCards() {
+    const wrapper = document.getElementById('tinderWrapper');
+    const dados = getData();
+    if (!dados.casamento) dados.casamento = { convidados: [] };
     
-    const totalMesValor = document.getElementById('totalMesValor');
-    const totalMesQtd = document.getElementById('totalMesQtd');
-    const btnPrevMonth = document.getElementById('btnPrevMonth');
-    const btnNextMonth = document.getElementById('btnNextMonth');
+    // Todos os pendentes para atualizar o contador
+    const todosPendentes = dados.casamento.convidados.filter(g => g.status === 'pending');
+    document.getElementById('counter').innerText = `${todosPendentes.length} aguardando decisão`;
 
-    const btnToggleView = document.getElementById('btnToggleView');
-    const dayCarouselView = document.getElementById('dayCarouselView');
-    const monthGridView = document.getElementById('monthGridView');
-    const monthGrid = document.getElementById('monthGrid');
+    // 🚀 OTIMIZAÇÃO: Desenha só 10 de cada vez para o celular voar sem travar
+    const pendentesRender = todosPendentes.slice(0, 10);
 
-    const tipoEvento = document.getElementById('tipoEvento');
-    const blocoValor = document.getElementById('blocoValor');
-    const blocoHorario = document.getElementById('blocoHorario');
-    const valorConta = document.getElementById('valorConta');
-    const horarioRotina = document.getElementById('horarioRotina');
+    wrapper.innerHTML = '';
+    
+    if (todosPendentes.length === 0) {
+        wrapper.innerHTML = `<div class="swiper-slide guest-card"><h2>🎉 Fim da Lista!</h2><p>Tudo pronto para o grande dia.</p></div>`;
+    } else {
+        pendentesRender.forEach(g => {
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide guest-card';
+            slide.dataset.id = g.id;
+            slide.innerHTML = `<div class="guest-name">${g.name}</div><p style="color:var(--text-muted)">Vai estar presente?</p>`;
+            wrapper.appendChild(slide);
+        });
+    }
 
-    const diasSemana = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
-    const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-
-    let calendarSwiper = null; 
-    let dataNavegacao = new Date(); 
-    dataNavegacao.setDate(1); 
-    dataNavegacao.setHours(12, 0, 0, 0); 
-    let diaAtivoNoCard = new Date().getDate(); 
-    let isMonthView = false; 
-
-    window.apagarEvento = function(id) {
-        if(confirm("Deseja apagar este evento do calendário?")) {
-            const dados = getData();
-            if (dados.contas) {
-                dados.contas = dados.contas.filter(c => c.id !== id);
-                saveData(dados);
-                renderizarMesAtual(diaAtivoNoCard); 
-            }
-        }
-    };
-
-    // 🚀 LÓGICA NOVA: Função para alternar entre Pago/Pendente
-    window.alternarStatusPagamento = function(id) {
-        const dados = getData();
-        if (dados.contas) {
-            const index = dados.contas.findIndex(c => c.id === id);
-            if (index !== -1) {
-                // Inverte o status: se era falso vira verdadeiro e vice-versa
-                dados.contas[index].pago = !dados.contas[index].pago;
-                saveData(dados); // Manda para o Firebase!
-                renderizarMesAtual(diaAtivoNoCard); // Recarrega o carrossel
-            }
-        }
-    };
-
-    tipoEvento.addEventListener('change', (e) => {
-        if (e.target.value === 'conta') {
-            blocoValor.style.display = 'block';
-            valorConta.required = true;
-            blocoHorario.style.display = 'none';
-            horarioRotina.required = false;
-        } else {
-            blocoValor.style.display = 'none';
-            valorConta.required = false;
-            blocoHorario.style.display = 'block';
-            horarioRotina.required = true;
-        }
+    if (tinderSwiper) tinderSwiper.destroy(true, true);
+    
+    // VOLTAMOS PARA O EFEITO TINDER (Elegante e limpo, porque só tem 10 cartas)
+    tinderSwiper = new Swiper(".tinderSwiper", { 
+        effect: "cards", 
+        grabCursor: true,
+        cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, rotate: true, slideShadows: false }
     });
 
-    function formatDateIso(ano, mes, dia) {
-        return `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
-    }
+    renderListasDeStatus(dados.casamento.convidados);
+}
 
-    function renderizarMesAtual(diaAlvo = null) {
-        if (calendarSwiper) {
-            calendarSwiper.destroy(true, true);
-            calendarSwiper = null;
-        }
-        
-        wrapper.innerHTML = '';
-        const ano = dataNavegacao.getFullYear();
-        const mes = dataNavegacao.getMonth();
-        mesAtualTitulo.innerText = `${mesesNomes[mes]} ${ano}`;
-        
-        const diasNoMes = new Date(ano, mes + 1, 0).getDate();
-        if (diaAtivoNoCard > diasNoMes) diaAtivoNoCard = diasNoMes;
-        if (diaAlvo !== null) diaAtivoNoCard = diaAlvo;
-
+// ==========================================
+// DECISÃO COM ANIMAÇÃO RAPIDA
+// ==========================================
+window.decidirStatus = (status) => {
+    if (!tinderSwiper || !tinderSwiper.slides.length) return;
+    
+    const activeIndex = tinderSwiper.activeIndex;
+    const activeSlide = tinderSwiper.slides[activeIndex];
+    const id = activeSlide ? activeSlide.dataset.id : null;
+    
+    if (id) {
         const dados = getData();
-        if (!dados.contas) dados.contas = [];
+        const g = dados.casamento.convidados.find(x => x.id === id);
         
-        const contas = dados.contas;
-        let somaMes = 0;
-        let qtdContasMes = 0;
-
-        for (let d = 1; d <= diasNoMes; d++) {
-            const strData = formatDateIso(ano, mes, d);
-            const dataFoco = new Date(ano, mes, d, 12, 0, 0);
-            const nomeDia = diasSemana[dataFoco.getDay()];
-            const itensDoDia = contas.filter(c => c.dataExata === strData);
+        if (g) { 
+            g.status = status; 
+            saveData(dados); 
             
-            let htmlItens = '';
-            if (itensDoDia.length === 0) {
-                htmlItens = `<div style="text-align: center; color: var(--text-muted); margin-top: 50px; font-style: italic; font-size: 0.9rem;">Dia livre!</div>`;
-            } else {
-                itensDoDia.forEach(item => {
-                    // 🚀 AJUSTE: Permite ler tanto as 'contas' do calendário quanto as 'despesas' das Transações
-                    const isConta = item.tipo === 'conta' || item.tipo === 'despesa' || !item.tipo; 
-                    const botaoHTML = `<button onclick="apagarEvento(${item.id})" style="background: none; border: none; color: var(--danger-red); font-size: 0.75rem; cursor: pointer; text-decoration: underline; margin-top: 2px;">Apagar</button>`;
-
-                    if (isConta) {
-                        somaMes += item.valor;
-                        qtdContasMes++;
-                        
-                        // 🚀 NOVO BOTÃO DE PAGO INJETADO NO SEU DESIGN
-                        let txtPago = item.pago ? '✅ Pago' : '💸 Pagar';
-                        let corPago = item.pago ? 'var(--primary-cyan)' : 'var(--danger-red)';
-                        let opacidade = item.pago ? 'opacity: 0.6;' : 'opacity: 1;';
-                        
-                        let botaoPago = `<button onclick="alternarStatusPagamento(${item.id})" style="background: rgba(0,0,0,0.5); border: 1px solid ${corPago}; color: ${corPago}; font-size: 0.75rem; cursor: pointer; padding: 3px 8px; border-radius: 5px; margin-right: 8px;">${txtPago}</button>`;
-
-                        htmlItens += `
-                            <div style="padding: 8px 10px; background: rgba(0,0,0,0.4); border-left: 3px solid ${corPago}; border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; ${opacidade} transition: 0.3s;">
-                                <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px;">
-                                    <strong style="color: #fff; font-size: 0.85rem;">${item.descricao}</strong>
-                                </div>
-                                <div style="text-align: right; min-width: 120px; display: flex; flex-direction: column; align-items: flex-end;">
-                                    <div style="font-weight: bold; color: ${corPago}; font-size: 0.85rem; margin-bottom: 5px;">${formatCurrency(item.valor)}</div>
-                                    <div style="display: flex;">
-                                        ${botaoPago}
-                                        ${botaoHTML}
-                                    </div>
-                                </div>
-                            </div>`;
-                    } else {
-                        htmlItens += `
-                            <div style="padding: 8px 10px; background: rgba(157, 78, 221, 0.1); border-left: 3px solid var(--primary-purple); border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
-                                <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px;">
-                                    <strong style="color: #fff; font-size: 0.85rem;">${item.descricao}</strong>
-                                </div>
-                                <div style="text-align: right; min-width: 70px;">
-                                    <div style="font-weight: bold; color: var(--text-muted); font-size: 0.85rem;">🕒 ${item.horario}</div>
-                                    ${botaoHTML}
-                                </div>
-                            </div>`;
-                    }
-                });
-            }
-
-            const card = document.createElement('div');
-            card.className = 'swiper-slide glass-panel';
-            card.dataset.diaReal = d;
+            // Joga a carta para fora rápido
+            activeSlide.style.transition = 'all 0.3s ease-out';
+            activeSlide.style.transform = status === 'yes' ? 'translate(200px, -50px) rotate(30deg)' : 'translate(-200px, -50px) rotate(-30deg)';
+            activeSlide.style.opacity = '0';
             
-            card.style.display = 'flex';
-            card.style.flexDirection = 'column';
-            card.style.height = '100%'; 
-
-            card.innerHTML = `
-                <div style="text-align: center; margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; flex-shrink: 0;">
-                    <h2 style="font-size: 3.5rem; color: var(--primary-cyan); margin: 0;">${d}</h2>
-                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: bold;">${nomeDia}</span>
-                </div>
-                <div class="scroll-interno" style="flex: 1; overflow-y: auto; padding-right: 5px;">
-                    ${htmlItens}
-                </div>`;
-            wrapper.appendChild(card);
-        }
-
-        if (totalMesValor) totalMesValor.innerText = formatCurrency(somaMes);
-        if (totalMesQtd) totalMesQtd.innerText = `${qtdContasMes} faturas pendentes`;
-
-        renderizarGradeMes(ano, mes, diasNoMes, contas);
-        if (!isMonthView) iniciarSwiper(diaAtivoNoCard);
-        atualizarTituloForm();
-    }
-
-    function iniciarSwiper(diaAlvo) {
-        calendarSwiper = new Swiper(".calendarSwiper", {
-            effect: "coverflow", 
-            grabCursor: true, 
-            touchRatio: 1.5, 
-            centeredSlides: true,
-            slidesPerView: "auto",
-            coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false },
-            initialSlide: diaAlvo - 1, 
-            navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
-            on: {
-                slideChange: function () {
-                    const slideAtual = this.slides[this.activeIndex];
-                    if (slideAtual) {
-                        diaAtivoNoCard = parseInt(slideAtual.dataset.diaReal);
-                        atualizarTituloForm();
-                        atualizarSelecaoNaGrade();
-                    }
-                }
-            }
-        });
-    }
-
-    function renderizarGradeMes(ano, mes, diasNoMes, contas) {
-        monthGrid.innerHTML = '';
-        const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
-        for (let i = 0; i < primeiroDiaSemana; i++) { monthGrid.innerHTML += `<div></div>`; }
-
-        for (let d = 1; d <= diasNoMes; d++) {
-            const strData = formatDateIso(ano, mes, d);
-            const temEvento = contas.some(c => c.dataExata === strData);
-            const divDia = document.createElement('div');
-            divDia.className = `grid-day ${diaAtivoNoCard === d ? 'selected-day' : ''}`;
-            let indicador = temEvento ? '<div class="indicador-ponto"></div>' : '';
-            divDia.innerHTML = `<span>${d}</span> ${indicador}`;
-            
-            divDia.addEventListener('click', () => {
-                diaAtivoNoCard = d;
-                isMonthView = false;
-                monthGridView.style.display = 'none';
-                dayCarouselView.style.display = 'flex';
-                renderizarMesAtual(d);
-            });
-            monthGrid.appendChild(divDia);
+            // Recarrega o baralho na hora (como são 10, é instantâneo e liso)
+            setTimeout(() => {
+                renderCards(); 
+            }, 300); 
         }
     }
+};
 
-    function atualizarSelecaoNaGrade() {
-        document.querySelectorAll('.grid-day').forEach(el => el.classList.remove('selected-day'));
-        const diasGrid = monthGrid.children;
-        const primeiroDiaSemana = new Date(dataNavegacao.getFullYear(), dataNavegacao.getMonth(), 1).getDay();
-        const indexNaGrid = diaAtivoNoCard + primeiroDiaSemana - 1;
-        if (diasGrid[indexNaGrid]) diasGrid[indexNaGrid].classList.add('selected-day');
+// ==========================================
+// LISTAS DE CONFIRMADOS E RECUSADOS
+// ==========================================
+function renderListasDeStatus(todosConvidados) {
+    const confirmados = todosConvidados.filter(g => g.status === 'yes');
+    const recusados = todosConvidados.filter(g => g.status === 'no');
+
+    const countYes = document.getElementById('countYes');
+    const countNo = document.getElementById('countNo');
+    
+    if(countYes) countYes.innerText = confirmados.length;
+    if(countNo) countNo.innerText = recusados.length;
+
+    const gerarHtmlLista = (lista) => {
+        if (lista.length === 0) return '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-top: 20px;">Ninguém ainda.</p>';
+        
+        return lista.map(g => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <span style="color: #fff; font-weight: bold; font-size: 0.95rem;">${g.name}</span>
+                <button onclick="desfazerStatus('${g.id}')" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; text-decoration: underline; transition: 0.3s;">Desfazer</button>
+            </div>
+        `).join('');
+    };
+
+    const divConf = document.getElementById('listaConfirmados');
+    const divRec = document.getElementById('listaRecusados');
+    
+    if(divConf) divConf.innerHTML = gerarHtmlLista(confirmados);
+    if(divRec) divRec.innerHTML = gerarHtmlLista(recusados);
+}
+
+window.desfazerStatus = (id) => {
+    const dados = getData();
+    const g = dados.casamento.convidados.find(x => x.id === id);
+    if (g) {
+        g.status = 'pending'; 
+        saveData(dados);
+        renderCards(); 
     }
+};
 
-    if (btnToggleView) {
-        btnToggleView.addEventListener('click', () => {
-            isMonthView = !isMonthView;
-            if (isMonthView) {
-                dayCarouselView.style.display = 'none';
-                monthGridView.style.display = 'block';
-                btnToggleView.innerHTML = '🃏 Voltar para as Cartas';
-            } else {
-                monthGridView.style.display = 'none';
-                dayCarouselView.style.display = 'flex';
-                btnToggleView.innerHTML = '📅 Abrir Visão do Mês Completo';
-                renderizarMesAtual(diaAtivoNoCard);
-            }
+// ==========================================
+// FUNÇÕES DE CADASTRO E EXCEL
+// ==========================================
+window.importarExcel = function() {
+    const area = document.getElementById('excelPasteArea');
+    const texto = area.value.trim();
+    if (!texto) return;
+
+    let novosNomes = [];
+    const linhas = texto.split(/\r?\n/);
+    linhas.forEach(l => {
+        const colunas = l.split(/\t|;/);
+        colunas.forEach(c => {
+            const nome = c.trim();
+            if (nome.length > 2) novosNomes.push(nome);
         });
-    }
+    });
+    
+    const r = adicionarNomes(novosNomes);
+    area.value = '';
+    alert(`✅ ${r.novos} adicionados | ⚠️ ${r.velhos} duplicados pulados.`);
+};
 
-    function atualizarTituloForm() {
-        const ano = dataNavegacao.getFullYear();
-        const mesStr = String(dataNavegacao.getMonth() + 1).padStart(2, '0');
-        const diaStr = String(diaAtivoNoCard).padStart(2, '0');
-        if (formTitle) formTitle.innerText = `AGENDAR PARA: ${diaStr}/${mesStr}/${ano}`;
-    }
+function adicionarNomes(lista) {
+    const dados = getData();
+    if (!dados.casamento) dados.casamento = { convidados: [] };
+    let n = 0, v = 0;
 
-    if (btnPrevMonth) {
-        btnPrevMonth.addEventListener('click', () => {
-            dataNavegacao.setMonth(dataNavegacao.getMonth() - 1);
-            renderizarMesAtual(1); 
-        });
-    }
+    lista.forEach(nome => {
+        const existe = dados.casamento.convidados.some(g => g.name.toLowerCase() === nome.toLowerCase());
+        if (!existe) {
+            dados.casamento.convidados.push({ id: 'g-'+Date.now()+Math.random(), name: nome, status: 'pending' });
+            n++;
+        } else { v++; }
+    });
 
-    if (btnNextMonth) {
-        btnNextMonth.addEventListener('click', () => {
-            dataNavegacao.setMonth(dataNavegacao.getMonth() + 1);
-            renderizarMesAtual(1); 
-        });
-    }
-
-    if (formRecorrente) {
-        formRecorrente.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const dados = getData();
-            if (!dados.contas) dados.contas = [];
-
-            const dataExata = formatDateIso(dataNavegacao.getFullYear(), dataNavegacao.getMonth(), diaAtivoNoCard);
-            const novoItem = {
-                id: Date.now(),
-                descricao: document.getElementById('descEvento').value,
-                tipo: tipoEvento.value,
-                dataExata: dataExata,
-                valor: tipoEvento.value === 'conta' ? parseFloat(valorConta.value) : 0,
-                horario: tipoEvento.value === 'rotina' ? horarioRotina.value : '',
-                categoria: "Lançamento Manual",
-                pago: false // 🚀 NASCE PENDENTE!
-            };
-            
-            dados.contas.push(novoItem);
-            saveData(dados); // Manda pro Firebase!
-            renderizarMesAtual(diaAtivoNoCard);
-            formRecorrente.reset();
-            tipoEvento.dispatchEvent(new Event('change'));
-        });
-    }
-
-    if (tipoEvento) tipoEvento.dispatchEvent(new Event('change'));
-    renderizarMesAtual();
-});
+    if (n > 0) { saveData(dados); renderCards(); }
+    return { novos: n, velhos: v };
+}
