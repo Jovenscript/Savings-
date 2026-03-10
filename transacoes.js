@@ -2,11 +2,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ==========================================
-    // SISTEMA DE FILTRO DE MÊS
+    // SISTEMA DE FILTRO DE MÊS E TELA
     // ==========================================
     const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     let dataFiltro = new Date(); 
     dataFiltro.setDate(1);
+
+    // Seta a data de hoje ao abrir o formulário
+    const inputDataManual = document.getElementById('dataManual');
+    if (inputDataManual) inputDataManual.value = new Date().toISOString().split('T')[0];
 
     const btnPrevMonth = document.getElementById('btnPrevMonthTrans');
     const btnNextMonth = document.getElementById('btnNextMonthTrans');
@@ -33,8 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
         tipoManualSelect.dispatchEvent(new Event('change'));
     }
 
+    // Carrega a tabela inicial
+    const checkDados = setInterval(() => {
+        if (typeof getData === 'function') {
+            clearInterval(checkDados);
+            renderizarTabela();
+        }
+    }, 200);
+
     // ==========================================
-    // MÁQUINA 1: LEITURA EM LOTE DA FATURA
+    // MÁQUINA 1: LEITURA EM LOTE DA FATURA (IA)
     // ==========================================
     const inputFatura = document.getElementById('uploadFatura');
     const ocrStatus = document.getElementById('ocrStatus');
@@ -96,13 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (!jaExiste) {
                         dados.contas.push({
-                            id: Date.now() + Math.random(), // ID Único gerado
+                            id: Date.now() + Math.random(),
                             descricao: descricao,
                             valor: valorNumerico,
                             dataExata: dataDia11,
                             categoria: "💳 Cartão de Crédito",
                             tipo: "despesa",
-                            pago: false // 🚀 ADICIONADO: Nasce como pendente no calendário
+                            pago: false 
                         });
                         transacoesAdicionadas++;
                     } else {
@@ -122,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // MÁQUINA 2: LEITURA DE COMPROVANTE INDIVIDUAL
+    // MÁQUINA 2: LEITURA DE COMPROVANTE INDIVIDUAL (IA)
     // ==========================================
     const inputComprovante = document.getElementById('uploadComprovante');
     const ocrStatusComprovante = document.getElementById('ocrStatusComprovante');
@@ -209,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // FORMULÁRIO MANUAL E PARCELAMENTOS
+    // FORMULÁRIO MANUAL (INCLUI EDIÇÃO E AGENDAMENTO FUTURO)
     // ==========================================
     const formManual = document.getElementById('formManual');
     const btnSalvarManual = document.getElementById('btnSalvarManual');
@@ -232,10 +244,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!dados.contas) dados.contas = [];
 
             if (idEmEdicao) {
+                // EDIÇÃO DE TRANSAÇÃO EXISTENTE
                 const index = dados.contas.findIndex(c => c.id === idEmEdicao);
                 if (index !== -1) {
                     dados.contas[index] = { 
-                        ...dados.contas[index], // Mantém as propriedades antigas, incluindo se está pago!
+                        ...dados.contas[index], 
                         dataExata: dataStr, 
                         descricao: descBase, 
                         valor: valorTotal, 
@@ -247,7 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 campoParcelas.parentElement.style.display = 'block';
                 btnSalvarManual.innerText = "Adicionar";
                 btnCancelarEdicao.style.display = "none";
+                document.getElementById('tituloManual').innerText = "✍️ Lançamento Manual / Agendamento";
             } else {
+                // CRIAÇÃO NOVA (Parcelamento ou Agendamento Futuro)
                 const valorPorParcela = valorTotal / qtdParcelas;
                 let [ano, mes, dia] = dataStr.split('-').map(Number);
 
@@ -267,13 +282,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         dataExata: dataFinal,
                         categoria: cat,
                         tipo: tipoLancamento,
-                        pago: tipoLancamento === 'despesa' ? false : true // 🚀 ADICIONADO: Despesas nascem pendentes
+                        pago: tipoLancamento === 'despesa' ? false : true 
                     });
                 }
             }
 
             if (typeof saveData === 'function') saveData(dados);
             formManual.reset();
+            document.getElementById('dataManual').value = new Date().toISOString().split('T')[0];
             if(tipoManualSelect) tipoManualSelect.dispatchEvent(new Event('change'));
             renderizarTabela();
         });
@@ -282,16 +298,18 @@ document.addEventListener('DOMContentLoaded', () => {
             btnCancelarEdicao.addEventListener('click', () => {
                 idEmEdicao = null;
                 formManual.reset();
+                document.getElementById('dataManual').value = new Date().toISOString().split('T')[0];
                 if(tipoManualSelect) tipoManualSelect.dispatchEvent(new Event('change'));
                 campoParcelas.parentElement.style.display = 'block';
                 btnSalvarManual.innerText = "Adicionar";
                 btnCancelarEdicao.style.display = "none";
+                document.getElementById('tituloManual').innerText = "✍️ Lançamento Manual / Agendamento";
             });
         }
     }
 
     // ==========================================
-    // FUNÇÕES DE AÇÃO DA TABELA
+    // FUNÇÕES DE AÇÃO DA TABELA (EDITAR/APAGAR)
     // ==========================================
     window.editarTransacao = function(id) {
         const dados = typeof getData === 'function' ? getData() : { contas: [] };
@@ -304,12 +322,13 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dataManual').value = t.dataExata;
             document.getElementById('descManual').value = t.descricao;
             document.getElementById('valorManual').value = t.valor;
-            document.getElementById('catManual').value = t.categoria || "🏠 Moradia / Contas";
+            document.getElementById('catManual').value = t.categoria || "💸 Outros";
             
             campoParcelas.value = 1;
-            campoParcelas.parentElement.style.display = 'none';
+            campoParcelas.parentElement.style.display = 'none'; // Esconde parcela na edição
 
             idEmEdicao = id;
+            document.getElementById('tituloManual').innerText = "✏️ Editando Transação";
             btnSalvarManual.innerText = "💾 Salvar Alteração";
             btnCancelarEdicao.style.display = "block";
             document.getElementById('painelManual').scrollIntoView({ behavior: 'smooth' });
@@ -329,6 +348,48 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof formatCurrency === 'function') return formatCurrency(valor);
         return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
+
+    // ==========================================
+    // 🧹 REGRA DOS 3 PILARES: REMOÇÃO DE DUPLICATAS
+    // ==========================================
+    window.limparDuplicatasInteligente = function() {
+        const dados = typeof getData === 'function' ? getData() : { contas: [] };
+        if (!dados.contas || dados.contas.length === 0) {
+            alert("Nenhuma transação registrada no sistema para analisar.");
+            return;
+        }
+
+        const transacoesUnicas = [];
+        const transacoesDuplicadas = [];
+
+        dados.contas.forEach(t => {
+            const isDuplicata = transacoesUnicas.some(u => {
+                // Pilar 1: Mesma Data
+                const mesmaData = u.dataExata === t.dataExata;
+                // Pilar 2: Mesmo Valor (com tolerância de casas decimais)
+                const mesmoValor = Math.abs(parseFloat(u.valor) - parseFloat(t.valor)) < 0.01;
+                // Pilar 3: Mesmo Nome exato (ignorando letras maiúsculas e minúsculas)
+                const mesmoNome = (u.descricao || "").toLowerCase().trim() === (t.descricao || "").toLowerCase().trim();
+
+                return mesmaData && mesmoValor && mesmoNome;
+            });
+
+            if (isDuplicata) {
+                transacoesDuplicadas.push(t);
+            } else {
+                transacoesUnicas.push(t);
+            }
+        });
+
+        if (transacoesDuplicadas.length > 0) {
+            dados.contas = transacoesUnicas;
+            if (typeof saveData === 'function') saveData(dados);
+            alert(`✅ Limpeza Concluída!\n\n${transacoesDuplicadas.length} registros perfeitamente idênticos (mesma data, mesmo valor E mesmo nome) foram removidos.`);
+            renderizarTabela();
+        } else {
+            alert("✨ Tudo limpo! O sistema não encontrou nenhuma transação duplicada com base na regra de Data + Valor + Nome.");
+        }
+    };
 
     // ==========================================
     // RENDERIZAR TABELA E SOMAR VALORES
@@ -359,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         filtradas.sort((a, b) => new Date(b.dataExata) - new Date(a.dataExata));
+        const hojeIso = new Date().toISOString().split('T')[0];
 
         corpoTabela.innerHTML = filtradas.map(item => {
             const valorNum = parseFloat(item.valor) || 0;
@@ -373,13 +435,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const sinal = isReceita ? '+' : '-';
             const catDefault = isReceita ? '💰 Entrada' : '💸 Saída';
             
-            // Ícone extra na tabela para você saber se já pagou!
+            // 📅 Badge visual se a data for no futuro (Agendamento)
+            const isFuturo = item.dataExata > hojeIso;
+            const badgeFuturo = isFuturo ? `<span style="background: #fb8500; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; margin-left: 8px; font-weight: bold;">📅 Agendado</span>` : '';
+            
+            // Ícone se já foi pago no calendário
             const statusPago = item.tipo === 'despesa' ? (item.pago ? ' ✅' : ' ⏳') : '';
             
             return `
                 <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                     <td style="padding: 15px;">${dataBr}</td>
-                    <td style="padding: 15px; font-weight: bold; color: #fff;">${item.descricao}${statusPago}</td>
+                    <td style="padding: 15px; font-weight: bold; color: #fff;">${item.descricao}${badgeFuturo}${statusPago}</td>
                     <td style="padding: 15px;"><span style="background: rgba(255,255,255,0.05); color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 0.85rem;">${item.categoria || catDefault}</span></td>
                     <td style="padding: 15px; color: ${corValor}; font-weight: bold;">${sinal} ${valorFormatado}</td>
                     <td style="padding: 15px;">
@@ -401,13 +467,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span style="color: var(--danger-red); margin-right: 15px; display: inline-block;">Saídas: ${formatarDinheiro(somaDespesas)}</span>
                         <br>SALDO DO MÊS:
                     </td>
-                    <td colspan="2" style="padding: 15px; color: ${corSaldo}; font-weight: bold; font-size: 1.3rem;">
+                    <td colspan="2" style="padding: 15px; font-size: 1.2rem; font-weight: bold; color: ${corSaldo};">
                         ${formatarDinheiro(saldoMes)}
                     </td>
                 </tr>
             `;
         }
     }
-
-    renderizarTabela();
 });
