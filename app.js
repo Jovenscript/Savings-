@@ -12,8 +12,8 @@ window.dispararConfetes = function() {
     }
 };
 
-let escudoAtivado = false;
-if (!localStorage.getItem('gemsEliteData')) escudoAtivado = true; 
+// Tornando o escudo global para o index.html conseguir desativar depois do Onboarding
+window.escudoAtivado = !localStorage.getItem('gemsEliteData'); 
 
 function getData() {
     return JSON.parse(localStorage.getItem('gemsEliteData')) || {};
@@ -21,7 +21,8 @@ function getData() {
 
 function saveData(data) {
     localStorage.setItem('gemsEliteData', JSON.stringify(data));
-    if (!escudoAtivado) {
+    // Se o escudo não estiver ativo, despacha pra nuvem!
+    if (!window.escudoAtivado) {
         sincronizarComFirebase(data);
     } else {
         console.log("🛡️ Upload bloqueado. Aguardando a nuvem...");
@@ -36,7 +37,7 @@ async function sincronizarComFirebase(data) {
     if (!window.db) return;
     try {
         const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
-        const docRef = doc(window.db, "sistema", "dados_casal"); // No futuro do SaaS, isso será ID dinâmico por usuário
+        const docRef = doc(window.db, "sistema", "dados_casal"); 
         await setDoc(docRef, { gemsEliteData: JSON.stringify(data) }, { merge: true });
         console.log("☁️ Nuvem atualizada!");
     } catch (error) {
@@ -59,13 +60,13 @@ async function ligarRadarEmTempoReal() {
                         
                         if (dadosNuvem && dadosNuvem !== dadosLocais) {
                             localStorage.setItem('gemsEliteData', dadosNuvem);
-                            if (escudoAtivado) escudoAtivado = false;
+                            if (window.escudoAtivado) window.escudoAtivado = false;
                             window.location.reload(); 
-                        } else if (escudoAtivado && dadosNuvem) {
-                            escudoAtivado = false;
+                        } else if (window.escudoAtivado && dadosNuvem) {
+                            window.escudoAtivado = false;
                         }
                     } else {
-                        escudoAtivado = false;
+                        window.escudoAtivado = false;
                     }
                 });
             }
@@ -83,7 +84,6 @@ function injetarElementosGlobais() {
     const sidebarElement = document.querySelector('.sidebar');
     const dados = getData();
     const config = dados.config || {};
-    // Se for o admin raiz (vocês) ou não configurou, libera tudo. Se configurou, lê os módulos ativos.
     const modulos = config.modulosAtivos || ['financas', 'metas', 'casamento']; 
     
     if (sidebarElement) {
@@ -92,7 +92,7 @@ function injetarElementosGlobais() {
 
         let menuHTML = `<div class="logo">GEMSELITE</div><ul class="nav-links">`;
 
-        // Módulo 1: FINANÇAS (Sempre ativo pra todo mundo)
+        // Módulo 1: FINANÇAS (Sempre ativo)
         menuHTML += `
             <li class="nav-category">📊 Rotina & Finanças</li>
             <li class="${paginaAtual === 'index.html' ? 'active' : ''}"><a href="index.html">🏠 Início (Visão Geral)</a></li>
