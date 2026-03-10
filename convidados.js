@@ -26,14 +26,15 @@ function renderCards() {
     const dados = getData();
     if (!dados.casamento) dados.casamento = { convidados: [] };
     
-    // Pega todos os pendentes para o contador
+    // Filtra os status
     const todosPendentes = dados.casamento.convidados.filter(g => g.status === 'pending');
+    
     document.getElementById('counter').innerText = `${todosPendentes.length} aguardando decisão`;
 
-    // 🚀 OTIMIZAÇÃO: Desenha apenas 15 por vez! Fim dos travamentos no celular!
+    // Desenha as cartas pendentes (lote de 15 para não travar)
     const pendentesRender = todosPendentes.slice(0, 15);
-
     wrapper.innerHTML = '';
+    
     if (todosPendentes.length === 0) {
         wrapper.innerHTML = `<div class="swiper-slide guest-card"><h2>🎉 Fim da Lista!</h2><p>Tudo pronto para o grande dia.</p></div>`;
     } else {
@@ -52,7 +53,44 @@ function renderCards() {
         grabCursor: true,
         cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, rotate: true, slideShadows: false }
     });
+
+    // 🚀 ATUALIZA AS LISTAS LÁ EMBAIXO
+    renderListasDeStatus(dados.casamento.convidados);
 }
+
+// NOVA FUNÇÃO: Desenha as listas de Confirmados e Recusados
+function renderListasDeStatus(todosConvidados) {
+    const confirmados = todosConvidados.filter(g => g.status === 'yes');
+    const recusados = todosConvidados.filter(g => g.status === 'no');
+
+    document.getElementById('countYes').innerText = confirmados.length;
+    document.getElementById('countNo').innerText = recusados.length;
+
+    const gerarHtmlLista = (lista) => {
+        if (lista.length === 0) return '<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; margin-top: 20px;">Ninguém ainda.</p>';
+        
+        return lista.map(g => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <span style="color: #fff; font-weight: bold; font-size: 0.95rem;">${g.name}</span>
+                <button onclick="desfazerStatus('${g.id}')" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; text-decoration: underline; transition: 0.3s;">Desfazer</button>
+            </div>
+        `).join('');
+    };
+
+    document.getElementById('listaConfirmados').innerHTML = gerarHtmlLista(confirmados);
+    document.getElementById('listaRecusados').innerHTML = gerarHtmlLista(recusados);
+}
+
+// NOVA FUNÇÃO: Voltar o convidado para as cartas
+window.desfazerStatus = (id) => {
+    const dados = getData();
+    const g = dados.casamento.convidados.find(x => x.id === id);
+    if (g) {
+        g.status = 'pending'; // Volta pra pilha
+        saveData(dados);
+        renderCards(); // Atualiza tudo na tela
+    }
+};
 
 window.importarExcel = function() {
     const area = document.getElementById('excelPasteArea');
@@ -101,7 +139,6 @@ window.decidirStatus = (status) => {
         if (g) { 
             g.status = status; 
             saveData(dados); 
-            // Recarrega as próximas 15 cartas
             setTimeout(renderCards, 250); 
         }
     }
