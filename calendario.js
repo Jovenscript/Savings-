@@ -10,7 +10,7 @@ let isMonthView = false;
 const diasSemana = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
 const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-// 🚀 FUNÇÃO BLINDADA PARA MUDAR O MÊS
+// 🚀 FUNÇÃO GLOBAL BLINDADA PARA MUDAR O MÊS (Chamada direto do HTML)
 window.mudarMes = function(direcao) {
     dataNavegacao.setMonth(dataNavegacao.getMonth() + direcao);
     renderizarMesAtual(1); // Sempre pula pro dia 1 do mês novo
@@ -164,7 +164,8 @@ function renderizarMesAtual(diaAlvo = null) {
                     let corPago = item.pago ? 'var(--primary-cyan)' : 'var(--danger-red)';
                     let opacidade = item.pago ? 'opacity: 0.5;' : 'opacity: 1;';
                     
-                    let botaoPago = `<button onclick="alternarStatusPagamento(${item.id})" style="background: rgba(0,0,0,0.5); border: 1px solid ${corPago}; color: ${corPago}; font-size: 0.75rem; cursor: pointer; padding: 3px 8px; border-radius: 5px; margin-right: 8px;">${txtPago}</button>`;
+                    // BOTAO PAGO/PAGAR ROXO/CYAN
+                    let botaoPago = `<button onclick="alternarStatusPagamento(${item.id})" style="background: rgba(0,0,0,0.5); border: 1px solid ${corPago}; color: ${corPago}; font-size: 0.75rem; cursor: pointer; padding: 3px 8px; border-radius: 5px; margin-right: 8px; font-weight: bold;">${txtPago}</button>`;
 
                     htmlItens += `
                         <div style="padding: 8px 10px; background: rgba(0,0,0,0.6); border-left: 3px solid ${corPago}; border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; ${opacidade} transition: 0.3s;">
@@ -180,8 +181,9 @@ function renderizarMesAtual(diaAlvo = null) {
                             </div>
                         </div>`;
                 } else {
+                    // ROTINA VISUAL ROXO
                     htmlItens += `
-                        <div style="padding: 8px 10px; background: rgba(241, 91, 181, 0.2); border-left: 3px solid var(--danger-red); border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="padding: 8px 10px; background: rgba(157, 78, 221, 0.15); border-left: 3px solid var(--primary-purple); border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px;">
                                 <strong style="color: #fff; font-size: 0.85rem;">${item.descricao}</strong>
                             </div>
@@ -203,8 +205,9 @@ function renderizarMesAtual(diaAlvo = null) {
         card.style.flexDirection = 'column';
         card.style.height = '100%'; 
 
+        // CABEÇALHO GIGANTE CYAN NEON
         card.innerHTML = `
-            <div class="card-header-pink">
+            <div class="card-header-glass">
                 <h2>${d}</h2>
                 <span style="font-size: 0.85rem; color: rgba(255,255,255,0.8); font-weight: bold; letter-spacing: 1px;">${nomeDia}</span>
             </div>
