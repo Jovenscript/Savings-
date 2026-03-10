@@ -1,3 +1,5 @@
+// calendario.js
+
 document.addEventListener('DOMContentLoaded', () => {
     const wrapper = document.getElementById('calendarWrapper');
     const formRecorrente = document.getElementById('formRecorrente');
@@ -32,28 +34,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.apagarEvento = function(id) {
         if(confirm("Deseja apagar este evento do calendário?")) {
-            const dados = getData();
+            const dados = typeof getData === 'function' ? getData() : {};
             if (dados.contas) {
                 dados.contas = dados.contas.filter(c => c.id !== id);
-                saveData(dados);
+                if (typeof saveData === 'function') saveData(dados);
                 renderizarMesAtual(diaAtivoNoCard); 
             }
         }
     };
 
-    tipoEvento.addEventListener('change', (e) => {
-        if (e.target.value === 'conta') {
-            blocoValor.style.display = 'block';
-            valorConta.required = true;
-            blocoHorario.style.display = 'none';
-            horarioRotina.required = false;
-        } else {
-            blocoValor.style.display = 'none';
-            valorConta.required = false;
-            blocoHorario.style.display = 'block';
-            horarioRotina.required = true;
+    window.alternarStatusPagamento = function(id) {
+        const dados = typeof getData === 'function' ? getData() : {};
+        if (dados.contas) {
+            const index = dados.contas.findIndex(c => c.id === id);
+            if (index !== -1) {
+                dados.contas[index].pago = !dados.contas[index].pago;
+                if (typeof saveData === 'function') saveData(dados); 
+                renderizarMesAtual(diaAtivoNoCard); 
+            }
         }
-    });
+    };
+
+    if (tipoEvento) {
+        tipoEvento.addEventListener('change', (e) => {
+            if (e.target.value === 'conta') {
+                if(blocoValor) blocoValor.style.display = 'block';
+                if(valorConta) valorConta.required = true;
+                if(blocoHorario) blocoHorario.style.display = 'none';
+                if(horarioRotina) horarioRotina.required = false;
+            } else {
+                if(blocoValor) blocoValor.style.display = 'none';
+                if(valorConta) valorConta.required = false;
+                if(blocoHorario) blocoHorario.style.display = 'block';
+                if(horarioRotina) horarioRotina.required = true;
+            }
+        });
+    }
 
     function formatDateIso(ano, mes, dia) {
         return `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
@@ -65,16 +81,16 @@ document.addEventListener('DOMContentLoaded', () => {
             calendarSwiper = null;
         }
         
-        wrapper.innerHTML = '';
+        if (wrapper) wrapper.innerHTML = '';
         const ano = dataNavegacao.getFullYear();
         const mes = dataNavegacao.getMonth();
-        mesAtualTitulo.innerText = `${mesesNomes[mes]} ${ano}`;
+        if (mesAtualTitulo) mesAtualTitulo.innerText = `${mesesNomes[mes]} ${ano}`;
         
         const diasNoMes = new Date(ano, mes + 1, 0).getDate();
         if (diaAtivoNoCard > diasNoMes) diaAtivoNoCard = diasNoMes;
         if (diaAlvo !== null) diaAtivoNoCard = diaAlvo;
 
-        const dados = getData();
+        const dados = typeof getData === 'function' ? getData() : {};
         if (!dados.contas) dados.contas = [];
         
         const contas = dados.contas;
@@ -92,20 +108,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 htmlItens = `<div style="text-align: center; color: var(--text-muted); margin-top: 50px; font-style: italic; font-size: 0.9rem;">Dia livre!</div>`;
             } else {
                 itensDoDia.forEach(item => {
-                    const isConta = item.tipo === 'conta' || !item.tipo; 
+                    const isConta = item.tipo === 'conta' || item.tipo === 'despesa' || !item.tipo; 
                     const botaoHTML = `<button onclick="apagarEvento(${item.id})" style="background: none; border: none; color: var(--danger-red); font-size: 0.75rem; cursor: pointer; text-decoration: underline; margin-top: 2px;">Apagar</button>`;
 
                     if (isConta) {
                         somaMes += item.valor;
                         qtdContasMes++;
+                        
+                        let txtPago = item.pago ? '✅ Pago' : '💸 Pagar';
+                        let corPago = item.pago ? 'var(--primary-cyan)' : 'var(--danger-red)';
+                        let opacidade = item.pago ? 'opacity: 0.6;' : 'opacity: 1;';
+                        
+                        let botaoPago = `<button onclick="alternarStatusPagamento(${item.id})" style="background: rgba(0,0,0,0.5); border: 1px solid ${corPago}; color: ${corPago}; font-size: 0.75rem; cursor: pointer; padding: 3px 8px; border-radius: 5px; margin-right: 8px;">${txtPago}</button>`;
+
                         htmlItens += `
-                            <div style="padding: 8px 10px; background: rgba(0,0,0,0.4); border-left: 3px solid var(--primary-cyan); border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="padding: 8px 10px; background: rgba(0,0,0,0.4); border-left: 3px solid ${corPago}; border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; ${opacidade} transition: 0.3s;">
                                 <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px;">
                                     <strong style="color: #fff; font-size: 0.85rem;">${item.descricao}</strong>
                                 </div>
-                                <div style="text-align: right; min-width: 70px;">
-                                    <div style="font-weight: bold; color: var(--primary-cyan); font-size: 0.85rem;">${formatCurrency(item.valor)}</div>
-                                    ${botaoHTML}
+                                <div style="text-align: right; min-width: 120px; display: flex; flex-direction: column; align-items: flex-end;">
+                                    <div style="font-weight: bold; color: ${corPago}; font-size: 0.85rem; margin-bottom: 5px;">${typeof formatCurrency === 'function' ? formatCurrency(item.valor) : 'R$ ' + item.valor}</div>
+                                    <div style="display: flex;">
+                                        ${botaoPago}
+                                        ${botaoHTML}
+                                    </div>
                                 </div>
                             </div>`;
                     } else {
@@ -131,7 +157,6 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.flexDirection = 'column';
             card.style.height = '100%'; 
 
-            /* AQUI ESTÁ A CORREÇÃO: Removi a classe "swiper-no-swiping" que travava o toque no celular */
             card.innerHTML = `
                 <div style="text-align: center; margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; flex-shrink: 0;">
                     <h2 style="font-size: 3.5rem; color: var(--primary-cyan); margin: 0;">${d}</h2>
@@ -140,42 +165,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="scroll-interno" style="flex: 1; overflow-y: auto; padding-right: 5px;">
                     ${htmlItens}
                 </div>`;
-            wrapper.appendChild(card);
+            if (wrapper) wrapper.appendChild(card);
         }
 
-        totalMesValor.innerText = formatCurrency(somaMes);
-        totalMesQtd.innerText = `${qtdContasMes} faturas pendentes`;
+        if (totalMesValor) totalMesValor.innerText = typeof formatCurrency === 'function' ? formatCurrency(somaMes) : 'R$ ' + somaMes;
+        if (totalMesQtd) totalMesQtd.innerText = `${qtdContasMes} faturas pendentes`;
 
         renderizarGradeMes(ano, mes, diasNoMes, contas);
         if (!isMonthView) iniciarSwiper(diaAtivoNoCard);
         atualizarTituloForm();
     }
 
-    /* AQUI ESTÁ A CORREÇÃO NO SWIPER: Adicionado touchRatio: 1.5 para maior sensibilidade */
     function iniciarSwiper(diaAlvo) {
-        calendarSwiper = new Swiper(".calendarSwiper", {
-            effect: "coverflow", 
-            grabCursor: true, 
-            touchRatio: 1.5, 
-            centeredSlides: true,
-            slidesPerView: "auto",
-            coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false },
-            initialSlide: diaAlvo - 1, 
-            navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
-            on: {
-                slideChange: function () {
-                    const slideAtual = this.slides[this.activeIndex];
-                    if (slideAtual) {
-                        diaAtivoNoCard = parseInt(slideAtual.dataset.diaReal);
-                        atualizarTituloForm();
-                        atualizarSelecaoNaGrade();
+        if (typeof Swiper !== 'undefined') {
+            calendarSwiper = new Swiper(".calendarSwiper", {
+                effect: "coverflow", 
+                grabCursor: true, 
+                touchRatio: 1.5, 
+                centeredSlides: true,
+                slidesPerView: "auto",
+                coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false },
+                initialSlide: diaAlvo - 1, 
+                navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
+                on: {
+                    slideChange: function () {
+                        const slideAtual = this.slides[this.activeIndex];
+                        if (slideAtual) {
+                            diaAtivoNoCard = parseInt(slideAtual.dataset.diaReal);
+                            atualizarTituloForm();
+                            atualizarSelecaoNaGrade();
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
     function renderizarGradeMes(ano, mes, diasNoMes, contas) {
+        if (!monthGrid) return;
         monthGrid.innerHTML = '';
         const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
         for (let i = 0; i < primeiroDiaSemana; i++) { monthGrid.innerHTML += `<div></div>`; }
@@ -191,8 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
             divDia.addEventListener('click', () => {
                 diaAtivoNoCard = d;
                 isMonthView = false;
-                monthGridView.style.display = 'none';
-                dayCarouselView.style.display = 'flex';
+                if(monthGridView) monthGridView.style.display = 'none';
+                if(dayCarouselView) dayCarouselView.style.display = 'flex';
                 renderizarMesAtual(d);
             });
             monthGrid.appendChild(divDia);
@@ -200,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function atualizarSelecaoNaGrade() {
+        if(!monthGrid) return;
         document.querySelectorAll('.grid-day').forEach(el => el.classList.remove('selected-day'));
         const diasGrid = monthGrid.children;
         const primeiroDiaSemana = new Date(dataNavegacao.getFullYear(), dataNavegacao.getMonth(), 1).getDay();
@@ -207,60 +235,69 @@ document.addEventListener('DOMContentLoaded', () => {
         if (diasGrid[indexNaGrid]) diasGrid[indexNaGrid].classList.add('selected-day');
     }
 
-    btnToggleView.addEventListener('click', () => {
-        isMonthView = !isMonthView;
-        if (isMonthView) {
-            dayCarouselView.style.display = 'none';
-            monthGridView.style.display = 'block';
-            btnToggleView.innerHTML = '🃏 Voltar para as Cartas';
-        } else {
-            monthGridView.style.display = 'none';
-            dayCarouselView.style.display = 'flex';
-            btnToggleView.innerHTML = '📅 Abrir Visão do Mês Completo';
-            renderizarMesAtual(diaAtivoNoCard);
-        }
-    });
+    if (btnToggleView) {
+        btnToggleView.addEventListener('click', () => {
+            isMonthView = !isMonthView;
+            if (isMonthView) {
+                if(dayCarouselView) dayCarouselView.style.display = 'none';
+                if(monthGridView) monthGridView.style.display = 'block';
+                btnToggleView.innerHTML = '🃏 Voltar para as Cartas';
+            } else {
+                if(monthGridView) monthGridView.style.display = 'none';
+                if(dayCarouselView) dayCarouselView.style.display = 'flex';
+                btnToggleView.innerHTML = '📅 Abrir Visão do Mês Completo';
+                renderizarMesAtual(diaAtivoNoCard);
+            }
+        });
+    }
 
     function atualizarTituloForm() {
         const ano = dataNavegacao.getFullYear();
         const mesStr = String(dataNavegacao.getMonth() + 1).padStart(2, '0');
         const diaStr = String(diaAtivoNoCard).padStart(2, '0');
-        formTitle.innerText = `AGENDAR PARA: ${diaStr}/${mesStr}/${ano}`;
+        if (formTitle) formTitle.innerText = `AGENDAR PARA: ${diaStr}/${mesStr}/${ano}`;
     }
 
-    btnPrevMonth.addEventListener('click', () => {
-        dataNavegacao.setMonth(dataNavegacao.getMonth() - 1);
-        renderizarMesAtual(1); 
-    });
+    if (btnPrevMonth) {
+        btnPrevMonth.addEventListener('click', () => {
+            dataNavegacao.setMonth(dataNavegacao.getMonth() - 1);
+            renderizarMesAtual(1); 
+        });
+    }
 
-    btnNextMonth.addEventListener('click', () => {
-        dataNavegacao.setMonth(dataNavegacao.getMonth() + 1);
-        renderizarMesAtual(1); 
-    });
+    if (btnNextMonth) {
+        btnNextMonth.addEventListener('click', () => {
+            dataNavegacao.setMonth(dataNavegacao.getMonth() + 1);
+            renderizarMesAtual(1); 
+        });
+    }
 
-    formRecorrente.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const dados = getData();
-        if (!dados.contas) dados.contas = [];
+    if (formRecorrente) {
+        formRecorrente.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dados = typeof getData === 'function' ? getData() : {};
+            if (!dados.contas) dados.contas = [];
 
-        const dataExata = formatDateIso(dataNavegacao.getFullYear(), dataNavegacao.getMonth(), diaAtivoNoCard);
-        const novoItem = {
-            id: Date.now(),
-            descricao: document.getElementById('descEvento').value,
-            tipo: tipoEvento.value,
-            dataExata: dataExata,
-            valor: tipoEvento.value === 'conta' ? parseFloat(valorConta.value) : 0,
-            horario: tipoEvento.value === 'rotina' ? horarioRotina.value : '',
-            categoria: "Lançamento Manual"
-        };
-        
-        dados.contas.push(novoItem);
-        saveData(dados);
-        renderizarMesAtual(diaAtivoNoCard);
-        formRecorrente.reset();
-        tipoEvento.dispatchEvent(new Event('change'));
-    });
+            const dataExata = formatDateIso(dataNavegacao.getFullYear(), dataNavegacao.getMonth(), diaAtivoNoCard);
+            const novoItem = {
+                id: Date.now(),
+                descricao: document.getElementById('descEvento') ? document.getElementById('descEvento').value : '',
+                tipo: tipoEvento ? tipoEvento.value : 'conta',
+                dataExata: dataExata,
+                valor: (tipoEvento && tipoEvento.value === 'conta' && valorConta) ? parseFloat(valorConta.value) : 0,
+                horario: (tipoEvento && tipoEvento.value === 'rotina' && horarioRotina) ? horarioRotina.value : '',
+                categoria: "Lançamento Manual",
+                pago: false
+            };
+            
+            dados.contas.push(novoItem);
+            if(typeof saveData === 'function') saveData(dados);
+            renderizarMesAtual(diaAtivoNoCard);
+            formRecorrente.reset();
+            if (tipoEvento) tipoEvento.dispatchEvent(new Event('change'));
+        });
+    }
 
-    tipoEvento.dispatchEvent(new Event('change'));
+    if (tipoEvento) tipoEvento.dispatchEvent(new Event('change'));
     renderizarMesAtual();
 });
