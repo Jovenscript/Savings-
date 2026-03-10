@@ -1,3 +1,5 @@
+// convidados.js
+
 let tinderSwiper = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,14 +26,18 @@ function renderCards() {
     const dados = getData();
     if (!dados.casamento) dados.casamento = { convidados: [] };
     
-    const pendentes = dados.casamento.convidados.filter(g => g.status === 'pending');
-    document.getElementById('counter').innerText = `${pendentes.length} aguardando decisão`;
+    // Pega todos os pendentes para o contador
+    const todosPendentes = dados.casamento.convidados.filter(g => g.status === 'pending');
+    document.getElementById('counter').innerText = `${todosPendentes.length} aguardando decisão`;
+
+    // 🚀 OTIMIZAÇÃO: Desenha apenas 15 por vez! Fim dos travamentos no celular!
+    const pendentesRender = todosPendentes.slice(0, 15);
 
     wrapper.innerHTML = '';
-    if (pendentes.length === 0) {
-        wrapper.innerHTML = `<div class="swiper-slide guest-card"><h2>🎉 Fim da Lista!</h2><p>Tudo pronto para o dia 29/08.</p></div>`;
+    if (todosPendentes.length === 0) {
+        wrapper.innerHTML = `<div class="swiper-slide guest-card"><h2>🎉 Fim da Lista!</h2><p>Tudo pronto para o grande dia.</p></div>`;
     } else {
-        pendentes.forEach(g => {
+        pendentesRender.forEach(g => {
             const slide = document.createElement('div');
             slide.className = 'swiper-slide guest-card';
             slide.dataset.id = g.id;
@@ -41,7 +47,11 @@ function renderCards() {
     }
 
     if (tinderSwiper) tinderSwiper.destroy(true, true);
-    tinderSwiper = new Swiper(".tinderSwiper", { effect: "cards", grabCursor: true });
+    tinderSwiper = new Swiper(".tinderSwiper", { 
+        effect: "cards", 
+        grabCursor: true,
+        cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, rotate: true, slideShadows: false }
+    });
 }
 
 window.importarExcel = function() {
@@ -88,6 +98,11 @@ window.decidirStatus = (status) => {
     if (id) {
         const dados = getData();
         const g = dados.casamento.convidados.find(x => x.id === id);
-        if (g) { g.status = status; saveData(dados); setTimeout(renderCards, 250); }
+        if (g) { 
+            g.status = status; 
+            saveData(dados); 
+            // Recarrega as próximas 15 cartas
+            setTimeout(renderCards, 250); 
+        }
     }
 };
