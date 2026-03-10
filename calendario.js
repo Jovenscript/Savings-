@@ -1,211 +1,266 @@
-// js/calendario.js
-
-// Variáveis Globais do Calendário
-let currentDate = new Date();
-const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-
-// ==========================================
-// 1. INICIALIZAÇÃO
-// ==========================================
-document.addEventListener("DOMContentLoaded", () => {
-    renderCalendar();
+document.addEventListener('DOMContentLoaded', () => {
+    const wrapper = document.getElementById('calendarWrapper');
+    const formRecorrente = document.getElementById('formRecorrente');
+    const formTitle = document.getElementById('formTitle');
+    const mesAtualTitulo = document.getElementById('mesAtualTitulo');
     
-    // Controles do calendário
-    const prevBtn = document.getElementById("prevMonth");
-    const nextBtn = document.getElementById("nextMonth");
-    
-    if(prevBtn) {
-        prevBtn.addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        });
+    const totalMesValor = document.getElementById('totalMesValor');
+    const totalMesQtd = document.getElementById('totalMesQtd');
+    const btnPrevMonth = document.getElementById('btnPrevMonth');
+    const btnNextMonth = document.getElementById('btnNextMonth');
+
+    const btnToggleView = document.getElementById('btnToggleView');
+    const dayCarouselView = document.getElementById('dayCarouselView');
+    const monthGridView = document.getElementById('monthGridView');
+    const monthGrid = document.getElementById('monthGrid');
+
+    const tipoEvento = document.getElementById('tipoEvento');
+    const blocoValor = document.getElementById('blocoValor');
+    const blocoHorario = document.getElementById('blocoHorario');
+    const valorConta = document.getElementById('valorConta');
+    const horarioRotina = document.getElementById('horarioRotina');
+
+    const diasSemana = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
+    const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+
+    let calendarSwiper = null; 
+    let dataNavegacao = new Date(); 
+    dataNavegacao.setDate(1); 
+    dataNavegacao.setHours(12, 0, 0, 0); 
+    let diaAtivoNoCard = new Date().getDate(); 
+    let isMonthView = false; 
+
+    window.apagarEvento = function(id) {
+        if(confirm("Deseja apagar este evento do calendário?")) {
+            const dados = getData();
+            if (dados.contas) {
+                dados.contas = dados.contas.filter(c => c.id !== id);
+                saveData(dados);
+                renderizarMesAtual(diaAtivoNoCard); 
+            }
+        }
+    };
+
+    tipoEvento.addEventListener('change', (e) => {
+        if (e.target.value === 'conta') {
+            blocoValor.style.display = 'block';
+            valorConta.required = true;
+            blocoHorario.style.display = 'none';
+            horarioRotina.required = false;
+        } else {
+            blocoValor.style.display = 'none';
+            valorConta.required = false;
+            blocoHorario.style.display = 'block';
+            horarioRotina.required = true;
+        }
+    });
+
+    function formatDateIso(ano, mes, dia) {
+        return `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
     }
-    
-    if(nextBtn) {
-        nextBtn.addEventListener("click", () => {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
-        });
-    }
-});
 
-// ==========================================
-// 2. RENDERIZAR CALENDÁRIO VISUAL
-// ==========================================
-function renderCalendar() {
-    const monthDisplay = document.getElementById("currentMonth");
-    const calendarDays = document.getElementById("calendarDays");
-    
-    // Escudo: Se a tela não tiver o calendário, sai da função sem travar o app
-    if (!monthDisplay || !calendarDays) return;
-
-    monthDisplay.textContent = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-    
-    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
-    const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
-    
-    calendarDays.innerHTML = "";
-    
-    // Dias vazios do começo do mês
-    for (let i = 0; i < firstDay; i++) {
-        const emptyDiv = document.createElement("div");
-        emptyDiv.classList.add("day", "empty");
-        calendarDays.appendChild(emptyDiv);
-    }
-    
-    // Tenta pegar os dados; se não conseguir, cria um objeto vazio
-    const dados = typeof getData === 'function' ? getData() : {};
-    const transacoes = dados.transacoes || [];
-    const mesAtual = (currentDate.getMonth() + 1).toString().padStart(2, '0');
-    const anoAtual = currentDate.getFullYear().toString();
-    
-    // Preenche os dias do mês
-    for (let i = 1; i <= daysInMonth; i++) {
-        const dayDiv = document.createElement("div");
-        dayDiv.classList.add("day");
-        dayDiv.textContent = i;
-        
-        // Verifica se é hoje
-        const hoje = new Date();
-        if (i === hoje.getDate() && currentDate.getMonth() === hoje.getMonth() && currentDate.getFullYear() === hoje.getFullYear()) {
-            dayDiv.classList.add("today");
+    function renderizarMesAtual(diaAlvo = null) {
+        if (calendarSwiper) {
+            calendarSwiper.destroy(true, true);
+            calendarSwiper = null;
         }
         
-        // Verifica se tem lançamento neste dia (lendo das transações)
-        const diaFormatado = i.toString().padStart(2, '0');
-        const dataBusca = `${anoAtual}-${mesAtual}-${diaFormatado}`;
+        wrapper.innerHTML = '';
+        const ano = dataNavegacao.getFullYear();
+        const mes = dataNavegacao.getMonth();
+        mesAtualTitulo.innerText = `${mesesNomes[mes]} ${ano}`;
+        
+        const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+        if (diaAtivoNoCard > diasNoMes) diaAtivoNoCard = diasNoMes;
+        if (diaAlvo !== null) diaAtivoNoCard = diaAlvo;
 
-        const temTransacao = transacoes.some(t => {
-            // Ajuste simples de data para comparar yyyy-mm-dd
-            let dataT = t.data || '';
-            if(dataT.includes('/')) {
-                const parts = dataT.split('/');
-                if(parts.length === 3) {
-                    dataT = `${parts[2]}-${parts[1]}-${parts[0]}`;
+        const dados = getData();
+        if (!dados.contas) dados.contas = [];
+        
+        const contas = dados.contas;
+        let somaMes = 0;
+        let qtdContasMes = 0;
+
+        for (let d = 1; d <= diasNoMes; d++) {
+            const strData = formatDateIso(ano, mes, d);
+            const dataFoco = new Date(ano, mes, d, 12, 0, 0);
+            const nomeDia = diasSemana[dataFoco.getDay()];
+            const itensDoDia = contas.filter(c => c.dataExata === strData);
+            
+            let htmlItens = '';
+            if (itensDoDia.length === 0) {
+                htmlItens = `<div style="text-align: center; color: var(--text-muted); margin-top: 50px; font-style: italic; font-size: 0.9rem;">Dia livre!</div>`;
+            } else {
+                itensDoDia.forEach(item => {
+                    const isConta = item.tipo === 'conta' || !item.tipo; 
+                    const botaoHTML = `<button onclick="apagarEvento(${item.id})" style="background: none; border: none; color: var(--danger-red); font-size: 0.75rem; cursor: pointer; text-decoration: underline; margin-top: 2px;">Apagar</button>`;
+
+                    if (isConta) {
+                        somaMes += item.valor;
+                        qtdContasMes++;
+                        htmlItens += `
+                            <div style="padding: 8px 10px; background: rgba(0,0,0,0.4); border-left: 3px solid var(--primary-cyan); border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px;">
+                                    <strong style="color: #fff; font-size: 0.85rem;">${item.descricao}</strong>
+                                </div>
+                                <div style="text-align: right; min-width: 70px;">
+                                    <div style="font-weight: bold; color: var(--primary-cyan); font-size: 0.85rem;">${formatCurrency(item.valor)}</div>
+                                    ${botaoHTML}
+                                </div>
+                            </div>`;
+                    } else {
+                        htmlItens += `
+                            <div style="padding: 8px 10px; background: rgba(157, 78, 221, 0.1); border-left: 3px solid var(--primary-purple); border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                                <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px;">
+                                    <strong style="color: #fff; font-size: 0.85rem;">${item.descricao}</strong>
+                                </div>
+                                <div style="text-align: right; min-width: 70px;">
+                                    <div style="font-weight: bold; color: var(--text-muted); font-size: 0.85rem;">🕒 ${item.horario}</div>
+                                    ${botaoHTML}
+                                </div>
+                            </div>`;
+                    }
+                });
+            }
+
+            const card = document.createElement('div');
+            card.className = 'swiper-slide glass-panel';
+            card.dataset.diaReal = d;
+            
+            card.style.display = 'flex';
+            card.style.flexDirection = 'column';
+            card.style.height = '100%'; 
+
+            /* AQUI ESTÁ A CORREÇÃO: Removi a classe "swiper-no-swiping" que travava o toque no celular */
+            card.innerHTML = `
+                <div style="text-align: center; margin-bottom: 10px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; flex-shrink: 0;">
+                    <h2 style="font-size: 3.5rem; color: var(--primary-cyan); margin: 0;">${d}</h2>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: bold;">${nomeDia}</span>
+                </div>
+                <div class="scroll-interno" style="flex: 1; overflow-y: auto; padding-right: 5px;">
+                    ${htmlItens}
+                </div>`;
+            wrapper.appendChild(card);
+        }
+
+        totalMesValor.innerText = formatCurrency(somaMes);
+        totalMesQtd.innerText = `${qtdContasMes} faturas pendentes`;
+
+        renderizarGradeMes(ano, mes, diasNoMes, contas);
+        if (!isMonthView) iniciarSwiper(diaAtivoNoCard);
+        atualizarTituloForm();
+    }
+
+    /* AQUI ESTÁ A CORREÇÃO NO SWIPER: Adicionado touchRatio: 1.5 para maior sensibilidade */
+    function iniciarSwiper(diaAlvo) {
+        calendarSwiper = new Swiper(".calendarSwiper", {
+            effect: "coverflow", 
+            grabCursor: true, 
+            touchRatio: 1.5, 
+            centeredSlides: true,
+            slidesPerView: "auto",
+            coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false },
+            initialSlide: diaAlvo - 1, 
+            navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
+            on: {
+                slideChange: function () {
+                    const slideAtual = this.slides[this.activeIndex];
+                    if (slideAtual) {
+                        diaAtivoNoCard = parseInt(slideAtual.dataset.diaReal);
+                        atualizarTituloForm();
+                        atualizarSelecaoNaGrade();
+                    }
                 }
             }
-            return dataT === dataBusca;
         });
+    }
 
-        if (temTransacao) {
-            const bolinha = document.createElement("div");
-            bolinha.style.width = "6px";
-            bolinha.style.height = "6px";
-            bolinha.style.background = "var(--primary-cyan)";
-            bolinha.style.borderRadius = "50%";
-            bolinha.style.margin = "2px auto 0";
-            dayDiv.appendChild(bolinha);
+    function renderizarGradeMes(ano, mes, diasNoMes, contas) {
+        monthGrid.innerHTML = '';
+        const primeiroDiaSemana = new Date(ano, mes, 1).getDay();
+        for (let i = 0; i < primeiroDiaSemana; i++) { monthGrid.innerHTML += `<div></div>`; }
+
+        for (let d = 1; d <= diasNoMes; d++) {
+            const strData = formatDateIso(ano, mes, d);
+            const temEvento = contas.some(c => c.dataExata === strData);
+            const divDia = document.createElement('div');
+            divDia.className = `grid-day ${diaAtivoNoCard === d ? 'selected-day' : ''}`;
+            let indicador = temEvento ? '<div class="indicador-ponto"></div>' : '';
+            divDia.innerHTML = `<span>${d}</span> ${indicador}`;
+            
+            divDia.addEventListener('click', () => {
+                diaAtivoNoCard = d;
+                isMonthView = false;
+                monthGridView.style.display = 'none';
+                dayCarouselView.style.display = 'flex';
+                renderizarMesAtual(d);
+            });
+            monthGrid.appendChild(divDia);
         }
-        
-        calendarDays.appendChild(dayDiv);
-    }
-    
-    renderizarListaDeContas();
-}
-
-// ==========================================
-// 3. RENDERIZAR LISTA DE CONTAS (COM BOTÃO DE PAGO)
-// ==========================================
-function renderizarListaDeContas() {
-    const listContainer = document.getElementById('upcomingBillsList');
-    if (!listContainer) return;
-
-    listContainer.innerHTML = '';
-    
-    const dados = typeof getData === 'function' ? getData() : {};
-    
-    // Nós vamos buscar as contas na aba de Planejamento 
-    let planejamento = dados.planejamento || [];
-    
-    if (planejamento.length === 0) {
-        listContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Nenhuma conta fixa cadastrada no planejamento.</p>';
-        return;
     }
 
-    // Filtra apenas contas ativas e de saída (despesas)
-    const despesas = planejamento.filter(item => item.ativo !== false && item.tipo === 'saida');
-
-    // Escudo extra caso não haja despesas ativas
-    if (despesas.length === 0) {
-        listContainer.innerHTML = '<p style="color: var(--text-muted); text-align: center; padding: 20px;">Nenhuma despesa ativa no momento.</p>';
-        return;
+    function atualizarSelecaoNaGrade() {
+        document.querySelectorAll('.grid-day').forEach(el => el.classList.remove('selected-day'));
+        const diasGrid = monthGrid.children;
+        const primeiroDiaSemana = new Date(dataNavegacao.getFullYear(), dataNavegacao.getMonth(), 1).getDay();
+        const indexNaGrid = diaAtivoNoCard + primeiroDiaSemana - 1;
+        if (diasGrid[indexNaGrid]) diasGrid[indexNaGrid].classList.add('selected-day');
     }
 
-    // Ordena pelo dia de vencimento
-    despesas.sort((a, b) => (parseInt(a.diaVencimento) || 0) - (parseInt(b.diaVencimento) || 0));
-
-    despesas.forEach(conta => {
-        const itemDiv = document.createElement('div');
-        
-        // Se estiver pago, fica meio transparente e com borda verde
-        const pagoClass = conta.pago ? 'opacity: 0.6; border-left: 4px solid var(--primary-cyan);' : 'border-left: 4px solid var(--danger-red);';
-        
-        itemDiv.style.cssText = `
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            ${pagoClass}
-        `;
-
-        const infoDiv = document.createElement('div');
-        const valorFormatado = typeof formatCurrency === 'function' ? formatCurrency(conta.valor) : 'R$ ' + (conta.valor || 0);
-        
-        infoDiv.innerHTML = `
-            <strong style="color: #fff; font-size: 1.1rem; display: block; margin-bottom: 5px;">${conta.descricao || 'Sem descrição'}</strong>
-            <span style="color: var(--text-muted); font-size: 0.85rem;">Vence dia: <strong>${conta.diaVencimento || 'N/A'}</strong></span>
-            <div style="color: var(--text-main); font-weight: bold; margin-top: 5px;">${valorFormatado}</div>
-        `;
-
-        // BOTÃO MÁGICO DE PAGO/PENDENTE
-        const btnStatus = document.createElement('button');
-        
-        if (conta.pago) {
-            btnStatus.innerHTML = '✅ Pago';
-            btnStatus.style.cssText = 'background: rgba(0, 245, 212, 0.1); color: var(--primary-cyan); border: 1px solid var(--primary-cyan); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;';
+    btnToggleView.addEventListener('click', () => {
+        isMonthView = !isMonthView;
+        if (isMonthView) {
+            dayCarouselView.style.display = 'none';
+            monthGridView.style.display = 'block';
+            btnToggleView.innerHTML = '🃏 Voltar para as Cartas';
         } else {
-            btnStatus.innerHTML = '💸 Pagar';
-            btnStatus.style.cssText = 'background: rgba(255, 75, 75, 0.1); color: var(--danger-red); border: 1px solid var(--danger-red); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;';
+            monthGridView.style.display = 'none';
+            dayCarouselView.style.display = 'flex';
+            btnToggleView.innerHTML = '📅 Abrir Visão do Mês Completo';
+            renderizarMesAtual(diaAtivoNoCard);
         }
-
-        // Evento de clique para mudar o status
-        btnStatus.addEventListener('click', () => {
-            alternarStatusPagamento(conta.id);
-        });
-
-        itemDiv.appendChild(infoDiv);
-        itemDiv.appendChild(btnStatus);
-        listContainer.appendChild(itemDiv);
     });
-}
 
-// ==========================================
-// 4. LÓGICA DE ALTERNAR STATUS
-// ==========================================
-window.alternarStatusPagamento = function(idConta) {
-    const dados = typeof getData === 'function' ? getData() : {};
-    
-    if (!dados.planejamento) return;
-    
-    // Procura a conta pelo ID
-    const contaIndex = dados.planejamento.findIndex(c => c.id === idConta);
-    
-    if (contaIndex !== -1) {
-        // Se não existir a propriedade 'pago', cria como false antes de inverter
-        if (dados.planejamento[contaIndex].pago === undefined) {
-            dados.planejamento[contaIndex].pago = false;
-        }
-        
-        // Inverte o status
-        dados.planejamento[contaIndex].pago = !dados.planejamento[contaIndex].pago;
-        
-        // Salva (isso aciona a nuvem automaticamente pelo app.js)
-        if (typeof saveData === 'function') saveData(dados);
-        
-        // Recarrega a lista para mostrar o novo botão
-        renderizarListaDeContas();
+    function atualizarTituloForm() {
+        const ano = dataNavegacao.getFullYear();
+        const mesStr = String(dataNavegacao.getMonth() + 1).padStart(2, '0');
+        const diaStr = String(diaAtivoNoCard).padStart(2, '0');
+        formTitle.innerText = `AGENDAR PARA: ${diaStr}/${mesStr}/${ano}`;
     }
-}
+
+    btnPrevMonth.addEventListener('click', () => {
+        dataNavegacao.setMonth(dataNavegacao.getMonth() - 1);
+        renderizarMesAtual(1); 
+    });
+
+    btnNextMonth.addEventListener('click', () => {
+        dataNavegacao.setMonth(dataNavegacao.getMonth() + 1);
+        renderizarMesAtual(1); 
+    });
+
+    formRecorrente.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const dados = getData();
+        if (!dados.contas) dados.contas = [];
+
+        const dataExata = formatDateIso(dataNavegacao.getFullYear(), dataNavegacao.getMonth(), diaAtivoNoCard);
+        const novoItem = {
+            id: Date.now(),
+            descricao: document.getElementById('descEvento').value,
+            tipo: tipoEvento.value,
+            dataExata: dataExata,
+            valor: tipoEvento.value === 'conta' ? parseFloat(valorConta.value) : 0,
+            horario: tipoEvento.value === 'rotina' ? horarioRotina.value : '',
+            categoria: "Lançamento Manual"
+        };
+        
+        dados.contas.push(novoItem);
+        saveData(dados);
+        renderizarMesAtual(diaAtivoNoCard);
+        formRecorrente.reset();
+        tipoEvento.dispatchEvent(new Event('change'));
+    });
+
+    tipoEvento.dispatchEvent(new Event('change'));
+    renderizarMesAtual();
+});
