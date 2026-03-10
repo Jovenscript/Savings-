@@ -67,7 +67,7 @@
 
         <div class="ob-content" id="step2">
             <h2 class="ob-title">Seus Maiores Sonhos</h2>
-            <p class="ob-subtitle">Escreva 3 grandes metas. A nossa Inteligência Artificial vai procurar fotos 4K e criar seus painéis de vidro.</p>
+            <p class="ob-subtitle">Escreva 3 grandes metas. A nossa IA vai gerar fotos 4K exclusivas para seu painel.</p>
             
             <input type="text" id="dream1" class="ob-input" placeholder="1. Ex: Viagem para as Maldivas" style="margin-bottom: 10px;">
             <input type="text" id="dream2" class="ob-input" placeholder="2. Ex: Porsche 911 Carrera" style="margin-bottom: 10px;">
@@ -78,11 +78,9 @@
     </div>
 
     <div class="app-container" id="appMainContainer">
-        
         <nav class="sidebar"></nav>
 
         <main class="main-content">
-            
             <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                 <div>
                     <h1 id="tituloBoasVindas" style="color: #fff; font-size: 2rem;">Cubo de Controle</h1>
@@ -122,7 +120,6 @@
                             <div style="position: relative; flex: 1; min-height: 180px; width: 100%; display: flex; justify-content: center; align-items: center;">
                                 <canvas id="donutChart"></canvas>
                             </div>
-                            <p id="semGastosAviso" style="text-align: center; color: var(--text-muted); font-size: 0.9rem; display: none;">Ainda não há despesas registradas neste mês.</p>
                         </div>
                     </div>
 
@@ -132,25 +129,23 @@
                             <div id="calendarAlerts" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary-cyan); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
                                 Analisando contas...
                             </div>
-
                             <h3 style="display: flex; justify-content: space-between; align-items: center;">
                                 📅 Próximos Vencimentos
-                                <a href="calendario-financeiro.html" style="font-size: 0.75rem; color: var(--primary-cyan); text-transform: none; text-decoration: underline;">Ver Completo</a>
+                                <a href="calendario-financeiro.html" style="font-size: 0.75rem; color: var(--primary-cyan);">Ver Completo</a>
                             </h3>
-                            <div id="agendaRapida" class="scroll-interno" style="flex: 1; overflow-y: auto; padding-right: 5px;">
-                                <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Carregando agenda...</p>
+                            <div id="agendaRapida" class="scroll-interno" style="flex: 1; overflow-y: auto;">
+                                <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Carregando...</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="swiper-slide" id="slideCasamento" style="display: flex;">
+                    <div class="swiper-slide" id="slideCasamento">
                         <div class="glass-panel" style="border-color: var(--danger-red);">
                             <div style="text-align: center; margin-bottom: 20px; border-bottom: 1px dashed rgba(241, 91, 181, 0.3); padding-bottom: 15px;">
                                 <h3 style="color: var(--danger-red); margin-bottom: 5px;">💍 O Grande Dia</h3>
-                                <div id="contagemCasamento" style="font-size: 2rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(241, 91, 181, 0.5);">-- Dias</div>
+                                <div id="contagemCasamento" style="font-size: 2rem; font-weight: bold; color: #fff;">-- Dias</div>
                             </div>
-
-                            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 5px; color: var(--primary-cyan);">Evolução Patrimonial (6 Meses)</h3>
+                            <h3 style="text-align: center; font-size: 1rem; color: var(--primary-cyan);">Evolução Patrimonial</h3>
                             <div style="position: relative; flex: 1; min-height: 150px; width: 100%;">
                                 <canvas id="balanceChart"></canvas>
                             </div>
@@ -160,27 +155,17 @@
                     <div class="swiper-slide">
                         <div class="glass-panel" style="border-color: var(--primary-cyan); text-align: center; display: flex; flex-direction: column; justify-content: center;">
                             <div style="font-size: 4rem; margin-bottom: 10px;">🔄</div>
-                            <h3 style="color: #fff; margin-bottom: 10px;">Sincronizar Aparelhos</h3>
-                            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px;">
-                                Gere o backup de um celular e importe no outro.
-                            </p>
-                            
-                            <div style="display: flex; flex-direction: column; gap: 15px;">
-                                <button id="btnExportar" class="btn-primary" style="background: rgba(0, 245, 212, 0.1); border: 1px solid var(--primary-cyan); color: var(--primary-cyan); padding: 15px;">
-                                    📤 1. Exportar Backup
-                                </button>
-                                <label class="btn-primary" style="cursor: pointer; padding: 15px; margin-top: 0; background: var(--primary-purple);">
-                                    📥 2. Importar Dados
-                                    <input type="file" id="btnImportar" accept=".json" style="display: none;">
-                                </label>
+                            <h3>Sincronizar Dados</h3>
+                            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                                <button id="btnExportar" class="btn-primary" style="background: rgba(0, 245, 212, 0.1); border: 1px solid var(--primary-cyan); color: var(--primary-cyan);">📤 Exportar</button>
+                                <label class="btn-primary" style="cursor: pointer; background: var(--primary-purple);">📥 Importar<input type="file" id="btnImportar" accept=".json" style="display: none;"></label>
                             </div>
                         </div>
                     </div>
 
                 </div>
-                <div class="swiper-pagination" style="bottom: 0;"></div>
+                <div class="swiper-pagination"></div>
             </div>
-
         </main>
     </div>
 
@@ -197,27 +182,30 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const checkData = setInterval(() => {
+                const userEmail = localStorage.getItem('gemsEliteLogin'); 
+                
                 if(typeof getData === 'function') {
                     clearInterval(checkData);
                     const dados = getData();
                     
-                    // 🛡️ PASSAPORTE VIP (Marlon & Carol)
-                    // Se a conta já tiver transações ou casamento configurado, ignora o onboarding!
-                    const isUsuarioAntigo = (dados.contas && dados.contas.length > 0) || (dados.casamento);
-                    
-                    if (isUsuarioAntigo && (!dados.config || !dados.config.setupConcluido)) {
+                    // 🛡️ PASSAPORTE VIP (Detecta se é Marlon ou Carol)
+                    const emailsFundadores = ['marlindo0951@gmail.com', 'carol@gmail.com']; 
+                    const eFundador = emailsFundadores.includes(userEmail);
+
+                    // Se for um dos fundadores, pula o onboarding e seta o nome fixo
+                    if (eFundador && (!dados.config || !dados.config.setupConcluido)) {
                         dados.config = {
                             setupConcluido: true,
                             nomeUsuario: 'Marlon & Carol',
                             modulosAtivos: ['financas', 'metas', 'casamento']
                         };
-                        window.escudoAtivado = false; // Quebra o escudo pra nuvem salvar
-                        if (typeof saveData === 'function') saveData(dados);
+                        window.escudoAtivado = false; 
+                        saveData(dados);
                         atualizarTelaBaseadoNoUsuario(dados);
-                        return; // Pula o resto da execução!
+                        return;
                     }
 
-                    // Se for usuário NOVO e zerado, mostra o Onboarding
+                    // Para qualquer outro e-mail (Novo Usuário)
                     if (!dados.config || !dados.config.setupConcluido) {
                         document.getElementById('appMainContainer').style.filter = 'blur(10px)';
                         document.getElementById('onboardingModal').style.display = 'flex';
@@ -229,26 +217,20 @@
         });
 
         function atualizarTelaBaseadoNoUsuario(dados) {
-            const nomeUsuario = dados.config.nomeUsuario || '';
-            if (nomeUsuario) {
-                const titulo = document.getElementById('tituloBoasVindas');
-                if (titulo) titulo.innerText = `Olá, ${nomeUsuario} 👋`;
-            }
+            const nome = dados.config?.nomeUsuario || 'Membro';
+            const titulo = document.getElementById('tituloBoasVindas');
+            if (titulo) titulo.innerText = `Olá, ${nome} 👋`;
 
-            if (!dados.config.modulosAtivos.includes('casamento')) {
+            if (dados.config?.modulosAtivos && !dados.config.modulosAtivos.includes('casamento')) {
                 const slideCas = document.getElementById('slideCasamento');
                 if(slideCas) slideCas.remove();
             }
         }
 
         function irParaStep2() {
-            const nomeDigitado = document.getElementById('obName').value.trim();
-            if (!nomeDigitado) {
-                alert("Por favor, digite o seu nome para continuarmos!");
-                document.getElementById('obName').focus();
-                return;
-            }
-
+            const nome = document.getElementById('obName').value.trim();
+            if (!nome) return alert("Digite seu nome!");
+            
             moduloSelecionados = ['financas']; 
             document.querySelectorAll('.ob-module-btn.active').forEach(btn => {
                 if(btn.dataset.mod !== 'financas') moduloSelecionados.push(btn.dataset.mod);
@@ -259,50 +241,37 @@
         }
 
         function finalizarOnboarding() {
-            const dados = typeof getData === 'function' ? getData() : {};
-            const nomeDigitado = document.getElementById('obName').value.trim();
+            const dados = getData();
+            const nome = document.getElementById('obName').value.trim();
             
-            dados.config = {
-                setupConcluido: true,
-                nomeUsuario: nomeDigitado,
-                modulosAtivos: moduloSelecionados
-            };
+            dados.config = { setupConcluido: true, nomeUsuario: nome, modulosAtivos: moduloSelecionados };
 
-            const d1 = document.getElementById('dream1').value.trim();
-            const d2 = document.getElementById('dream2').value.trim();
-            const d3 = document.getElementById('dream3').value.trim();
-            const sonhosDigitados = [d1, d2, d3].filter(d => d !== '');
+            const sonhos = [
+                document.getElementById('dream1').value.trim(),
+                document.getElementById('dream2').value.trim(),
+                document.getElementById('dream3').value.trim()
+            ].filter(s => s !== '');
 
-            // O MOTOR DE IA QUE GERA A IMAGEM BASEADA NO TEXTO
-            if (sonhosDigitados.length > 0) {
+            if (sonhos.length > 0) {
                 let metasProntas = [];
                 let valoresZerados = {};
 
-                sonhosDigitados.forEach((textoSonho, index) => {
-                    const idCriado = "meta_" + index;
-                    
-                    // A Mágica: Transforma o texto em um prompt fotorealista e manda pra IA renderizar!
-                    const promptIA = encodeURIComponent(textoSonho + ", highly detailed, cinematic lighting, 4k resolution, luxury, realistic photography");
-                    const urlImagemIA = `https://image.pollinations.ai/prompt/${promptIA}?width=1920&height=1080&nologo=true`;
+                sonhos.forEach((texto, i) => {
+                    const id = "meta_" + i;
+                    const promptIA = encodeURIComponent(texto + ", high end luxury, cinematic 8k, realistic photography, glass design");
+                    const urlImg = `https://image.pollinations.ai/prompt/${promptIA}?width=1080&height=1920&nologo=true`;
 
-                    metasProntas.push({
-                        id: idCriado,
-                        title: textoSonho,
-                        desc: "Plano Oficial",
-                        img: urlImagemIA,
-                        defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
-                    });
-                    valoresZerados[idCriado] = { s1: "R$ 0", s2: "0%", s3: "Definir" };
+                    metasProntas.push({ id, title: texto, desc: "Meta com IA", img: urlImg, defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir" });
+                    valoresZerados[id] = { s1: "R$ 0", s2: "0%", s3: "Definir" };
                 });
 
                 dados.apresentacaoMetas = metasProntas;
                 dados.valoresMetas = valoresZerados;
             }
 
-            window.escudoAtivado = false; // 🔓 DESLIGA O ESCUDO PARA SALVAR NA NUVEM! (Evita o loop)
-            if (typeof saveData === 'function') saveData(dados);
-            
-            alert(`✨ O Gems Elite está gerando o sistema para você, ${nomeDigitado}!`);
+            window.escudoAtivado = false; 
+            saveData(dados);
+            alert(`✨ Bem-vindo ao time, ${nome}!`);
             window.location.reload();
         }
     </script>
