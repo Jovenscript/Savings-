@@ -7,14 +7,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ESCUDO DE CARREGAMENTO */
-        body { background: #0d0221; transition: opacity 0.5s; }
-        #appMainContainer { opacity: 0; pointer-events: none; transition: 0.8s; }
-        #appMainContainer.active { opacity: 1; pointer-events: auto; }
+        /* 🛡️ PAREDE DE SEGURANÇA: Bloqueia a visão de tudo até o sistema decidir */
+        #bloqueioTotal {
+            position: fixed; inset: 0; background: #0d0221; z-index: 200000;
+            display: flex; align-items: center; justify-content: center; color: #fff; font-family: sans-serif;
+        }
+
+        #appMainContainer { opacity: 0; transition: opacity 1s; }
+        #appMainContainer.liberado { opacity: 1; }
 
         /* ESTILOS DO ONBOARDING */
         #onboardingModal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 100000;
+            position: fixed; inset: 0; background: rgba(13, 2, 33, 0.98); z-index: 150000;
             display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px);
         }
         .ob-content { 
@@ -26,31 +30,29 @@
             width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); 
             border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem;
         }
-        .ob-input:focus { border-color: var(--primary-cyan); outline: none; }
-        
-        .color-preview {
-            width: 30px; height: 30px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px;
-        }
+        .color-preview { width: 30px; height: 30px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; }
     </style>
 </head>
 <body>
 
+    <div id="bloqueioTotal">Carregando Gems Elite...</div>
+
     <div id="onboardingModal">
         <div class="ob-content" id="step1">
-            <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 10px;">Bem-vindo à Elite! 💎</h2>
-            <p style="color: #8b949e; margin-bottom: 25px;">Vamos configurar seu novo espaço.</p>
+            <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 10px;">Gems Elite 💎</h2>
+            <p style="color: #8b949e; margin-bottom: 25px;">Personalize sua experiência.</p>
             
-            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Como quer ser chamado?</label>
-            <input type="text" id="obName" class="ob-input" placeholder="Seu nome">
+            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Seu Nome:</label>
+            <input type="text" id="obName" class="ob-input" placeholder="Ex: Marlon & Carol">
 
-            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Sua Cor de Destaque:</label>
+            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Cor do Sistema:</label>
             <select id="obColor" class="ob-select" onchange="document.getElementById('cp').style.background = this.value">
-                <option value="#00f5d4">Ciano Neon (Padrão)</option>
-                <option value="#72efdd">Azul Água</option>
+                <option value="#00f5d4">Ciano Neon</option>
                 <option value="#9d4edd">Roxo Royal</option>
                 <option value="#f15bb5">Rosa Shock</option>
                 <option value="#fee440">Amarelo Ouro</option>
                 <option value="#57cc99">Verde Esmeralda</option>
+                <option value="#00b4d8">Azul Mar</option>
             </select>
             <div id="cp" class="color-preview" style="background: #00f5d4; margin-bottom: 20px;"></div>
 
@@ -59,13 +61,13 @@
 
         <div class="ob-content" id="step2" style="display:none;">
             <h2 style="color:#fff; margin-bottom: 10px;">Quais seus Sonhos?</h2>
-            <p style="color: #8b949e; margin-bottom: 20px;">A IA vai gerar imagens 4K com base nisso.</p>
+            <p style="color: #8b949e; margin-bottom: 20px;">Diga 3 metas para a IA gerar suas fotos.</p>
             
-            <input type="text" id="dream1" class="ob-input" placeholder="Sonho 1 (Ex: Viagem Japão)">
-            <input type="text" id="dream2" class="ob-input" placeholder="Sonho 2 (Ex: Mustang GT)">
-            <input type="text" id="dream3" class="ob-input" placeholder="Sonho 3 (Ex: Minha Empresa)">
+            <input type="text" id="dream1" class="ob-input" placeholder="Meta 1">
+            <input type="text" id="dream2" class="ob-input" placeholder="Meta 2">
+            <input type="text" id="dream3" class="ob-input" placeholder="Meta 3">
 
-            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px;">Ativar meu Gems Elite ✨</button>
+            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px;">Gerar meu Sistema ✨</button>
         </div>
     </div>
 
@@ -73,7 +75,7 @@
         <nav class="sidebar"></nav>
         <main class="main-content">
             <header>
-                <h1 id="tituloBoasVindas" style="color:#fff;">Carregando...</h1>
+                <h1 id="tituloBoasVindas" style="color:#fff;">Cubo de Controle</h1>
             </header>
             <div class="swiper superAppSwiper">
                 <div class="swiper-wrapper" id="wrapperDashboard">
@@ -91,37 +93,44 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const verificar = setInterval(() => {
-                const userEmail = localStorage.getItem('gemsEliteLogin');
-                if (typeof getData === 'function') {
-                    clearInterval(verificar);
-                    const dados = getData();
+            // Pequeno delay para o Firebase/Auth carregar o e-mail
+            setTimeout(() => {
+                const verificar = setInterval(() => {
+                    const userEmail = localStorage.getItem('gemsEliteLogin');
                     
-                    const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
-                    const eFundador = fundadores.includes(userEmail);
+                    if (typeof getData === 'function' && userEmail) {
+                        clearInterval(verificar);
+                        const dados = getData();
+                        
+                        const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
+                        const eFundador = fundadores.includes(userEmail);
 
-                    // LÓGICA DE EXIBIÇÃO
-                    if (eFundador) {
-                        aplicarCores('#00f5d4'); // Cor padrão para vocês
-                        document.getElementById('appMainContainer').classList.add('active');
-                        if (typeof atualizarTelaBaseadoNoUsuario === 'function') atualizarTelaBaseadoNoUsuario(dados);
-                    } else if (!dados.config || !dados.config.setupConcluido) {
-                        // NOVO USUÁRIO: Abre Onboarding
-                        document.getElementById('onboardingModal').style.display = 'flex';
-                    } else {
-                        // USUÁRIO JÁ CONFIGURADO
-                        aplicarCores(dados.config.corPreferida);
-                        document.getElementById('appMainContainer').classList.add('active');
-                        atualizarTelaBaseadoNoUsuario(dados);
+                        if (eFundador) {
+                            // FUNDADORES: Libera direto
+                            document.getElementById('bloqueioTotal').style.display = 'none';
+                            document.getElementById('appMainContainer').classList.add('liberado');
+                            aplicarCores('#00f5d4');
+                            if (typeof atualizarTelaBaseadoNoUsuario === 'function') atualizarTelaBaseadoNoUsuario(dados);
+                        } else if (!dados.config || !dados.config.setupConcluido) {
+                            // NOVO: Mostra Onboarding (Mantém bloqueio do fundo)
+                            document.getElementById('bloqueioTotal').style.display = 'none';
+                            document.getElementById('onboardingModal').style.display = 'flex';
+                        } else {
+                            // CONFIGURADO: Libera
+                            aplicarCores(dados.config.corPreferida);
+                            document.getElementById('bloqueioTotal').style.display = 'none';
+                            document.getElementById('appMainContainer').classList.add('liberado');
+                            atualizarTelaBaseadoNoUsuario(dados);
+                        }
                     }
-                }
-            }, 300);
+                }, 300);
+            }, 500);
         });
 
         function aplicarCores(cor) {
             document.documentElement.style.setProperty('--primary-cyan', cor);
-            // Cria uma cor secundária que combine (mais escura)
-            document.documentElement.style.setProperty('--primary-purple', cor + 'cc'); 
+            // Cria um tom escuro da mesma cor para o gradiente
+            document.documentElement.style.setProperty('--primary-purple', cor + '88'); 
         }
 
         function irParaStep2() {
@@ -133,7 +142,7 @@
         function finalizarOnboarding() {
             const nome = document.getElementById('obName').value;
             const cor = document.getElementById('obColor').value;
-            const dados = getData();
+            const dados = getData() || {};
 
             dados.config = {
                 setupConcluido: true,
@@ -152,20 +161,23 @@
                 dados.apresentacaoMetas = sonhos.map((s, i) => ({
                     id: `meta_${i}`,
                     title: s,
-                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury style cinematic")}?width=1080&height=1920&nologo=true`,
+                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury style cinematic 8k")}?width=1080&height=1920&nologo=true`,
                     defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                 }));
+                dados.valoresMetas = {};
+                sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
             }
 
             window.escudoAtivado = false;
             saveData(dados);
-            alert("Configuração salva com sucesso!");
+            alert("✨ Tudo pronto! Bem-vindo ao Gems Elite.");
             window.location.reload();
         }
 
         function atualizarTelaBaseadoNoUsuario(dados) {
             const nome = dados.config?.nomeUsuario || 'Membro';
-            document.getElementById('tituloBoasVindas').innerText = `Olá, ${nome} 👋`;
+            const titulo = document.getElementById('tituloBoasVindas');
+            if(titulo) titulo.innerText = `Olá, ${nome} 👋`;
         }
     </script>
 </body>
