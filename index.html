@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     <style>
-        /* ESTILOS DO ONBOARDING (SaaS) */
+        /* ESTILOS DO ONBOARDING */
         #onboardingModal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000;
             display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);
@@ -46,124 +46,51 @@
     <div id="onboardingModal" style="display: none;">
         <div class="ob-content" id="step1">
             <h2 class="ob-title">Boas-vindas! 💎</h2>
-            
-            <p class="ob-subtitle" style="margin-bottom: 10px;">Como podemos chamar você?</p>
-            <input type="text" id="obName" class="ob-input" placeholder="Digite seu nome (Ex: João, Casal Silva...)">
+            <p class="ob-subtitle">Como podemos chamar você?</p>
+            <input type="text" id="obName" class="ob-input" placeholder="Seu nome ou do Casal">
 
-            <p class="ob-subtitle" style="margin-bottom: 15px; margin-top: -10px;">O que você quer organizar hoje?</p>
-            
-            <button class="ob-module-btn active" data-mod="financas" style="pointer-events: none; opacity: 0.7;">
-                📊 Controle Financeiro (Obrigatório)
-            </button>
-            <button class="ob-module-btn active" data-mod="metas" onclick="this.classList.toggle('active')">
-                🎯 Planejar Grandes Metas (Sonhos)
-            </button>
-            <button class="ob-module-btn" data-mod="casamento" onclick="this.classList.toggle('active')">
-                💍 Planejar meu Casamento
-            </button>
+            <p class="ob-subtitle" style="margin-top: -10px;">O que quer organizar?</p>
+            <button class="ob-module-btn active" style="pointer-events: none; opacity: 0.7;">📊 Finanças (Ativo)</button>
+            <button class="ob-module-btn active" data-mod="metas" onclick="this.classList.toggle('active')">🎯 Metas e Sonhos</button>
+            <button class="ob-module-btn" data-mod="casamento" onclick="this.classList.toggle('active')">💍 Casamento</button>
 
-            <button class="btn-primary" onclick="irParaStep2()" style="margin-top: 20px;">Avançar ❯</button>
+            <button class="btn-primary" onclick="irParaStep2()" style="margin-top: 20px; width: 100%;">Avançar ❯</button>
         </div>
 
         <div class="ob-content" id="step2">
-            <h2 class="ob-title">Seus Maiores Sonhos</h2>
-            <p class="ob-subtitle">Escreva 3 grandes metas. A nossa IA vai gerar fotos 4K exclusivas para seu painel.</p>
-            
-            <input type="text" id="dream1" class="ob-input" placeholder="1. Ex: Viagem para as Maldivas" style="margin-bottom: 10px;">
-            <input type="text" id="dream2" class="ob-input" placeholder="2. Ex: Porsche 911 Carrera" style="margin-bottom: 10px;">
-            <input type="text" id="dream3" class="ob-input" placeholder="3. Ex: Mansão com Piscina" style="margin-bottom: 10px;">
+            <h2 class="ob-title">Seus Sonhos</h2>
+            <p class="ob-subtitle">Escreva 3 metas. Nossa IA vai gerar imagens 4K exclusivas para você.</p>
+            <input type="text" id="dream1" class="ob-input" placeholder="Ex: Viagem para Maldivas" style="margin-bottom: 10px;">
+            <input type="text" id="dream2" class="ob-input" placeholder="Ex: Porsche 911" style="margin-bottom: 10px;">
+            <input type="text" id="dream3" class="ob-input" placeholder="Ex: Minha Casa Própria" style="margin-bottom: 10px;">
 
-            <button class="btn-primary" onclick="finalizarOnboarding()" style="margin-top: 20px;">Gerar Painéis com IA ✨</button>
+            <button class="btn-primary" onclick="finalizarOnboarding()" style="margin-top: 20px; width: 100%;">Gerar com IA ✨</button>
         </div>
     </div>
 
     <div class="app-container" id="appMainContainer">
         <nav class="sidebar"></nav>
-
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+            <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
                 <div>
-                    <h1 id="tituloBoasVindas" style="color: #fff; font-size: 2rem;">Cubo de Controle</h1>
-                    <p style="color: var(--text-muted);">Gire o cubo para navegar entre seus módulos.</p>
-                </div>
-                
-                <div style="min-width: 180px;">
-                    <label for="userSwitch" style="font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">Filtrar Visão:</label>
-                    <select id="userSwitch" style="margin-top: 5px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--primary-cyan); border-radius: 8px; padding: 5px 10px;">
-                        <option value="ambos">Visão Geral (Todos)</option>
-                        <option value="Usuário 1">Usuário 1</option>
-                        <option value="Usuário 2">Usuário 2</option>
-                    </select>
+                    <h1 id="tituloBoasVindas" style="color: #fff; font-size: 2rem;">Carregando...</h1>
+                    <p style="color: var(--text-muted);">Gire o cubo para navegar.</p>
                 </div>
             </header>
 
             <div class="swiper superAppSwiper">
                 <div class="swiper-wrapper">
-                    
                     <div class="swiper-slide">
                         <div class="glass-panel" style="border-color: var(--primary-cyan);">
                             <h3 style="text-align: center; color: var(--text-muted);">Patrimônio Líquido</h3>
-                            <h2 id="totalBalance" style="font-size: 3rem; color: var(--text-main); margin: 0 0 10px 0; text-align: center;">R$ 0,00</h2>
-                            
-                            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                    <span style="color: var(--text-muted); font-size: 0.9rem;">Entradas do Mês:</span>
-                                    <strong id="resumoEntradas" style="color: var(--primary-cyan);">R$ 0,00</strong>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span style="color: var(--text-muted); font-size: 0.9rem;">Saídas do Mês:</span>
-                                    <strong id="resumoSaidas" style="color: var(--danger-red);">R$ 0,00</strong>
-                                </div>
-                            </div>
-
-                            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 10px;">Análise de Despesas</h3>
-                            <div style="position: relative; flex: 1; min-height: 180px; width: 100%; display: flex; justify-content: center; align-items: center;">
-                                <canvas id="donutChart"></canvas>
+                            <h2 id="totalBalance" style="font-size: 3rem; color: #fff; text-align: center;">R$ 0,00</h2>
+                            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: 20px;">
+                                <div style="display: flex; justify-content: space-between;"><span>Entradas:</span><strong id="resumoEntradas" style="color:var(--primary-cyan)">R$ 0,00</strong></div>
+                                <div style="display: flex; justify-content: space-between;"><span>Saídas:</span><strong id="resumoSaidas" style="color:var(--danger-red)">R$ 0,00</strong></div>
                             </div>
                         </div>
                     </div>
-
-                    <div class="swiper-slide">
-                        <div class="glass-panel" style="border-color: var(--primary-purple);">
-                            <h3 style="color: var(--danger-red);">🔔 Radares do Calendário</h3>
-                            <div id="calendarAlerts" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary-cyan); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
-                                Analisando contas...
-                            </div>
-                            <h3 style="display: flex; justify-content: space-between; align-items: center;">
-                                📅 Próximos Vencimentos
-                                <a href="calendario-financeiro.html" style="font-size: 0.75rem; color: var(--primary-cyan);">Ver Completo</a>
-                            </h3>
-                            <div id="agendaRapida" class="scroll-interno" style="flex: 1; overflow-y: auto;">
-                                <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Carregando...</p>
-                            </div>
-                        </div>
                     </div>
-
-                    <div class="swiper-slide" id="slideCasamento">
-                        <div class="glass-panel" style="border-color: var(--danger-red);">
-                            <div style="text-align: center; margin-bottom: 20px; border-bottom: 1px dashed rgba(241, 91, 181, 0.3); padding-bottom: 15px;">
-                                <h3 style="color: var(--danger-red); margin-bottom: 5px;">💍 O Grande Dia</h3>
-                                <div id="contagemCasamento" style="font-size: 2rem; font-weight: bold; color: #fff;">-- Dias</div>
-                            </div>
-                            <h3 style="text-align: center; font-size: 1rem; color: var(--primary-cyan);">Evolução Patrimonial</h3>
-                            <div style="position: relative; flex: 1; min-height: 150px; width: 100%;">
-                                <canvas id="balanceChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="swiper-slide">
-                        <div class="glass-panel" style="border-color: var(--primary-cyan); text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                            <div style="font-size: 4rem; margin-bottom: 10px;">🔄</div>
-                            <h3>Sincronizar Dados</h3>
-                            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
-                                <button id="btnExportar" class="btn-primary" style="background: rgba(0, 245, 212, 0.1); border: 1px solid var(--primary-cyan); color: var(--primary-cyan);">📤 Exportar</button>
-                                <label class="btn-primary" style="cursor: pointer; background: var(--primary-purple);">📥 Importar<input type="file" id="btnImportar" accept=".json" style="display: none;"></label>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
                 <div class="swiper-pagination"></div>
             </div>
         </main>
@@ -182,30 +109,28 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const checkData = setInterval(() => {
-                const userEmail = localStorage.getItem('gemsEliteLogin'); 
+                const userEmail = localStorage.getItem('gemsEliteLogin'); // Pega do auth.js
                 
                 if(typeof getData === 'function') {
                     clearInterval(checkData);
                     const dados = getData();
                     
-                    // 🛡️ PASSAPORTE VIP (Detecta se é Marlon ou Carol)
-                    const emailsFundadores = ['marlindo0951@gmail.com', 'carol@gmail.com']; 
-                    const eFundador = emailsFundadores.includes(userEmail);
+                    // 🛡️ PASSAPORTE VIP CORRIGIDO
+                    const emailsFundadores = ['carol18bistaffa@gmail.com', 'carol@gmail.com']; 
+                    const isMarlonOuCarol = emailsFundadores.includes(userEmail);
 
-                    // Se for um dos fundadores, pula o onboarding e seta o nome fixo
-                    if (eFundador && (!dados.config || !dados.config.setupConcluido)) {
-                        dados.config = {
+                    // Se for e-mail oficial, pula o onboarding
+                    if (isMarlonOuCarol) {
+                        dados.config = dados.config || {
                             setupConcluido: true,
                             nomeUsuario: 'Marlon & Carol',
                             modulosAtivos: ['financas', 'metas', 'casamento']
                         };
-                        window.escudoAtivado = false; 
-                        saveData(dados);
                         atualizarTelaBaseadoNoUsuario(dados);
                         return;
                     }
 
-                    // Para qualquer outro e-mail (Novo Usuário)
+                    // Se NÃO for Marlon/Carol e NÃO tiver setup concluído: Mostra Onboarding
                     if (!dados.config || !dados.config.setupConcluido) {
                         document.getElementById('appMainContainer').style.filter = 'blur(10px)';
                         document.getElementById('onboardingModal').style.display = 'flex';
@@ -213,29 +138,16 @@
                         atualizarTelaBaseadoNoUsuario(dados);
                     }
                 }
-            }, 200);
+            }, 300);
         });
 
         function atualizarTelaBaseadoNoUsuario(dados) {
-            const nome = dados.config?.nomeUsuario || 'Membro';
-            const titulo = document.getElementById('tituloBoasVindas');
-            if (titulo) titulo.innerText = `Olá, ${nome} 👋`;
-
-            if (dados.config?.modulosAtivos && !dados.config.modulosAtivos.includes('casamento')) {
-                const slideCas = document.getElementById('slideCasamento');
-                if(slideCas) slideCas.remove();
-            }
+            const nome = dados.config?.nomeUsuario || 'Usuário';
+            document.getElementById('tituloBoasVindas').innerText = `Olá, ${nome} 👋`;
         }
 
         function irParaStep2() {
-            const nome = document.getElementById('obName').value.trim();
-            if (!nome) return alert("Digite seu nome!");
-            
-            moduloSelecionados = ['financas']; 
-            document.querySelectorAll('.ob-module-btn.active').forEach(btn => {
-                if(btn.dataset.mod !== 'financas') moduloSelecionados.push(btn.dataset.mod);
-            });
-
+            if(!document.getElementById('obName').value.trim()) return alert("Diga seu nome!");
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
         }
@@ -244,7 +156,7 @@
             const dados = getData();
             const nome = document.getElementById('obName').value.trim();
             
-            dados.config = { setupConcluido: true, nomeUsuario: nome, modulosAtivos: moduloSelecionados };
+            dados.config = { setupConcluido: true, nomeUsuario: nome, modulosAtivos: ['financas', 'metas'] };
 
             const sonhos = [
                 document.getElementById('dream1').value.trim(),
@@ -253,25 +165,17 @@
             ].filter(s => s !== '');
 
             if (sonhos.length > 0) {
-                let metasProntas = [];
-                let valoresZerados = {};
-
-                sonhos.forEach((texto, i) => {
-                    const id = "meta_" + i;
-                    const promptIA = encodeURIComponent(texto + ", high end luxury, cinematic 8k, realistic photography, glass design");
-                    const urlImg = `https://image.pollinations.ai/prompt/${promptIA}?width=1080&height=1920&nologo=true`;
-
-                    metasProntas.push({ id, title: texto, desc: "Meta com IA", img: urlImg, defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir" });
-                    valoresZerados[id] = { s1: "R$ 0", s2: "0%", s3: "Definir" };
-                });
-
-                dados.apresentacaoMetas = metasProntas;
-                dados.valoresMetas = valoresZerados;
+                dados.apresentacaoMetas = sonhos.map((s, i) => ({
+                    id: `meta_${i}`,
+                    title: s,
+                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury 8k") || 'rich'}?width=1080&height=1920&nologo=true`,
+                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
+                }));
             }
 
             window.escudoAtivado = false; 
             saveData(dados);
-            alert(`✨ Bem-vindo ao time, ${nome}!`);
+            alert(`✨ Perfil criado, ${nome}!`);
             window.location.reload();
         }
     </script>
