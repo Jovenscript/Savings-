@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gems Elite - Dashboard</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d0221">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <title>Gems Elite - Super App</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0221">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" href="icon-192.png">
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -21,16 +21,25 @@
         <nav class="sidebar">
             <div class="logo">GEMSELITE</div>
             <ul class="nav-links">
-                <li class="active"><a href="index.html">Dashboard</a></li>
-                <li><a href="transacoes.html">Transações</a></li>
-                <li><a href="planejamento.html">Planejamento</a></li>
-                <li><a href="calendario-financeiro.html">Calendário</a></li>
-                <li><a href="metas.html">Metas</a></li>
-                <li><a href="#" id="btnLogout" style="color: #ff4b4b;">Sair do Sistema</a></li>
-                <li><a href="convidados.html">💍 Convidados</a></li>
-<li><a href="orcamento-casamento.html">💰 Orçamento</a></li>
+                <li class="nav-category">📊 Rotina & Finanças</li>
+                <li class="active"><a href="index.html">🏠 Início (Visão Geral)</a></li>
+                <li><a href="transacoes.html">💸 Lançar Transações</a></li>
+                <li><a href="planejamento.html">📝 Planejamento Fixo</a></li>
+                <li><a href="calendario-financeiro.html">📅 Calendário Completo</a></li>
+
+                <li class="nav-category">🎯 Grandes Objetivos</li>
+                <li><a href="metas.html">🏡 Amortização & Metas</a></li>
+
+                <li class="nav-category">💍 Projeto 29/08/2026</li>
+                <li><a href="convidados.html">💝 Match de Convidados</a></li>
+                <li><a href="orcamento-casamento.html">💰 Orçamento Casamento</a></li>
                 
-                <li style="margin-top: 30px;"><a href="#" id="resetAppBtn" style="color: var(--danger-red); font-weight: bold;">🗑️ Resetar App</a></li>
+                <li style="margin-top: 30px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px;">
+                    <a href="#" id="btnLogout" style="color: #ff4b4b;">Sair do Sistema</a>
+                </li>
+                <li style="margin-top: 10px;">
+                    <a href="#" id="resetAppBtn" style="color: var(--danger-red); font-weight: bold;">🗑️ Resetar App</a>
+                </li>
             </ul>
         </nav>
 
@@ -52,34 +61,15 @@
                 </div>
             </header>
 
-            <div class="swiper dashboardSwiper" style="padding-bottom: 40px; padding-top: 10px;">
+            <div class="swiper superAppSwiper">
                 <div class="swiper-wrapper">
                     
-                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
-                        <div class="calendar-page-layout"> 
-                            <div class="glass-panel" style="flex: 1; min-width: 100%; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-color: var(--primary-purple);">
-                                <h3 style="color: var(--text-muted);">Patrimônio Líquido</h3>
-                                <h2 id="totalBalance" style="font-size: 3rem; color: var(--text-main); margin: 10px 0;">R$ 0,00</h2>
-                                <p style="color: var(--primary-cyan); font-weight: bold; font-size: 0.9rem;">↑ Saldo consolidado atual</p>
-                                
-                                <h3 style="margin-top: 2rem; color: var(--danger-red);">🔔 Radares do Calendário</h3>
-                                <div id="calendarAlerts" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary-cyan); font-size: 0.95rem; line-height: 1.5;">
-                                    Analisando contas...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
-                        <div class="glass-panel full-page-card" style="margin: 0 auto; height: 100%; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-color: var(--primary-cyan);">
-                            <h3 style="text-align: center; font-size: 1.2rem; margin-bottom: 10px;">Análise de Despesas do Mês</h3>
+                    <div class="swiper-slide">
+                        <div class="glass-panel" style="width: 100%; max-width: 600px; display: flex; flex-direction: column; height: 100%; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-color: var(--primary-cyan);">
+                            <h3 style="text-align: center; color: var(--text-muted);">Patrimônio Líquido</h3>
+                            <h2 id="totalBalance" style="font-size: 3rem; color: var(--text-main); margin: 0 0 10px 0; text-align: center;">R$ 0,00</h2>
                             
-                            <div style="position: relative; height: 230px; width: 100%; display: flex; justify-content: center; align-items: center;">
-                                <canvas id="donutChart"></canvas>
-                            </div>
-                            <p id="semGastosAviso" style="text-align: center; color: var(--text-muted); font-size: 0.9rem; display: none; margin-top: 15px;">Ainda não há despesas registradas neste mês.</p>
-
-                            <div style="margin-top: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                     <span style="color: var(--text-muted); font-size: 0.9rem;">Entradas do Mês:</span>
                                     <strong id="resumoEntradas" style="color: var(--primary-cyan);">R$ 0,00</strong>
@@ -90,21 +80,46 @@
                                 </div>
                             </div>
 
+                            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 10px;">Análise de Despesas</h3>
+                            <div style="position: relative; flex: 1; min-height: 180px; width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="donutChart"></canvas>
+                            </div>
+                            <p id="semGastosAviso" style="text-align: center; color: var(--text-muted); font-size: 0.9rem; display: none;">Ainda não há despesas registradas neste mês.</p>
                         </div>
                     </div>
 
-                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
-                        <div class="glass-panel full-page-card" id="mainGoal" style="margin: 0 auto; height: 100%; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
-                            <div style="text-align: center; color: var(--text-muted); font-style: italic;">Carregando metas...</div>
+                    <div class="swiper-slide">
+                        <div class="glass-panel" style="width: 100%; max-width: 600px; display: flex; flex-direction: column; height: 100%; border-color: var(--primary-purple);">
+                            <h3 style="color: var(--danger-red);">🔔 Radares do Calendário</h3>
+                            <div id="calendarAlerts" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary-cyan); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">
+                                Analisando contas...
+                            </div>
+
+                            <h3 style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px;">
+                                📅 Próximos Vencimentos
+                                <a href="calendario-financeiro.html" style="font-size: 0.75rem; color: var(--primary-cyan); text-transform: none; text-decoration: underline;">Ver Completo</a>
+                            </h3>
+                            <div id="agendaRapida" class="scroll-interno" style="flex: 1; overflow-y: auto; padding-right: 5px;">
+                                <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">Carregando agenda...</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="swiper-slide" style="width: 100%; max-width: 600px;">
-                        <div class="glass-panel full-page-card" style="margin: 0 auto; height: 100%; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);">
-                            <h3 style="text-align: center; font-size: 1.2rem; margin-bottom: 5px;">Evolução do Patrimônio</h3>
-                            <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 20px;">Crescimento acumulado nos últimos 6 meses</p>
+                    <div class="swiper-slide">
+                        <div class="glass-panel" style="width: 100%; max-width: 600px; display: flex; flex-direction: column; height: 100%;">
                             
-                            <div style="position: relative; height: 260px; width: 100%;">
+                            <div style="text-align: center; margin-bottom: 20px; border-bottom: 1px dashed rgba(241, 91, 181, 0.3); padding-bottom: 15px;">
+                                <h3 style="color: var(--danger-red); margin-bottom: 5px;">💍 O Grande Dia</h3>
+                                <div id="contagemCasamento" style="font-size: 2rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(241, 91, 181, 0.5);">-- Dias</div>
+                                <span style="font-size: 0.8rem; color: var(--text-muted);">para o "Sim!"</span>
+                            </div>
+
+                            <div id="mainGoal" style="margin-bottom: 20px;">
+                                <div style="text-align: center; color: var(--text-muted); font-style: italic;">Carregando metas...</div>
+                            </div>
+
+                            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 5px;">Evolução do Patrimônio (6 Meses)</h3>
+                            <div style="position: relative; flex: 1; min-height: 150px; width: 100%;">
                                 <canvas id="balanceChart"></canvas>
                             </div>
                         </div>
@@ -115,7 +130,7 @@
                 <div class="swiper-pagination"></div>
             </div>
 
-            <div class="glass-panel" style="margin-top: 1rem; border: 1px dashed var(--primary-cyan); text-align: center; background: rgba(0, 245, 212, 0.02);">
+            <div class="glass-panel" style="margin-top: 1rem; border: 1px dashed var(--primary-cyan); text-align: center; background: rgba(0, 245, 212, 0.02); max-width: 100%;">
                 <h3 style="color: #fff; margin-bottom: 10px;">🔄 Sincronizar Aparelhos</h3>
                 <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
                     Gere um backup dos seus dados para enviar e importar no celular parceiro.
@@ -139,9 +154,6 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     
@@ -150,7 +162,3 @@
     <script src="pwa.js"></script>
 </body>
 </html>
-
-
-
-
