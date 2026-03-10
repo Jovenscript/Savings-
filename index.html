@@ -4,92 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gems Elite - Super App</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0d0221">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="icon" type="image/png" href="icon-192.png">
-    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     <style>
+        /* ESCUDO DE CARREGAMENTO */
+        body { background: #0d0221; transition: opacity 0.5s; }
+        #appMainContainer { opacity: 0; pointer-events: none; transition: 0.8s; }
+        #appMainContainer.active { opacity: 1; pointer-events: auto; }
+
         /* ESTILOS DO ONBOARDING */
         #onboardingModal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000;
-            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 100000;
+            display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px);
         }
-        .ob-content { background: var(--bg-dark); border: 1px solid var(--primary-purple); border-radius: 20px; padding: 40px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 0 50px rgba(157, 78, 221, 0.3); }
-        .ob-title { color: #fff; font-size: 2rem; margin-bottom: 10px; }
-        .ob-subtitle { color: var(--text-muted); margin-bottom: 25px; }
+        .ob-content { 
+            background: #161b22; border: 1px solid var(--primary-purple); border-radius: 24px; 
+            padding: 40px; width: 90%; max-width: 450px; text-align: center;
+            box-shadow: 0 0 60px rgba(157, 78, 221, 0.2);
+        }
+        .ob-input, .ob-select {
+            width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); 
+            border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem;
+        }
+        .ob-input:focus { border-color: var(--primary-cyan); outline: none; }
         
-        .ob-input {
-            width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.5); 
-            border: 1px solid var(--primary-cyan); color: #fff; margin-bottom: 30px; 
-            font-size: 1rem; outline: none; text-align: left; font-weight: bold;
+        .color-preview {
+            width: 30px; height: 30px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px;
         }
-        .ob-input:focus { box-shadow: 0 0 15px rgba(0, 245, 212, 0.4); }
-
-        .ob-module-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff;
-            padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; width: 100%; text-align: left; font-size: 1.1rem;
-        }
-        .ob-module-btn.active {
-            background: rgba(0, 245, 212, 0.1); border-color: var(--primary-cyan); box-shadow: inset 0 0 10px rgba(0, 245, 212, 0.2);
-        }
-        
-        #step2 { display: none; }
     </style>
 </head>
 <body>
-    <button id="hamburgerBtn">☰</button>
-    <div id="mobileOverlay"></div>
 
-    <div id="onboardingModal" style="display: none;">
+    <div id="onboardingModal">
         <div class="ob-content" id="step1">
-            <h2 class="ob-title">Boas-vindas! 💎</h2>
-            <p class="ob-subtitle">Como podemos chamar você?</p>
-            <input type="text" id="obName" class="ob-input" placeholder="Seu nome ou do Casal">
+            <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 10px;">Bem-vindo à Elite! 💎</h2>
+            <p style="color: #8b949e; margin-bottom: 25px;">Vamos configurar seu novo espaço.</p>
+            
+            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Como quer ser chamado?</label>
+            <input type="text" id="obName" class="ob-input" placeholder="Seu nome">
 
-            <p class="ob-subtitle" style="margin-top: -10px;">O que quer organizar?</p>
-            <button class="ob-module-btn active" style="pointer-events: none; opacity: 0.7;">📊 Finanças (Ativo)</button>
-            <button class="ob-module-btn active" data-mod="metas" onclick="this.classList.toggle('active')">🎯 Metas e Sonhos</button>
-            <button class="ob-module-btn" data-mod="casamento" onclick="this.classList.toggle('active')">💍 Casamento</button>
+            <label style="display:block; text-align:left; color:#fff; margin-bottom: 5px;">Sua Cor de Destaque:</label>
+            <select id="obColor" class="ob-select" onchange="document.getElementById('cp').style.background = this.value">
+                <option value="#00f5d4">Ciano Neon (Padrão)</option>
+                <option value="#72efdd">Azul Água</option>
+                <option value="#9d4edd">Roxo Royal</option>
+                <option value="#f15bb5">Rosa Shock</option>
+                <option value="#fee440">Amarelo Ouro</option>
+                <option value="#57cc99">Verde Esmeralda</option>
+            </select>
+            <div id="cp" class="color-preview" style="background: #00f5d4; margin-bottom: 20px;"></div>
 
-            <button class="btn-primary" onclick="irParaStep2()" style="margin-top: 20px; width: 100%;">Avançar ❯</button>
+            <button class="btn-primary" onclick="irParaStep2()" style="width:100%; padding: 18px;">Próximo ❯</button>
         </div>
 
-        <div class="ob-content" id="step2">
-            <h2 class="ob-title">Seus Sonhos</h2>
-            <p class="ob-subtitle">Escreva 3 metas. Nossa IA vai gerar imagens 4K exclusivas para você.</p>
-            <input type="text" id="dream1" class="ob-input" placeholder="Ex: Viagem para Maldivas" style="margin-bottom: 10px;">
-            <input type="text" id="dream2" class="ob-input" placeholder="Ex: Porsche 911" style="margin-bottom: 10px;">
-            <input type="text" id="dream3" class="ob-input" placeholder="Ex: Minha Casa Própria" style="margin-bottom: 10px;">
+        <div class="ob-content" id="step2" style="display:none;">
+            <h2 style="color:#fff; margin-bottom: 10px;">Quais seus Sonhos?</h2>
+            <p style="color: #8b949e; margin-bottom: 20px;">A IA vai gerar imagens 4K com base nisso.</p>
+            
+            <input type="text" id="dream1" class="ob-input" placeholder="Sonho 1 (Ex: Viagem Japão)">
+            <input type="text" id="dream2" class="ob-input" placeholder="Sonho 2 (Ex: Mustang GT)">
+            <input type="text" id="dream3" class="ob-input" placeholder="Sonho 3 (Ex: Minha Empresa)">
 
-            <button class="btn-primary" onclick="finalizarOnboarding()" style="margin-top: 20px; width: 100%;">Gerar com IA ✨</button>
+            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px;">Ativar meu Gems Elite ✨</button>
         </div>
     </div>
 
     <div class="app-container" id="appMainContainer">
         <nav class="sidebar"></nav>
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
-                <div>
-                    <h1 id="tituloBoasVindas" style="color: #fff; font-size: 2rem;">Carregando...</h1>
-                    <p style="color: var(--text-muted);">Gire o cubo para navegar.</p>
-                </div>
+            <header>
+                <h1 id="tituloBoasVindas" style="color:#fff;">Carregando...</h1>
             </header>
-
             <div class="swiper superAppSwiper">
-                <div class="swiper-wrapper">
-                    <div class="swiper-slide">
-                        <div class="glass-panel" style="border-color: var(--primary-cyan);">
-                            <h3 style="text-align: center; color: var(--text-muted);">Patrimônio Líquido</h3>
-                            <h2 id="totalBalance" style="font-size: 3rem; color: #fff; text-align: center;">R$ 0,00</h2>
-                            <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: 20px;">
-                                <div style="display: flex; justify-content: space-between;"><span>Entradas:</span><strong id="resumoEntradas" style="color:var(--primary-cyan)">R$ 0,00</strong></div>
-                                <div style="display: flex; justify-content: space-between;"><span>Saídas:</span><strong id="resumoSaidas" style="color:var(--danger-red)">R$ 0,00</strong></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="swiper-wrapper" id="wrapperDashboard">
                     </div>
                 <div class="swiper-pagination"></div>
             </div>
@@ -101,49 +88,40 @@
     <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     <script src="dashboard.js"></script>
-    <script src="mobile.js"></script> 
-    <script src="pwa.js"></script>
 
     <script>
-        let moduloSelecionados = ['financas'];
-
         document.addEventListener('DOMContentLoaded', () => {
-            const checkData = setInterval(() => {
-                const userEmail = localStorage.getItem('gemsEliteLogin'); // Pega do auth.js
-                
-                if(typeof getData === 'function') {
-                    clearInterval(checkData);
+            const verificar = setInterval(() => {
+                const userEmail = localStorage.getItem('gemsEliteLogin');
+                if (typeof getData === 'function') {
+                    clearInterval(verificar);
                     const dados = getData();
                     
-                    // 🛡️ PASSAPORTE VIP CORRIGIDO
-                    const emailsFundadores = ['carol18bistaffa@gmail.com', 'carol@gmail.com']; 
-                    const isMarlonOuCarol = emailsFundadores.includes(userEmail);
+                    const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
+                    const eFundador = fundadores.includes(userEmail);
 
-                    // Se for e-mail oficial, pula o onboarding
-                    if (isMarlonOuCarol) {
-                        dados.config = dados.config || {
-                            setupConcluido: true,
-                            nomeUsuario: 'Marlon & Carol',
-                            modulosAtivos: ['financas', 'metas', 'casamento']
-                        };
-                        atualizarTelaBaseadoNoUsuario(dados);
-                        return;
-                    }
-
-                    // Se NÃO for Marlon/Carol e NÃO tiver setup concluído: Mostra Onboarding
-                    if (!dados.config || !dados.config.setupConcluido) {
-                        document.getElementById('appMainContainer').style.filter = 'blur(10px)';
+                    // LÓGICA DE EXIBIÇÃO
+                    if (eFundador) {
+                        aplicarCores('#00f5d4'); // Cor padrão para vocês
+                        document.getElementById('appMainContainer').classList.add('active');
+                        if (typeof atualizarTelaBaseadoNoUsuario === 'function') atualizarTelaBaseadoNoUsuario(dados);
+                    } else if (!dados.config || !dados.config.setupConcluido) {
+                        // NOVO USUÁRIO: Abre Onboarding
                         document.getElementById('onboardingModal').style.display = 'flex';
                     } else {
+                        // USUÁRIO JÁ CONFIGURADO
+                        aplicarCores(dados.config.corPreferida);
+                        document.getElementById('appMainContainer').classList.add('active');
                         atualizarTelaBaseadoNoUsuario(dados);
                     }
                 }
             }, 300);
         });
 
-        function atualizarTelaBaseadoNoUsuario(dados) {
-            const nome = dados.config?.nomeUsuario || 'Usuário';
-            document.getElementById('tituloBoasVindas').innerText = `Olá, ${nome} 👋`;
+        function aplicarCores(cor) {
+            document.documentElement.style.setProperty('--primary-cyan', cor);
+            // Cria uma cor secundária que combine (mais escura)
+            document.documentElement.style.setProperty('--primary-purple', cor + 'cc'); 
         }
 
         function irParaStep2() {
@@ -153,30 +131,41 @@
         }
 
         function finalizarOnboarding() {
+            const nome = document.getElementById('obName').value;
+            const cor = document.getElementById('obColor').value;
             const dados = getData();
-            const nome = document.getElementById('obName').value.trim();
-            
-            dados.config = { setupConcluido: true, nomeUsuario: nome, modulosAtivos: ['financas', 'metas'] };
+
+            dados.config = {
+                setupConcluido: true,
+                nomeUsuario: nome,
+                corPreferida: cor,
+                modulosAtivos: ['financas', 'metas']
+            };
 
             const sonhos = [
-                document.getElementById('dream1').value.trim(),
-                document.getElementById('dream2').value.trim(),
-                document.getElementById('dream3').value.trim()
+                document.getElementById('dream1').value,
+                document.getElementById('dream2').value,
+                document.getElementById('dream3').value
             ].filter(s => s !== '');
 
-            if (sonhos.length > 0) {
+            if(sonhos.length > 0) {
                 dados.apresentacaoMetas = sonhos.map((s, i) => ({
                     id: `meta_${i}`,
                     title: s,
-                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury 8k") || 'rich'}?width=1080&height=1920&nologo=true`,
+                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury style cinematic")}?width=1080&height=1920&nologo=true`,
                     defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                 }));
             }
 
-            window.escudoAtivado = false; 
+            window.escudoAtivado = false;
             saveData(dados);
-            alert(`✨ Perfil criado, ${nome}!`);
+            alert("Configuração salva com sucesso!");
             window.location.reload();
+        }
+
+        function atualizarTelaBaseadoNoUsuario(dados) {
+            const nome = dados.config?.nomeUsuario || 'Membro';
+            document.getElementById('tituloBoasVindas').innerText = `Olá, ${nome} 👋`;
         }
     </script>
 </body>
