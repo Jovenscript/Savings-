@@ -67,16 +67,17 @@ body {
 }
 
 /* =========================================
-   DASHBOARD - PROTEÇÃO DE TAMANHO E SWIPER GERAL
+   DASHBOARD - A BELEZA ORIGINAL RESTAURADA
 ========================================= */
 .dashboardSwiper { width: 100%; height: auto !important; padding-bottom: 40px; overflow: hidden; }
 .dashboardSwiper .swiper-slide { width: 100% !important; height: auto !important; opacity: 1 !important; box-sizing: border-box; }
 .full-page-card { display: flex; flex-direction: column; justify-content: center; min-height: 550px; }
 
-/* 🚀 SWIPER DOS CONVIDADOS (CORREÇÃO DE TRAVAMENTO) */
-.swiper { width: 100%; max-width: 450px; height: 450px; margin: 20px auto; padding-top: 10px; }
-.swiper-slide { width: 280px !important; height: 380px !important; transition: 0.3s; opacity: 0.5; }
-.swiper-slide-active { opacity: 1 !important; transform: scale(1.05); }
+/* =========================================
+   CONVIDADOS (MATCH) - EFEITO TINDER
+========================================= */
+.tinderSwiper { width: 90%; max-width: 320px; height: 420px; margin: 20px auto; }
+.tinderSwiper .swiper-slide { width: 100% !important; height: 100% !important; opacity: 1 !important; transition: 0.3s; display: flex; flex-direction: column; }
 
 /* =========================================
    CALENDÁRIO - LAYOUT EM BLOCOS
@@ -107,7 +108,7 @@ body {
 .scroll-interno::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 4px; }
 
 /* =========================================
-   ELEMENTOS GERAIS E FORMULÁRIOS (BLINDADOS)
+   ELEMENTOS GERAIS E FORMULÁRIOS
 ========================================= */
 .glass-panel { 
     background: var(--panel-bg); 
@@ -127,7 +128,6 @@ body {
     letter-spacing: 1px; 
 }
 
-/* Todos os Inputs e Selects com vidro roxo/rosa */
 input, select, textarea { 
     width: 100%; 
     background: rgba(157, 78, 221, 0.15); 
@@ -149,7 +149,6 @@ input:focus, select:focus, textarea:focus {
 
 input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
-/* Mágica exclusiva do Select (Remove a seta padrão e põe a rosa) */
 select {
     cursor: pointer;
     appearance: none; 
@@ -160,71 +159,28 @@ select {
     background-size: 1.2em;
 }
 
-/* FORÇA BRUTA PARA O NAVEGADOR NÃO PINTAR A LISTA DE BRANCO */
-select option { 
-    background-color: var(--bg-dark) !important; 
-    color: #ffffff !important; 
-    font-weight: bold;
-    padding: 10px;
-}
+select option { background-color: var(--bg-dark) !important; color: #ffffff !important; font-weight: bold; padding: 10px; }
+select optgroup { background-color: var(--primary-purple) !important; color: #ffffff !important; font-weight: bold; font-style: normal; }
 
-select optgroup {
-    background-color: var(--primary-purple) !important;
-    color: #ffffff !important;
-    font-weight: bold;
-    font-style: normal;
-}
-
-/* Força TODOS os botões de envio a serem roxos, mesmo se faltar a classe no HTML */
 .btn-primary, button[type="submit"] { 
-    background: var(--primary-purple); 
-    color: #fff; 
-    border: none; 
-    padding: 15px; 
-    border-radius: 10px; 
-    cursor: pointer; 
-    font-weight: bold; 
-    width: 100%; 
-    margin-top: 15px; 
-    transition: 0.3s; 
+    background: var(--primary-purple); color: #fff; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; transition: 0.3s; 
 }
-
-.btn-primary:hover, button[type="submit"]:hover { 
-    box-shadow: 0 0 20px rgba(157, 78, 221, 0.6); 
-    transform: scale(0.98); 
-}
+.btn-primary:hover, button[type="submit"]:hover { box-shadow: 0 0 20px rgba(157, 78, 221, 0.6); transform: scale(0.98); }
 
 /* =========================================
    METAS E PROGRESSO
 ========================================= */
-.progress-bar { 
-    height: 8px; 
-    background: rgba(255, 255, 255, 0.1); 
-    border-radius: 4px; 
-    margin: 10px 0; 
-    overflow: hidden; 
-}
-
-.progress-fill { 
-    height: 100%; 
-    background: var(--primary-cyan); 
-    box-shadow: 0 0 10px var(--primary-cyan); 
-    transition: width 0.5s ease-in-out; 
-}
-
+.progress-bar { height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; margin: 10px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--primary-cyan); box-shadow: 0 0 10px var(--primary-cyan); transition: width 0.5s ease-in-out; }
 .text-green { color: var(--primary-cyan); }
 .text-red { color: var(--danger-red); }
 
 /* =========================================
-   ESTILOS DO MENU HAMBÚRGUER (OCULTOS NO PC)
+   MÍDIAS DE RESPONSIVIDADE
 ========================================= */
 #hamburgerBtn { display: none; position: fixed; top: 15px; left: 15px; z-index: 10001; background: var(--primary-purple); color: white; border: none; border-radius: 8px; padding: 10px 15px; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
 #mobileOverlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); z-index: 9999; backdrop-filter: blur(5px); opacity: 0; transition: 0.3s; pointer-events: none; }
 #mobileOverlay.active { opacity: 1; pointer-events: all; }
-
-/* =========================================
-   MÍDIAS DE RESPONSIVIDADE
-========================================= */
 
 @media (max-width: 1100px) {
     .calendar-page-layout { flex-direction: column; align-items: center; }
@@ -232,50 +188,22 @@ select optgroup {
 }
 
 @media (max-width: 768px) {
-    /* 1. Ativa a Cortina e o Botão Hambúrguer */
     #hamburgerBtn { display: block; }
     #mobileOverlay { display: block; }
 
-    /* 2. Esconde o menu para a esquerda e joga os itens pra baixo do botão */
-    .sidebar { 
-        transform: translateX(-100%); /* Fica invisível para a esquerda */
-        padding-top: 80px; 
-        border-right: 1px solid var(--primary-purple);
-        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
-    }
-    
-    /* Quando o JS adicionar a classe "active", o menu desliza para a tela */
+    .sidebar { transform: translateX(-100%); padding-top: 80px; border-right: 1px solid var(--primary-purple); box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
     .sidebar.active { transform: translateX(0); }
 
-    /* 3. Ajustes do Conteúdo Principal */
-    .main-content { 
-        margin-left: 0; /* Remove aquele buraco enorme na lateral */
-        padding: 1rem; 
-        padding-top: 80px; /* Dá espaço pro botão lá em cima */
-        width: 100vw;
-    }
+    .main-content { margin-left: 0; padding: 1rem; padding-top: 80px; width: 100vw; }
 
-    /* =========================================
-       CORREÇÃO DO DASHBOARD "GIGANTE" E SWIPER GERAL
-    ========================================= */
-    .full-page-card {
-        min-height: auto; /* Corta a altura exagerada */
-        padding: 1.5rem 1rem; /* Reduz o espaçamento interno */
-        margin-bottom: 10px;
-    }
-
+    .full-page-card { min-height: auto; padding: 1.5rem 1rem; margin-bottom: 10px; }
     .dashboardSwiper { padding-bottom: 20px; }
 
-    /* SWIPER DOS CONVIDADOS MOBILE */
-    .swiper { height: 400px; max-width: 100%; }
-    .swiper-slide { width: 260px !important; height: 360px !important; }
+    .tinderSwiper { height: 400px; max-width: 100%; }
+    .tinderSwiper .swiper-slide { width: 260px !important; height: 360px !important; }
 
-    /* Força os inputs a não vazarem da tela */
     input, select, textarea, .btn-primary { max-width: 100%; }
 
-    /* =========================================
-       CALENDÁRIO MOBILE
-    ========================================= */
     .calendar-page-layout { gap: 1.5rem; }
     .calendar-nav-btn { display: none; } 
     .calendarSwiper { height: 420px; max-width: 100%; }
@@ -287,7 +215,6 @@ select optgroup {
 @media (max-width: 400px) {
     .calendarSwiper { height: 380px; }
     .calendarSwiper .swiper-slide { width: 240px !important; height: 340px !important; }
-    
-    .swiper { height: 380px; }
-    .swiper-slide { width: 240px !important; height: 340px !important; }
+    .tinderSwiper { height: 380px; }
+    .tinderSwiper .swiper-slide { width: 240px !important; height: 340px !important; }
 }
