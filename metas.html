@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#0d0221">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         .metas-hero {
             padding: 0 !important;
@@ -17,106 +18,79 @@
             height: 100vh;
             background-color: #000;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* EFEITO DE CÂMERA CINEMATOGRÁFICA (ILUSÃO 3D) */
-        @keyframes cameraPan {
-            0% { transform: scale(1.05) translate(0, 0); }
-            50% { transform: scale(1.12) translate(-2%, 1%); }
-            100% { transform: scale(1.05) translate(0, 0); }
+        /* O CUBO OCUPANDO A TELA TODA (Descontando o Menu) */
+        .metasSwiper { 
+            width: 100%; 
+            height: 100%; 
         }
 
-        #metaBackground {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+        .swiper-slide {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Textos na parte de baixo */
             background-size: cover;
             background-position: center;
-            opacity: 0.6;
-            z-index: 1;
-            transition: background-image 0.8s ease-in-out;
-            animation: cameraPan 40s infinite ease-in-out; 
-            will-change: transform;
         }
 
+        /* Degradê escuro embaixo para dar leitura ao texto */
         .meta-overlay {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.9) 100%);
-            z-index: 2;
+            bottom: 0; left: 0; width: 100%; height: 60%;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+            z-index: 1;
         }
 
         .meta-content {
             position: relative;
             z-index: 3;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             padding: 4rem;
             color: white;
             text-align: center;
         }
 
-        .meta-title { font-size: 3.5rem; font-weight: bold; margin-bottom: 10px; text-shadow: 0 4px 15px rgba(0,0,0,0.5); display: inline-block; }
-        .meta-desc { font-size: 1.2rem; color: #ccc; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .meta-title { font-size: 4rem; font-weight: bold; margin-bottom: 5px; text-shadow: 0 4px 15px rgba(0,0,0,0.8); display: inline-block; }
+        .meta-desc { font-size: 1.2rem; color: #ccc; text-shadow: 0 2px 10px rgba(0,0,0,0.8); letter-spacing: 2px; text-transform: uppercase; }
 
-        .meta-nav {
-            position: absolute;
-            right: 2rem; top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            list-style: none;
-        }
-
-        .meta-nav li {
-            color: rgba(255,255,255,0.5);
-            padding: 15px;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 2px;
-            transition: all 0.4s ease;
-        }
-
-        .meta-nav li.active { 
-            color: var(--primary-cyan, #00f5d4); 
-            font-weight: bold; 
-            transform: scale(1.15); 
-            text-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
-        }
-
-        .meta-stats { display: flex; justify-content: center; gap: 3rem; margin-top: 2rem; }
+        .meta-stats { display: flex; justify-content: center; gap: 4rem; margin-top: 2.5rem; margin-bottom: 2rem;}
         .stat-box { position: relative; }
-        .stat-number { display: block; font-size: 2.2rem; font-weight: bold; color: #fff; }
-        .stat-label { font-size: 0.85rem; color: var(--primary-purple, #9d4edd); letter-spacing: 1px; font-weight: bold; }
+        .stat-number { display: block; font-size: 2.5rem; font-weight: bold; color: #fff; text-shadow: 0 0 15px rgba(0, 245, 212, 0.4); }
+        .stat-label { font-size: 0.85rem; color: var(--primary-cyan); letter-spacing: 2px; font-weight: bold; text-transform: uppercase; }
 
         .btn-edit-meta {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--primary-cyan);
             color: var(--primary-cyan);
             border-radius: 50%;
-            width: 40px; height: 40px;
+            width: 45px; height: 45px;
             font-size: 1.2rem;
             cursor: pointer;
             margin-left: 15px;
             vertical-align: middle;
             transition: 0.3s;
+            backdrop-filter: blur(5px);
         }
         .btn-edit-meta:hover { background: var(--primary-cyan); color: #000; transform: scale(1.1); }
 
-        /* CORREÇÃO DO BUG MOBILE */
+        /* Bolinhas indicadoras do Cubo */
+        .swiper-pagination-bullet { background: #fff; opacity: 0.4; width: 12px; height: 12px; margin: 0 8px !important;}
+        .swiper-pagination-bullet-active { background: var(--primary-purple); opacity: 1; box-shadow: 0 0 15px var(--primary-purple); transform: scale(1.3); }
+
+        /* MODO MOBILE */
         @media (max-width: 1024px) {
             .metas-hero { margin-left: 0; }
-            .meta-nav { 
-                top: 80px; right: 0; width: 100%; display: flex; justify-content: center; 
-                transform: none; padding: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            }
-            .meta-nav li { padding: 10px 15px; font-size: 0.75rem; }
-            .meta-content { padding: 2rem 1.5rem; justify-content: flex-end; padding-bottom: 6rem; }
-            .meta-title { font-size: 2.2rem; margin-top: 0; }
-            .meta-desc { font-size: 1rem; }
-            .meta-stats { gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; }
-            .stat-number { font-size: 1.5rem; }
+            .meta-content { padding: 2rem 1.5rem; padding-bottom: 4rem; }
+            .meta-title { font-size: 2.5rem; }
+            .meta-desc { font-size: 0.9rem; }
+            .meta-stats { gap: 1.5rem; flex-wrap: wrap; margin-top: 1.5rem; margin-bottom: 1rem; }
+            .stat-number { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -128,35 +102,17 @@
         <nav class="sidebar"></nav>
 
         <main class="main-content metas-hero">
-            <div id="metaBackground"></div>
-            <div class="meta-overlay"></div>
-
-            <ul class="meta-nav" id="metaNav"></ul>
-
-            <div class="meta-content">
-                <div style="margin-bottom: auto;"></div>
-
-                <div>
-                    <div>
-                        <h1 id="metaTitle" class="meta-title">Carregando...</h1>
-                        <button class="btn-edit-meta" onclick="editarMetaAtual()" title="Editar Meta">✏️</button>
+            
+            <div class="swiper metasSwiper">
+                <div class="swiper-wrapper" id="cuboMetas">
                     </div>
-                    <p id="metaDesc">Aguarde...</p>
-                    
-                    <div class="meta-stats">
-                        <div class="stat-box"><span class="stat-number" id="stat1">--</span><span class="stat-label">ALVO</span></div>
-                        <div class="stat-box"><span class="stat-number" id="stat2">--</span><span class="stat-label">PROGRESSO</span></div>
-                        <div class="stat-box"><span class="stat-number" id="stat3">--</span><span class="stat-label">PREVISÃO</span></div>
-                    </div>
-                    
-                    <button class="btn-meta" onclick="window.location.href='index.html'" style="margin-top: 30px; padding: 15px 40px; border-radius: 30px; border: 1px solid var(--primary-cyan); background: transparent; color: var(--primary-cyan); font-weight: bold; cursor: pointer; transition: 0.3s; backdrop-filter: blur(5px);">
-                        ACOMPANHAR NO DASHBOARD
-                    </button>
-                </div>
+                <div class="swiper-pagination" style="bottom: 20px;"></div>
             </div>
+
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     <script src="metas.js"></script> 
