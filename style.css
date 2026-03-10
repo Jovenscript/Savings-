@@ -67,11 +67,16 @@ body {
 }
 
 /* =========================================
-   DASHBOARD - PROTEÇÃO DE TAMANHO
+   DASHBOARD - PROTEÇÃO DE TAMANHO E SWIPER GERAL
 ========================================= */
 .dashboardSwiper { width: 100%; height: auto !important; padding-bottom: 40px; overflow: hidden; }
 .dashboardSwiper .swiper-slide { width: 100% !important; height: auto !important; opacity: 1 !important; box-sizing: border-box; }
 .full-page-card { display: flex; flex-direction: column; justify-content: center; min-height: 550px; }
+
+/* 🚀 SWIPER DOS CONVIDADOS (CORREÇÃO DE TRAVAMENTO) */
+.swiper { width: 100%; max-width: 450px; height: 450px; margin: 20px auto; padding-top: 10px; }
+.swiper-slide { width: 280px !important; height: 380px !important; transition: 0.3s; opacity: 0.5; }
+.swiper-slide-active { opacity: 1 !important; transform: scale(1.05); }
 
 /* =========================================
    CALENDÁRIO - LAYOUT EM BLOCOS
@@ -102,10 +107,6 @@ body {
 .scroll-interno::-webkit-scrollbar-thumb { background: var(--primary-purple); border-radius: 4px; }
 
 /* =========================================
-   ELEMENTOS GERAIS E FORMULÁRIOS
-========================================= */
-/* Estilo exclusivo para Inputs de texto/número */
-/* =========================================
    ELEMENTOS GERAIS E FORMULÁRIOS (BLINDADOS)
 ========================================= */
 .glass-panel { 
@@ -127,7 +128,7 @@ body {
 }
 
 /* Todos os Inputs e Selects com vidro roxo/rosa */
-input, select { 
+input, select, textarea { 
     width: 100%; 
     background: rgba(157, 78, 221, 0.15); 
     backdrop-filter: blur(10px);
@@ -141,7 +142,7 @@ input, select {
     font-weight: bold;
 }
 
-input:focus, select:focus { 
+input:focus, select:focus, textarea:focus { 
     border-color: var(--danger-red); 
     box-shadow: 0 0 15px rgba(241, 91, 181, 0.4); 
 }
@@ -214,8 +215,6 @@ select optgroup {
 .text-green { color: var(--primary-cyan); }
 .text-red { color: var(--danger-red); }
 
-/* (DAQUI PRA BAIXO CONTINUA O SEU @media DO MOBILE NORMALMENTE) */
-
 /* =========================================
    ESTILOS DO MENU HAMBÚRGUER (OCULTOS NO PC)
 ========================================= */
@@ -257,7 +256,7 @@ select optgroup {
     }
 
     /* =========================================
-       CORREÇÃO DO DASHBOARD "GIGANTE"
+       CORREÇÃO DO DASHBOARD "GIGANTE" E SWIPER GERAL
     ========================================= */
     .full-page-card {
         min-height: auto; /* Corta a altura exagerada */
@@ -267,8 +266,12 @@ select optgroup {
 
     .dashboardSwiper { padding-bottom: 20px; }
 
+    /* SWIPER DOS CONVIDADOS MOBILE */
+    .swiper { height: 400px; max-width: 100%; }
+    .swiper-slide { width: 260px !important; height: 360px !important; }
+
     /* Força os inputs a não vazarem da tela */
-    input, select, .btn-primary { max-width: 100%; }
+    input, select, textarea, .btn-primary { max-width: 100%; }
 
     /* =========================================
        CALENDÁRIO MOBILE
@@ -284,4 +287,7 @@ select optgroup {
 @media (max-width: 400px) {
     .calendarSwiper { height: 380px; }
     .calendarSwiper .swiper-slide { width: 240px !important; height: 340px !important; }
+    
+    .swiper { height: 380px; }
+    .swiper-slide { width: 240px !important; height: 340px !important; }
 }
