@@ -5,26 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gems Elite - Wedding Pulse</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
     <style>
-        .pulse-container { display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 20px; }
-        .main-vault {
-            width: 220px; height: 220px; border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: radial-gradient(circle, rgba(0, 245, 212, 0.05) 0%, transparent 75%);
-            border: 4px solid rgba(255, 255, 255, 0.05); position: relative;
-        }
-        .main-vault h2 { font-size: 2.2rem; margin: 0; color: var(--primary-cyan); }
-        .gems-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 15px; width: 100%; margin-top: 20px; }
-        .gem-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border);
-            border-radius: 15px; padding: 18px; position: relative; overflow: hidden;
-        }
-        .gem-progress { position: absolute; bottom: 0; left: 0; height: 5px; background: var(--primary-cyan); transition: width 0.8s; }
-        .pay-input { background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; padding: 8px; width: 100%; margin-top: 10px; border-radius: 8px; }
+        /* 💎 DESIGN DESLUMBRANTE DO ORÇAMENTO 💎 */
+        .pulse-container { display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 20px 0; }
         
-        /* Modal Simples */
-        #modalAdd { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; }
-        .modal-content { background: var(--bg-dark); border: 1px solid var(--primary-purple); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; }
+        .main-vault {
+            width: 250px; height: 250px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: radial-gradient(circle, rgba(0, 245, 212, 0.1) 0%, rgba(13, 2, 33, 0.8) 80%);
+            border: 2px solid rgba(0, 245, 212, 0.5); 
+            box-shadow: 0 0 40px rgba(0, 245, 212, 0.3), inset 0 0 20px rgba(157, 78, 221, 0.2);
+            position: relative;
+            animation: pulse-glow 3s infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 30px rgba(0, 245, 212, 0.2), inset 0 0 15px rgba(157, 78, 221, 0.1); }
+            100% { box-shadow: 0 0 50px rgba(0, 245, 212, 0.5), inset 0 0 30px rgba(157, 78, 221, 0.3); }
+        }
+
+        .main-vault h2 { font-size: 3.5rem; margin: 0; color: #fff; text-shadow: 0 0 15px var(--primary-cyan); }
+        
+        .gems-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; width: 100%; margin-top: 10px; }
+        
+        .gem-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(0,0,0,0.4)); 
+            border: 1px solid var(--primary-purple);
+            border-radius: 20px; padding: 25px; position: relative; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+        .gem-card:hover { transform: translateY(-5px); border-color: var(--primary-cyan); box-shadow: 0 15px 30px rgba(0, 245, 212, 0.15); }
+        
+        .gem-progress { position: absolute; bottom: 0; left: 0; height: 6px; background: linear-gradient(90deg, var(--primary-purple), var(--primary-cyan)); transition: width 0.8s ease-in-out; box-shadow: 0 -2px 10px rgba(0, 245, 212, 0.5); }
+        
+        .pay-input { background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; padding: 12px; width: 100%; margin-top: 15px; border-radius: 10px; font-weight: bold; }
+        .pay-input:focus { border-color: var(--primary-cyan); box-shadow: 0 0 10px rgba(0, 245, 212, 0.2); }
+        
+        #modalAdd { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--bg-dark); border: 1px solid var(--primary-cyan); padding: 35px; border-radius: 25px; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(0, 245, 212, 0.2); }
     </style>
 </head>
 <body>
@@ -36,48 +57,47 @@
             <div class="logo">GEMSELITE</div>
             <ul class="nav-links">
                 <li><a href="index.html">Dashboard</a></li>
+                <li><a href="transacoes.html">Transações</a></li>
+                <li><a href="planejamento.html">Planejamento</a></li>
+                <li><a href="calendario-financeiro.html">Calendário</a></li>
+                <li><a href="metas.html">Metas</a></li>
+                <li style="border-top: 1px dashed rgba(255,255,255,0.2); margin: 15px 0;"></li>
                 <li><a href="convidados.html">💍 Convidados</a></li>
-                <li class="active"><a href="orcamento-casamento.html">💰 Orçamento</a></li>
-                <li style="margin-top: 50px;"><a href="index.html" style="color: var(--danger-red);">← Voltar</a></li>
+                <li class="active"><a href="orcamento-casamento.html">💰 Orçamento Casamento</a></li>
+                <li style="margin-top: 30px;"><a href="#" id="btnLogout" style="color: #ff4b4b;">Sair do Sistema</a></li>
             </ul>
         </nav>
 
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 0 10px;">
+            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 10px; flex-wrap: wrap; gap: 15px;">
                 <div>
-                    <h1 style="color: var(--primary-purple);">Wedding Pulse</h1>
-                    <p>Faltam <span id="daysCount" style="color: #fff; font-weight: bold;">--</span> dias para o SIM!</p>
+                    <h1 style="color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.3);">Wedding <span style="color: var(--primary-cyan);">Pulse</span></h1>
+                    <p style="color: var(--text-muted);">Faltam <span id="daysCount" style="color: var(--danger-red); font-weight: bold; font-size: 1.2rem;">--</span> dias para o SIM!</p>
                 </div>
-                <button class="btn-primary" onclick="abrirModal()" style="padding: 10px 20px;">+ Item</button>
+                <button class="btn-primary" onclick="abrirModal()" style="width: auto; margin-top: 0; padding: 12px 25px; border-radius: 30px;">✨ Adicionar Fornecedor</button>
             </header>
 
             <div class="pulse-container">
                 <div class="main-vault" id="mainVault">
-                    <span style="font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px;">TOTAL PAGO</span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted); letter-spacing: 2px;">STATUS FINANCEIRO</span>
                     <h2 id="percTotal">0%</h2>
-                    <span id="valTotal" style="font-size: 0.8rem;">R$ 0,00</span>
+                    <span id="valTotal" style="font-size: 1.1rem; color: #fff; font-weight: bold; margin-top: 5px;">R$ 0,00 / R$ 0,00</span>
                 </div>
                 <div class="gems-grid" id="gemsGrid"></div>
-            </div>
-
-            <div class="glass-panel" style="margin-top: 40px; text-align: center;">
-                <h3>📥 Importar JSON</h3>
-                <input type="file" id="jsonMaster" accept=".json" style="display:none">
-                <button class="btn-primary" onclick="document.getElementById('jsonMaster').click()" style="background: transparent; border: 1px solid var(--primary-cyan); color: var(--primary-cyan);">Selecionar Backup</button>
             </div>
         </main>
     </div>
 
     <div id="modalAdd">
-        <div class="modal-content glass-panel">
-            <h3 style="margin-top: 0;">Novo Fornecedor</h3>
-            <div style="display: flex; flex-direction: column; gap: 15px; margin: 20px 0;">
-                <input type="text" id="addNome" placeholder="Ex: Fotógrafo, Alianças...">
-                <input type="number" id="addTotal" placeholder="Valor Total R$">
+        <div class="modal-content">
+            <h3 style="margin-top: 0; color: #fff; text-align: center; font-size: 1.5rem;">Novo Contrato</h3>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin: 25px 0;">
+                <input type="text" id="addNome" placeholder="Ex: Fotógrafo, Buffet, Alianças..." style="background: rgba(0,0,0,0.3);">
+                <input type="number" id="addTotal" placeholder="Valor Total R$" style="background: rgba(0,0,0,0.3);">
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn-primary" onclick="salvarNovoItem()" style="flex:1">Salvar</button>
-                <button class="btn-primary" onclick="fecharModal()" style="background: var(--danger-red); flex:1">Cancelar</button>
+                <button class="btn-primary" onclick="salvarNovoItem()" style="flex:1; margin-top: 0;">Salvar</button>
+                <button class="btn-primary" onclick="fecharModal()" style="background: transparent; border: 1px solid var(--danger-red); color: var(--danger-red); flex:1; margin-top: 0;">Cancelar</button>
             </div>
         </div>
     </div>
