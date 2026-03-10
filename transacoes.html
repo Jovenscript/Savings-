@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Savings - Transações</title>
     <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0d0221">
-<link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#0d0221">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -16,9 +16,8 @@
     <div id="mobileOverlay"></div>
 
     <div class="app-container">
-        <nav class="sidebar">
-      
-        </nav>
+        
+        <nav class="sidebar"></nav>
 
         <main class="main-content">
             <header style="margin-bottom: 30px;">
@@ -29,13 +28,23 @@
             <div class="transactions-layout">
                 
                 <div class="glass-panel" style="margin-bottom: 20px; border-color: var(--primary-cyan); background: linear-gradient(145deg, rgba(0, 245, 212, 0.05), rgba(0,0,0,0.4));">
-                    <h3>📸 Leitor em Lote da Fatura (Cartão)</h3>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Faça upload do print da sua fatura. O sistema extrairá vários valores de uma vez e os agendará para o <strong>dia 11</strong> do mês selecionado.</p>
-                    
-                    <input type="file" id="uploadFatura" accept="image/*" style="display: none;">
-                    <label for="uploadFatura" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: transparent; border: 1px solid var(--primary-cyan); color: var(--primary-cyan); padding: 10px 20px;">
-                        📎 Selecionar Print da Fatura
-                    </label>
+                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <h3>📸 Leitor em Lote da Fatura (Cartão)</h3>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">Faça upload do print da sua fatura. O sistema extrairá vários valores de uma vez e os agendará para o <strong>dia 11</strong> do mês selecionado.</p>
+                            
+                            <input type="file" id="uploadFatura" accept="image/*" style="display: none;">
+                            <label for="uploadFatura" class="btn-primary" style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; background: transparent; border: 1px solid var(--primary-cyan); color: var(--primary-cyan); padding: 10px 20px;">
+                                📎 Selecionar Print da Fatura
+                            </label>
+                        </div>
+                        
+                        <div style="display: flex; align-items: flex-end;">
+                            <button onclick="limparDuplicatasInteligente()" class="btn-primary" style="background: rgba(241, 91, 181, 0.2); border: 1px solid var(--danger-red); color: var(--danger-red); padding: 10px 20px; margin-top: 0;">
+                                🧹 Limpar Duplicatas (Data + Valor + Nome)
+                            </button>
+                        </div>
+                    </div>
                     
                     <div id="ocrStatus" style="margin-top: 15px; color: var(--primary-cyan); font-weight: bold; font-size: 0.9rem; display: none;">
                         ⏳ Analisando a imagem com IA... Aguarde alguns segundos.
@@ -45,7 +54,7 @@
                 <div class="glass-panel" id="painelManual" style="margin-bottom: 30px; border-color: var(--primary-purple);">
                     
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 15px; gap: 10px;">
-                        <h3 id="tituloManual" style="margin: 0;">✍️ Lançamento Manual</h3>
+                        <h3 id="tituloManual" style="margin: 0;">✍️ Lançamento Manual / Agendamento</h3>
                         
                         <div>
                             <input type="file" id="uploadComprovante" accept="image/*" style="display: none;">
@@ -129,15 +138,10 @@
         </main>
     </div>
 
-<script type="module" src="auth.js"></script>
-    
+    <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     <script src="transacoes.js"></script>
     <script src="mobile.js"></script>
     <script src="pwa.js"></script>
 </body>
 </html>
-
-
-
-
