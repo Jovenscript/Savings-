@@ -26,17 +26,16 @@ function renderCards() {
     const dados = getData();
     if (!dados.casamento) dados.casamento = { convidados: [] };
     
-    // Pega todos os pendentes para atualizar o contador
     const todosPendentes = dados.casamento.convidados.filter(g => g.status === 'pending');
     document.getElementById('counter').innerText = `${todosPendentes.length} aguardando decisão`;
 
-    // 🚀 OTIMIZAÇÃO: Carrega um baralho de 100 cartas. (Fluidez máxima!)
-    const pendentesRender = todosPendentes.slice(0, 100);
+    // Lote de 30 cartas com o novo motor super leve
+    const pendentesRender = todosPendentes.slice(0, 30);
 
     wrapper.innerHTML = '';
     
     if (todosPendentes.length === 0) {
-        wrapper.innerHTML = `<div class="swiper-slide guest-card"><h2>🎉 Fim da Lista!</h2><p>Tudo pronto para o grande dia.</p></div>`;
+        wrapper.innerHTML = `<div class="swiper-slide guest-card" style="opacity: 1;"><h2>🎉 Fim da Lista!</h2><p>Tudo pronto para o grande dia.</p></div>`;
     } else {
         pendentesRender.forEach(g => {
             const slide = document.createElement('div');
@@ -48,18 +47,22 @@ function renderCards() {
     }
 
     if (tinderSwiper) tinderSwiper.destroy(true, true);
+    
+    // 🚀 O MOTOR DO CALENDÁRIO ESTÁ AQUI!
     tinderSwiper = new Swiper(".tinderSwiper", { 
-        effect: "cards", 
-        grabCursor: true,
-        cardsEffect: { perSlideOffset: 8, perSlideRotate: 2, rotate: true, slideShadows: false }
+        effect: "coverflow", 
+        grabCursor: true, 
+        touchRatio: 1.5, 
+        centeredSlides: true,
+        slidesPerView: "auto",
+        coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false }
     });
 
-    // Atualiza as listas lá embaixo
     renderListasDeStatus(dados.casamento.convidados);
 }
 
 // ==========================================
-// 🧠 LÓGICA NINJA DE ANIMAÇÃO E REMOÇÃO
+// ANIMAÇÃO SUAVE DE REMOÇÃO (SEM LAG)
 // ==========================================
 window.decidirStatus = (status) => {
     if (!tinderSwiper || !tinderSwiper.slides.length) return;
@@ -69,7 +72,6 @@ window.decidirStatus = (status) => {
     const id = activeSlide ? activeSlide.dataset.id : null;
     
     if (id) {
-        // 1. Atualiza no Banco de Dados
         const dados = getData();
         const g = dados.casamento.convidados.find(x => x.id === id);
         
@@ -77,25 +79,25 @@ window.decidirStatus = (status) => {
             g.status = status; 
             saveData(dados); 
             
-            // 2. Faz a carta "Voar" para o lado correspondente (Animação)
-            activeSlide.style.transition = 'all 0.25s ease-out';
-            activeSlide.style.transform = status === 'yes' ? 'translate(200px, -50px) rotate(30deg)' : 'translate(-200px, -50px) rotate(-30deg)';
+            // Animação leve: encolhe e some
+            activeSlide.style.transition = 'all 0.3s ease';
+            activeSlide.style.transform = 'scale(0.8)';
             activeSlide.style.opacity = '0';
             
-            // 3. Apaga a carta da memória e atualiza as listas em tempo real!
             setTimeout(() => {
                 tinderSwiper.removeSlide(activeIndex);
                 renderListasDeStatus(dados.casamento.convidados);
                 
-                // Atualiza o contador do topo
                 const pendentes = dados.casamento.convidados.filter(x => x.status === 'pending');
                 document.getElementById('counter').innerText = `${pendentes.length} aguardando decisão`;
                 
-                // Se zerar o baralho de 100, carrega as próximas automaticamente
-                if (tinderSwiper.slides.length === 0) {
+                // Se sobrarem poucas cartas na tela, recarrega silenciosamente
+                if (tinderSwiper.slides.length < 5 && pendentes.length > 0) {
+                    renderCards();
+                } else if (tinderSwiper.slides.length === 0 && pendentes.length === 0) {
                     renderCards();
                 }
-            }, 250); 
+            }, 300); 
         }
     }
 };
@@ -110,7 +112,6 @@ function renderListasDeStatus(todosConvidados) {
     const countYes = document.getElementById('countYes');
     const countNo = document.getElementById('countNo');
     
-    // Proteção caso os contadores não existam no HTML
     if(countYes) countYes.innerText = confirmados.length;
     if(countNo) countNo.innerText = recusados.length;
 
@@ -136,9 +137,9 @@ window.desfazerStatus = (id) => {
     const dados = getData();
     const g = dados.casamento.convidados.find(x => x.id === id);
     if (g) {
-        g.status = 'pending'; // Volta pra pilha pendente
+        g.status = 'pending'; 
         saveData(dados);
-        renderCards(); // Recarrega o baralho para a pessoa voltar pro topo
+        renderCards(); 
     }
 };
 
