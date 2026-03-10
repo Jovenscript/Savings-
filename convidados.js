@@ -58,8 +58,8 @@ function renderCards() {
         touchRatio: 1.5, 
         centeredSlides: true,
         slidesPerView: "auto",
-        coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false },
-        allowTouchMove: false // Trava o arraste manual pra usar só os botões
+        coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false }
+        // 🔓 REMOVIDO AQUI: a linha "allowTouchMove: false" foi apagada! Agora você pode folhear livremente!
     });
 
     renderListasDeStatus(dados.casamento.convidados);
@@ -71,6 +71,7 @@ function renderCards() {
 window.decidirStatus = (status) => {
     if (!tinderSwiper || !tinderSwiper.slides.length) return;
     
+    // O botão sempre age sobre a carta que está no MEIO da tela (activeIndex)
     const activeIndex = tinderSwiper.activeIndex;
     const activeSlide = tinderSwiper.slides[activeIndex];
     const id = activeSlide ? activeSlide.dataset.id : null;
@@ -112,7 +113,7 @@ window.decidirStatus = (status) => {
 function renderListasDeStatus(todosConvidados) {
     const confirmados = todosConvidados.filter(g => g.status === 'yes');
     const recusados = todosConvidados.filter(g => g.status === 'no');
-    const emEspera = todosConvidados.filter(g => g.status === 'wait'); // A nova lista!
+    const emEspera = todosConvidados.filter(g => g.status === 'wait');
 
     document.getElementById('countYes').innerText = confirmados.length;
     document.getElementById('countNo').innerText = recusados.length;
