@@ -11,16 +11,65 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ESTILOS DO ONBOARDING (SaaS) */
+        #onboardingModal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000;
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px);
+        }
+        .ob-content { background: var(--bg-dark); border: 1px solid var(--primary-purple); border-radius: 20px; padding: 40px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 0 50px rgba(157, 78, 221, 0.3); }
+        .ob-title { color: #fff; font-size: 2rem; margin-bottom: 10px; }
+        .ob-subtitle { color: var(--text-muted); margin-bottom: 30px; }
+        
+        .ob-module-btn, .ob-dream-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff;
+            padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; width: 100%; text-align: left; font-size: 1.1rem;
+        }
+        .ob-module-btn.active, .ob-dream-btn.active {
+            background: rgba(0, 245, 212, 0.1); border-color: var(--primary-cyan); box-shadow: inset 0 0 10px rgba(0, 245, 212, 0.2);
+        }
+        
+        #step2 { display: none; }
+    </style>
 </head>
 <body>
     <button id="hamburgerBtn">☰</button>
     <div id="mobileOverlay"></div>
 
-    <div class="app-container">
-        
-        <nav class="sidebar">
+    <div id="onboardingModal" style="display: none;">
+        <div class="ob-content" id="step1">
+            <h2 class="ob-title">Boas-vindas ao Gems 💎</h2>
+            <p class="ob-subtitle">O que você quer organizar na sua vida hoje?</p>
             
-        </nav>
+            <button class="ob-module-btn active" data-mod="financas" style="pointer-events: none; opacity: 0.7;">
+                📊 Controle Financeiro (Obrigatório)
+            </button>
+            <button class="ob-module-btn active" data-mod="metas" onclick="this.classList.toggle('active')">
+                🎯 Planejar Grandes Metas (Sonhos)
+            </button>
+            <button class="ob-module-btn" data-mod="casamento" onclick="this.classList.toggle('active')">
+                💍 Planejar meu Casamento
+            </button>
+
+            <button class="btn-primary" onclick="irParaStep2()" style="margin-top: 30px;">Avançar ❯</button>
+        </div>
+
+        <div class="ob-content" id="step2">
+            <h2 class="ob-title">Seus Grandes Sonhos</h2>
+            <p class="ob-subtitle">Escolha até 3 metas de vida para o sistema montar seu painel preditivo.</p>
+            
+            <button class="ob-dream-btn" onclick="toggleDream(this, 'Casa Própria', 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80')">🏠 Comprar uma Casa</button>
+            <button class="ob-dream-btn" onclick="toggleDream(this, 'Comprar Carro', 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1920&q=80')">🚗 Comprar um Carro</button>
+            <button class="ob-dream-btn" onclick="toggleDream(this, 'Viagem Internacional', 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1920&q=80')">✈️ Viagem Inesquecível</button>
+            <button class="ob-dream-btn" onclick="toggleDream(this, 'Casamento', 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=1920&q=80')">💍 Fazer Festa de Casamento</button>
+
+            <button class="btn-primary" onclick="finalizarOnboarding()" style="margin-top: 30px;">Gerar Meu Aplicativo ✨</button>
+        </div>
+    </div>
+
+    <div class="app-container" id="appMainContainer">
+        
+        <nav class="sidebar"></nav>
 
         <main class="main-content">
             
@@ -33,9 +82,9 @@
                 <div style="min-width: 180px;">
                     <label for="userSwitch" style="font-size: 0.85rem; color: var(--text-muted); font-weight: bold;">Filtrar Visão:</label>
                     <select id="userSwitch" style="margin-top: 5px; background: rgba(0,0,0,0.5); color: #fff; border: 1px solid var(--primary-cyan); border-radius: 8px; padding: 5px 10px;">
-                        <option value="ambos">Casal (Visão Geral)</option>
-                        <option value="Caroline">Caroline</option>
-                        <option value="Marlon">Marlon</option>
+                        <option value="ambos">Visão Geral (Todos)</option>
+                        <option value="Usuário 1">Usuário 1</option>
+                        <option value="Usuário 2">Usuário 2</option>
                     </select>
                 </div>
             </header>
@@ -84,19 +133,14 @@
                         </div>
                     </div>
 
-                    <div class="swiper-slide">
+                    <div class="swiper-slide" id="slideCasamento" style="display: flex;">
                         <div class="glass-panel" style="border-color: var(--danger-red);">
                             <div style="text-align: center; margin-bottom: 20px; border-bottom: 1px dashed rgba(241, 91, 181, 0.3); padding-bottom: 15px;">
                                 <h3 style="color: var(--danger-red); margin-bottom: 5px;">💍 O Grande Dia</h3>
                                 <div id="contagemCasamento" style="font-size: 2rem; font-weight: bold; color: #fff; text-shadow: 0 0 10px rgba(241, 91, 181, 0.5);">-- Dias</div>
-                                <span style="font-size: 0.8rem; color: var(--text-muted);">para o "Sim!"</span>
                             </div>
 
-                            <div id="mainGoal" style="margin-bottom: 20px;">
-                                <div style="text-align: center; color: var(--text-muted); font-style: italic;">Carregando metas...</div>
-                            </div>
-
-                            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 5px; color: var(--primary-cyan);">Evolução (6 Meses)</h3>
+                            <h3 style="text-align: center; font-size: 1rem; margin-bottom: 5px; color: var(--primary-cyan);">Evolução Patrimonial (6 Meses)</h3>
                             <div style="position: relative; flex: 1; min-height: 150px; width: 100%;">
                                 <canvas id="balanceChart"></canvas>
                             </div>
@@ -108,16 +152,15 @@
                             <div style="font-size: 4rem; margin-bottom: 10px;">🔄</div>
                             <h3 style="color: #fff; margin-bottom: 10px;">Sincronizar Aparelhos</h3>
                             <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px;">
-                                O seu banco de dados na palma da mão. Gere o backup de um celular e importe no outro para manter o casal na mesma página.
+                                Gere o backup de um celular e importe no outro.
                             </p>
                             
                             <div style="display: flex; flex-direction: column; gap: 15px;">
                                 <button id="btnExportar" class="btn-primary" style="background: rgba(0, 245, 212, 0.1); border: 1px solid var(--primary-cyan); color: var(--primary-cyan); padding: 15px;">
-                                    📤 1. Exportar Backup Atual
+                                    📤 1. Exportar Backup
                                 </button>
-
                                 <label class="btn-primary" style="cursor: pointer; padding: 15px; margin-top: 0; background: var(--primary-purple);">
-                                    📥 2. Importar Dados do Parceiro
+                                    📥 2. Importar Dados
                                     <input type="file" id="btnImportar" accept=".json" style="display: none;">
                                 </label>
                             </div>
@@ -133,12 +176,98 @@
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     <script src="dashboard.js"></script>
     <script src="mobile.js"></script> 
     <script src="pwa.js"></script>
+
+    <script>
+        let moduloSelecionados = ['financas'];
+        let sonhosSelecionados = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkData = setInterval(() => {
+                if(typeof getData === 'function') {
+                    clearInterval(checkData);
+                    const dados = getData();
+                    
+                    // Se não tiver setup concluído, bloqueia a tela e mostra o Modal!
+                    if (!dados.config || !dados.config.setupConcluido) {
+                        document.getElementById('appMainContainer').style.filter = 'blur(10px)';
+                        document.getElementById('onboardingModal').style.display = 'flex';
+                    } else {
+                        // Se já configurou e não marcou Casamento, esconde o lado do cubo de casamento
+                        if (!dados.config.modulosAtivos.includes('casamento')) {
+                            const slideCas = document.getElementById('slideCasamento');
+                            if(slideCas) slideCas.remove();
+                        }
+                    }
+                }
+            }, 200);
+        });
+
+        function irParaStep2() {
+            // Salva os módulos clicados
+            moduloSelecionados = ['financas']; // Sempre ativo
+            document.querySelectorAll('.ob-module-btn.active').forEach(btn => {
+                if(btn.dataset.mod !== 'financas') moduloSelecionados.push(btn.dataset.mod);
+            });
+
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+        }
+
+        function toggleDream(btn, title, img) {
+            if (btn.classList.contains('active')) {
+                btn.classList.remove('active');
+                sonhosSelecionados = sonhosSelecionados.filter(s => s.title !== title);
+            } else {
+                if (sonhosSelecionados.length >= 3) {
+                    alert("Você só pode escolher até 3 sonhos para focar agora!");
+                    return;
+                }
+                btn.classList.add('active');
+                sonhosSelecionados.push({ title: title, img: img });
+            }
+        }
+
+        function finalizarOnboarding() {
+            const dados = typeof getData === 'function' ? getData() : {};
+            
+            // 1. Salva os Módulos Ativos
+            dados.config = {
+                setupConcluido: true,
+                modulosAtivos: moduloSelecionados
+            };
+
+            // 2. Se escolheu Metas, O Motor Inteligente injeta os itens com as fotos Premium
+            if (sonhosSelecionados.length > 0) {
+                let metasProntas = [];
+                let valoresZerados = {};
+
+                sonhosSelecionados.forEach((s, index) => {
+                    const idCriado = "meta_" + index;
+                    metasProntas.push({
+                        id: idCriado,
+                        title: s.title,
+                        desc: "Plano Oficial",
+                        img: s.img,
+                        defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir Ano"
+                    });
+                    valoresZerados[idCriado] = { s1: "R$ 0", s2: "0%", s3: "Definir Ano" };
+                });
+
+                // Aqui nós hackeamos o seu arquivo de metas.js injetando as metas criadas pelo usuário
+                dados.apresentacaoMetas = metasProntas;
+                dados.valoresMetas = valoresZerados;
+            }
+
+            if (typeof saveData === 'function') saveData(dados);
+            
+            alert("✨ Tudo pronto! O Gems Elite foi moldado para você.");
+            window.location.reload();
+        }
+    </script>
 </body>
 </html>
-
