@@ -19,8 +19,16 @@
         }
         .ob-content { background: var(--bg-dark); border: 1px solid var(--primary-purple); border-radius: 20px; padding: 40px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 0 50px rgba(157, 78, 221, 0.3); }
         .ob-title { color: #fff; font-size: 2rem; margin-bottom: 10px; }
-        .ob-subtitle { color: var(--text-muted); margin-bottom: 30px; }
+        .ob-subtitle { color: var(--text-muted); margin-bottom: 25px; }
         
+        /* NOVO: Input de Nome */
+        .ob-input {
+            width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.5); 
+            border: 1px solid var(--primary-cyan); color: #fff; margin-bottom: 30px; 
+            font-size: 1.2rem; outline: none; text-align: center; font-weight: bold;
+        }
+        .ob-input:focus { box-shadow: 0 0 15px rgba(0, 245, 212, 0.4); }
+
         .ob-module-btn, .ob-dream-btn {
             background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: #fff;
             padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.3s; width: 100%; text-align: left; font-size: 1.1rem;
@@ -38,8 +46,12 @@
 
     <div id="onboardingModal" style="display: none;">
         <div class="ob-content" id="step1">
-            <h2 class="ob-title">Boas-vindas ao Gems 💎</h2>
-            <p class="ob-subtitle">O que você quer organizar na sua vida hoje?</p>
+            <h2 class="ob-title">Boas-vindas! 💎</h2>
+            
+            <p class="ob-subtitle" style="margin-bottom: 10px;">Como podemos chamar você?</p>
+            <input type="text" id="obName" class="ob-input" placeholder="Digite seu nome">
+
+            <p class="ob-subtitle" style="margin-bottom: 15px;">O que você quer organizar hoje?</p>
             
             <button class="ob-module-btn active" data-mod="financas" style="pointer-events: none; opacity: 0.7;">
                 📊 Controle Financeiro (Obrigatório)
@@ -51,7 +63,7 @@
                 💍 Planejar meu Casamento
             </button>
 
-            <button class="btn-primary" onclick="irParaStep2()" style="margin-top: 30px;">Avançar ❯</button>
+            <button class="btn-primary" onclick="irParaStep2()" style="margin-top: 20px;">Avançar ❯</button>
         </div>
 
         <div class="ob-content" id="step2">
@@ -75,7 +87,7 @@
             
             <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
                 <div>
-                    <h1 style="color: #fff; font-size: 2rem;">Cubo de Controle</h1>
+                    <h1 id="tituloBoasVindas" style="color: #fff; font-size: 2rem;">Cubo de Controle</h1>
                     <p style="color: var(--text-muted);">Gire o cubo para navegar entre seus módulos.</p>
                 </div>
                 
@@ -192,12 +204,19 @@
                     clearInterval(checkData);
                     const dados = getData();
                     
-                    // Se não tiver setup concluído, bloqueia a tela e mostra o Modal!
+                    // Se não tiver setup concluído, mostra o Modal
                     if (!dados.config || !dados.config.setupConcluido) {
                         document.getElementById('appMainContainer').style.filter = 'blur(10px)';
                         document.getElementById('onboardingModal').style.display = 'flex';
                     } else {
-                        // Se já configurou e não marcou Casamento, esconde o lado do cubo de casamento
+                        // NOVO: Atualiza a saudação com o nome do usuário
+                        const nomeUsuario = dados.config.nomeUsuario || '';
+                        if (nomeUsuario) {
+                            const titulo = document.getElementById('tituloBoasVindas');
+                            if (titulo) titulo.innerText = `Olá, ${nomeUsuario} 👋`;
+                        }
+
+                        // Esconde casamento se não ativou
                         if (!dados.config.modulosAtivos.includes('casamento')) {
                             const slideCas = document.getElementById('slideCasamento');
                             if(slideCas) slideCas.remove();
@@ -208,6 +227,14 @@
         });
 
         function irParaStep2() {
+            // Valida o Nome antes de avançar!
+            const nomeDigitado = document.getElementById('obName').value.trim();
+            if (!nomeDigitado) {
+                alert("Por favor, digite o seu nome para continuarmos!");
+                document.getElementById('obName').focus();
+                return;
+            }
+
             // Salva os módulos clicados
             moduloSelecionados = ['financas']; // Sempre ativo
             document.querySelectorAll('.ob-module-btn.active').forEach(btn => {
@@ -234,14 +261,16 @@
 
         function finalizarOnboarding() {
             const dados = typeof getData === 'function' ? getData() : {};
+            const nomeDigitado = document.getElementById('obName').value.trim();
             
-            // 1. Salva os Módulos Ativos
+            // 1. Salva o Nome e Módulos Ativos
             dados.config = {
                 setupConcluido: true,
+                nomeUsuario: nomeDigitado,
                 modulosAtivos: moduloSelecionados
             };
 
-            // 2. Se escolheu Metas, O Motor Inteligente injeta os itens com as fotos Premium
+            // 2. Se escolheu Metas, injeta os itens com as fotos
             if (sonhosSelecionados.length > 0) {
                 let metasProntas = [];
                 let valoresZerados = {};
@@ -258,14 +287,13 @@
                     valoresZerados[idCriado] = { s1: "R$ 0", s2: "0%", s3: "Definir Ano" };
                 });
 
-                // Aqui nós hackeamos o seu arquivo de metas.js injetando as metas criadas pelo usuário
                 dados.apresentacaoMetas = metasProntas;
                 dados.valoresMetas = valoresZerados;
             }
 
             if (typeof saveData === 'function') saveData(dados);
             
-            alert("✨ Tudo pronto! O Gems Elite foi moldado para você.");
+            alert(`✨ Tudo pronto, ${nomeDigitado}! O Gems Elite foi moldado para você.`);
             window.location.reload();
         }
     </script>
