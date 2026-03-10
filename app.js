@@ -14,21 +14,15 @@ window.dispararConfetes = function() {
             origin: { y: 0.6 },
             colors: ['#9d4edd', '#00f5d4', '#f15bb5']
         });
-        
-        // Vibração se o celular suportar
         if (navigator.vibrate) navigator.vibrate(50);
     }
 };
 
-// 🛡️ ESCUDO DE PROTEÇÃO (Evita que um celular zerado apague a nuvem)
 let escudoAtivado = false;
 if (!localStorage.getItem('gemsEliteData')) {
     escudoAtivado = true; 
 }
 
-// ==========================================
-// 1. BANCO DE DADOS LOCAL + CACHE INTELIGENTE
-// ==========================================
 function getData() {
     return JSON.parse(localStorage.getItem('gemsEliteData')) || {};
 }
@@ -46,9 +40,6 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// ==========================================
-// 2. MOTOR DE SINCRONIZAÇÃO (FIREBASE)
-// ==========================================
 async function sincronizarComFirebase(data) {
     if (!window.db) return;
     try {
@@ -61,9 +52,6 @@ async function sincronizarComFirebase(data) {
     }
 }
 
-// ==========================================
-// 3. RADAR EM TEMPO REAL (ESCUTA O PARCEIRO)
-// ==========================================
 async function ligarRadarEmTempoReal() {
     try {
         const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
@@ -102,13 +90,9 @@ async function ligarRadarEmTempoReal() {
 
 ligarRadarEmTempoReal();
 
-// ==========================================
-// 4. MENU DINÂMICO E BOTÃO FAST ACTION
-// ==========================================
 function injetarElementosGlobais() {
     const sidebarElement = document.querySelector('.sidebar');
     
-    // Injeta Menu se a tela suportar
     if (sidebarElement) {
         let paginaAtual = window.location.pathname.split('/').pop();
         if (paginaAtual === '' || paginaAtual === '/') paginaAtual = 'index.html';
@@ -165,7 +149,6 @@ function injetarElementosGlobais() {
         }
     }
 
-    // 🚀 INJETA O BOTÃO FLUTUANTE DE LANÇAMENTO RÁPIDO (Se não for a tela de Login)
     if (window.location.pathname.indexOf('login.html') === -1) {
         const fab = document.createElement('button');
         fab.id = 'fabLancar';
@@ -176,7 +159,6 @@ function injetarElementosGlobais() {
         fab.addEventListener('click', () => {
             let paginaAtual = window.location.pathname.split('/').pop();
             
-            // Se já estiver nas transações, apenas rola a tela até o formulário e foca nele
             if (paginaAtual === 'transacoes.html') {
                 const painelManual = document.getElementById('painelManual');
                 if (painelManual) {
@@ -184,7 +166,6 @@ function injetarElementosGlobais() {
                     setTimeout(() => document.getElementById('descManual').focus(), 500);
                 }
             } else {
-                // Se estiver em outra tela, manda para Transações
                 window.location.href = 'transacoes.html';
             }
         });
