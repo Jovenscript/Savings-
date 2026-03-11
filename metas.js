@@ -34,7 +34,7 @@ function initMetas() {
     if (dadosGerais.apresentacaoMetas && dadosGerais.apresentacaoMetas.length > 0) {
         baseMetas = dadosGerais.apresentacaoMetas;
     } else {
-        baseMetas = baseMetas = metasFundadores;
+        baseMetas = metasFundadores;
     }
 
     if (dadosGerais.valoresMetas) {
@@ -59,13 +59,16 @@ function renderizarCubo() {
 
     baseMetas.forEach((meta) => {
         const meusValores = valoresSalvos[meta.id] || { s1: meta.defaultS1 || "R$ 0", s2: meta.defaultS2 || "0%", s3: meta.defaultS3 || "Definir" };
+        
+        // Verifica se o usuário subiu uma foto customizada. Se sim, usa ela. Se não, usa a padrão.
+        const imagemFundo = meusValores.imgCustomizada ? meusValores.imgCustomizada : meta.img;
 
         html += `
             <div class="swiper-slide" style="background-color: #050110; position: relative;">
                 
                 <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, rgba(13,2,33,0.9), rgba(157,78,221,0.5)); z-index: 0;"></div>
 
-                <img src="${meta.img}" 
+                <img src="${imagemFundo}" 
                      alt="${meta.title}" 
                      style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.85;">
                 
@@ -74,9 +77,10 @@ function renderizarCubo() {
                 <div class="meta-content" style="position: relative; z-index: 3; width: 100%;">
                     <div>
                         <h1 class="meta-title">${meta.title}</h1>
+                        <button class="btn-edit-meta" onclick="trocarFotoMeta('${meta.id}')" title="Mudar Foto">📷</button>
                         <button class="btn-edit-meta" onclick="editarValoresCofre('${meta.id}')" title="Editar Valores">✏️</button>
                     </div>
-                    <p class="meta-desc">${meta.desc || 'Metas e Sonhos'}</p>
+                    <p class="meta-desc">${meta.desc || 'Sonhos e Metas'}</p>
                     
                     <div class="meta-stats">
                         <div class="stat-box"><span class="stat-number">${meusValores.s1}</span><span class="stat-label">ALVO</span></div>
@@ -103,6 +107,59 @@ function iniciarMotor3D() {
     });
 }
 
+// 💥 SISTEMA DE UPLOAD DE FOTO (COMPRIME PARA NÃO TRAVAR O CELULAR)
+window.trocarFotoMeta = function(idDaMeta) {
+    if (swiperMetas && swiperMetas.autoplay) swiperMetas.autoplay.stop();
+
+    // Cria um input de arquivo escondido
+    const inputFoto = document.createElement('input');
+    inputFoto.type = 'file';
+    inputFoto.accept = 'image/*';
+    
+    inputFoto.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(e) {
+            const img = new Image();
+            img.src = e.target.result;
+            
+            img.onload = function() {
+                // Comprime a imagem para 800px de largura para salvar no localStorage sem estourar o limite
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                const fotoBase64 = canvas.toDataURL('image/jpeg', 0.7); // Qualidade 70%
+                
+                // Salva a foto
+                if (!valoresSalvos[idDaMeta]) valoresSalvos[idDaMeta] = {s1:'', s2:'', s3:''};
+                valoresSalvos[idDaMeta].imgCustomizada = fotoBase64;
+                
+                const dadosGerais = typeof getData === 'function' ? getData() : {};
+                dadosGerais.valoresMetas = valoresSalvos;
+                if (typeof saveData === 'function') saveData(dadosGerais);
+
+                // Atualiza a tela
+                const slideAtual = swiperMetas.realIndex;
+                swiperMetas.destroy(true, true);
+                renderizarCubo();
+                iniciarMotor3D();
+                if(baseMetas.length > 1) swiperMetas.slideToLoop(slideAtual, 0, false);
+            }
+        };
+    };
+    
+    inputFoto.click(); // Abre a galeria do celular
+};
+
 window.editarValoresCofre = function(idDaMeta) {
     if (swiperMetas && swiperMetas.autoplay) swiperMetas.autoplay.stop();
     
@@ -113,7 +170,10 @@ window.editarValoresCofre = function(idDaMeta) {
     const novoS2 = prompt(`Qual o PROGRESSO atual? (Ex: 12%):`, valoresAtuais.s2) || valoresAtuais.s2;
     const novoS3 = prompt(`Qual a PREVISÃO para realizar? (Ex: 2030):`, valoresAtuais.s3) || valoresAtuais.s3;
 
-    valoresSalvos[idDaMeta] = { s1: novoS1, s2: novoS2, s3: novoS3 };
+    // Mantém a imagem caso ela já exista
+    const fotoExistente = valoresAtuais.imgCustomizada || null;
+
+    valoresSalvos[idDaMeta] = { s1: novoS1, s2: novoS2, s3: novoS3, imgCustomizada: fotoExistente };
 
     const dadosGerais = typeof getData === 'function' ? getData() : {};
     dadosGerais.valoresMetas = valoresSalvos;
