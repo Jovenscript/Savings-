@@ -183,14 +183,25 @@
 
             dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
             
+            // 🛡️ NOVO: FUNÇÃO PARA HIGIENIZAR O TEXTO ANTES DE MANDAR PRA IA (Evita a URL quebrar e carregar a casa padrão)
+            const limparTexto = (txt) => encodeURIComponent(txt.trim().toLowerCase().replace(/[^a-z0-9 ]/g, ''));
+
             // SONHOS E IMAGENS IA
             const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
+            
             if(sonhos.length > 0) {
-                dados.apresentacaoMetas = sonhos.map((s, i) => ({
-                    id: `meta_${i}`, title: s, 
-                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " ultra luxury cinematic photography 8k")}?width=1080&height=1920&nologo=true`,
-                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
-                }));
+                dados.apresentacaoMetas = sonhos.map((s, i) => {
+                    const termoLimpo = limparTexto(s);
+                    // Agora a URL é simples e direta. Sem espaços estranhos.
+                    const urlSegura = `https://image.pollinations.ai/prompt/${termoLimpo}%20ultra%20luxury%20cinematic%20photography%208k?width=1080&height=1920&nologo=true`;
+                    
+                    return {
+                        id: `meta_${i}`, 
+                        title: s, 
+                        img: urlSegura,
+                        defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
+                    };
+                });
                 
                 dados.valoresMetas = {};
                 sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
@@ -201,7 +212,6 @@
             window.escudoAtivado = false;
             saveData(dados);
             
-            // 🛡️ A CORREÇÃO DE OURO: ESPERA O BANCO DE DADOS SALVAR O PORSCHE
             const modalStep2 = document.getElementById('step2');
             modalStep2.innerHTML = `
                 <div style="text-align: center; padding: 20px;">
@@ -211,7 +221,6 @@
                 </div>
             `;
             
-            // Espera 2.5 segundos para garantir o envio antes de piscar a tela
             setTimeout(() => {
                 window.location.reload();
             }, 2500);
