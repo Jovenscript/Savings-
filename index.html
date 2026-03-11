@@ -7,19 +7,16 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 🛡️ BLOQUEIO TOTAL */
         #bloqueioTotal { position: fixed; inset: 0; background: #0d0221; z-index: 200000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
         #appMainContainer { opacity: 0; transition: opacity 1s; }
         #appMainContainer.liberado { opacity: 1; }
 
-        /* MODAL DE ONBOARDING */
         #onboardingModal { position: fixed; inset: 0; background: rgba(13, 2, 33, 0.98); z-index: 150000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
         .ob-content { background: #161b22; border: 1px solid var(--primary-cyan); border-radius: 24px; padding: 35px; width: 95%; max-width: 450px; text-align: center; max-height: 90vh; overflow-y: auto;}
         .ob-input, .ob-select { width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem; outline: none; box-sizing: border-box;}
         .ob-input:focus { border-color: var(--primary-cyan); }
         .color-preview { width: 35px; height: 35px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; flex-shrink: 0;}
         
-        /* BOTÕES DE MÓDULO */
         .ob-module-btn { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #30363d; color: #fff; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.3s; margin-bottom: 8px; font-size: 1rem;}
         .ob-module-btn.active { border-color: var(--primary-cyan); background: rgba(0, 245, 212, 0.1); font-weight: bold;}
     </style>
@@ -176,29 +173,32 @@
             const cor = document.getElementById('obColor').value;
             const dados = getData() || {};
             
-            // MÓDULOS
             const modulosSelecionados = ['financas'];
             if(document.getElementById('btnModMetas').classList.contains('active')) modulosSelecionados.push('metas');
             if(document.getElementById('btnModCasamento').classList.contains('active')) modulosSelecionados.push('casamento');
 
             dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
             
-            // 🛡️ NOVO: FUNÇÃO PARA HIGIENIZAR O TEXTO ANTES DE MANDAR PRA IA (Evita a URL quebrar e carregar a casa padrão)
-            const limparTexto = (txt) => encodeURIComponent(txt.trim().toLowerCase().replace(/[^a-z0-9 ]/g, ''));
+            // 🛡️ NOVO: FORMATADOR IMPLACÁVEL DE IMAGENS
+            const formatarTermoIA = (txt) => {
+                // Troca espaços por %20, e adiciona palavras mágicas pra foto sair realista
+                let limpo = txt.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '');
+                return encodeURIComponent(limpo + " photorealistic luxury real life architecture 8k");
+            };
 
-            // SONHOS E IMAGENS IA
             const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
             
             if(sonhos.length > 0) {
                 dados.apresentacaoMetas = sonhos.map((s, i) => {
-                    const termoLimpo = limparTexto(s);
-                    // Agora a URL é simples e direta. Sem espaços estranhos.
-                    const urlSegura = `https://image.pollinations.ai/prompt/${termoLimpo}%20ultra%20luxury%20cinematic%20photography%208k?width=1080&height=1920&nologo=true`;
+                    const termoTratado = formatarTermoIA(s);
+                    // Semente randômica para forçar a IA a gerar uma imagem nova e não puxar do cache
+                    const semente = Math.floor(Math.random() * 100000);
+                    const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}?width=1080&height=1920&nologo=true&seed=${semente}`;
                     
                     return {
                         id: `meta_${i}`, 
                         title: s, 
-                        img: urlSegura,
+                        img: urlPerfeita,
                         defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                     };
                 });
@@ -217,13 +217,13 @@
                 <div style="text-align: center; padding: 20px;">
                     <div style="width: 50px; height: 50px; border: 4px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
                     <h2 style="color:#fff; margin-bottom: 10px;">Gerando seu Império...</h2>
-                    <p style="color: var(--primary-cyan);">A IA está processando suas imagens 8K e enviando para a nuvem.</p>
+                    <p style="color: var(--primary-cyan);">Criando imagens de alta definição e enviando para a nuvem.</p>
                 </div>
             `;
             
             setTimeout(() => {
                 window.location.reload();
-            }, 2500);
+            }, 3000); // 3 segundos para garantir!
         }
     </script>
     <style> @keyframes spin { to { transform: rotate(360deg); } } </style>
