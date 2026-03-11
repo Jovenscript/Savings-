@@ -56,7 +56,7 @@
 
         <div class="ob-content" id="step2" style="display:none;">
             <h2 style="color:#fff; margin-bottom: 10px;">Seus Sonhos</h2>
-            <p style="color: #8b949e; margin-bottom: 20px; font-size: 0.9rem;">Diga 3 metas para a IA gerar suas imagens.</p>
+            <p style="color: #8b949e; margin-bottom: 20px; font-size: 0.9rem;">Diga 3 metas. Você poderá adicionar a foto delas no app.</p>
             <input type="text" id="dream1" class="ob-input" placeholder="1. Ex: Porsche 911" style="margin-bottom:10px;">
             <input type="text" id="dream2" class="ob-input" placeholder="2. Ex: Mansão Moderna" style="margin-bottom:10px;">
             <input type="text" id="dream3" class="ob-input" placeholder="3. Ex: Viagem para o Japão" style="margin-bottom:10px;">
@@ -157,8 +157,6 @@
     function aplicarCores(cor) {
         document.documentElement.style.setProperty('--primary-cyan', cor);
         document.documentElement.style.setProperty('--primary-purple', cor + '88'); 
-        // Chama a função global para garantir o fundo
-        if(typeof aplicarCoresGlobais === 'function') aplicarCoresGlobais();
     }
 
     function irParaStep2() {
@@ -178,29 +176,15 @@
 
         dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
         
-        // 💥 CORREÇÃO SUPREMA DA IA: Texto limpo (sem forçar arquitetura) + bypass violento de cache
-        const formatarTermoIA = (txt) => {
-            let limpo = txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            limpo = limpo.trim().replace(/[^a-zA-Z0-9 ]/g, '');
-            // Pede apenas foto realista com alta qualidade, não restringe a casas.
-            return encodeURIComponent(limpo + " highly detailed photorealistic 8k");
-        };
-
         const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
         
+        // Agora, em vez da IA, salvamos os títulos e colocamos uma foto padrão bonita (que ele pode trocar depois)
         if(sonhos.length > 0) {
             dados.apresentacaoMetas = sonhos.map((s, i) => {
-                const termoTratado = formatarTermoIA(s);
-                // Parâmetros randomicos brutos para garantir imagem única
-                const semente = Math.floor(Math.random() * 9999999); 
-                const timeStamp = Date.now() + i; 
-                
-                const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}?width=1080&height=1920&nologo=true&seed=${semente}&t=${timeStamp}`;
-                
                 return {
                     id: `meta_${i}`, 
                     title: s, 
-                    img: urlPerfeita,
+                    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80", // Imagem neutra padrão
                     defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                 };
             });
@@ -214,16 +198,8 @@
         window.escudoAtivado = false;
         saveData(dados);
         
-        const modalStep2 = document.getElementById('step2');
-        modalStep2.innerHTML = `
-            <div style="text-align: center; padding: 20px;">
-                <div style="width: 50px; height: 50px; border: 4px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                <h2 style="color:#fff; margin-bottom: 10px;">Gerando seu Império...</h2>
-                <p style="color: var(--primary-cyan);">A IA está pintando seus sonhos. Isso leva alguns segundos.</p>
-            </div>
-        `;
-        
-        setTimeout(() => { window.location.reload(); }, 3000);
+        // Sem tempo de espera. Vai direto pro app.
+        window.location.reload(); 
     }
   </script>
     <style> @keyframes spin { to { transform: rotate(360deg); } } </style>
