@@ -176,17 +176,18 @@
 
         dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
         
-        const formatarTermoIA = (txt) => {
+        const formatarTermoIA = (txt, i) => {
             let limpo = txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             limpo = limpo.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '');
-            return encodeURIComponent(limpo + " photorealistic luxury real life architecture 8k");
+            // O segredo: injetamos o número da meta na frase para a IA NUNCA repetir a foto
+            return encodeURIComponent(limpo + " photorealistic luxury real life architecture 8k version " + i);
         };
 
         const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
         
         if(sonhos.length > 0) {
             dados.apresentacaoMetas = sonhos.map((s, i) => {
-                const termoTratado = formatarTermoIA(s);
+                const termoTratado = formatarTermoIA(s, i);
                 const semente = Math.floor(Math.random() * 9999999) + i; 
                 
                 const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}?width=1080&height=1920&nologo=true&seed=${semente}`;
