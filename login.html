@@ -9,116 +9,21 @@
     <meta name="theme-color" content="#0d0221">
     <link rel="apple-touch-icon" href="icon-192.png">
     <style>
-        body {
-            background: linear-gradient(135deg, #0d0221, #1a0b2e);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            font-family: sans-serif;
-        }
-        .auth-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .auth-card {
-            background: rgba(20, 10, 35, 0.8);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(157, 78, 221, 0.2);
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            text-align: center;
-            transition: opacity 0.4s ease, transform 0.4s ease;
-        }
-        .hidden-card {
-            display: none;
-            opacity: 0;
-            transform: scale(0.95);
-        }
-        .auth-title {
-            color: #fff;
-            font-size: 1.8rem;
-            letter-spacing: 3px;
-            margin-bottom: 5px;
-            margin-top: 0;
-        }
-        .auth-subtitle {
-            color: var(--primary-purple, #9d4edd);
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-        .input-group {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-        .input-group label {
-            display: block;
-            color: #aaa;
-            font-size: 0.8rem;
-            margin-bottom: 8px;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.3s;
-            box-sizing: border-box;
-        }
-        .input-group input:focus {
-            border-color: var(--primary-purple, #9d4edd);
-            box-shadow: 0 0 10px rgba(157, 78, 221, 0.3);
-        }
-        .btn-auth {
-            width: 100%;
-            padding: 15px;
-            background: var(--primary-purple, #9d4edd);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
-        }
-        .btn-auth:hover {
-            background: #7b2cbf;
-        }
-        .auth-switch {
-            margin-top: 25px;
-            font-size: 0.85rem;
-            color: #aaa;
-        }
-        .auth-switch span {
-            color: var(--primary-cyan, #00f5d4);
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-        .auth-switch span:hover {
-            text-decoration: underline;
-            text-shadow: 0 0 8px rgba(0, 245, 212, 0.5);
-        }
-        .msg-box {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            display: none;
-        }
-        .msg-box.error { background: rgba(241, 91, 181, 0.2); color: var(--danger-red, #f15bb5); border: 1px solid var(--danger-red, #f15bb5); }
-        .msg-box.success { background: rgba(0, 245, 212, 0.2); color: var(--primary-cyan, #00f5d4); border: 1px solid var(--primary-cyan, #00f5d4); }
+        body { background: linear-gradient(135deg, #0d0221, #1a0b2e); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: sans-serif; }
+        .auth-container { width: 100%; max-width: 400px; padding: 20px; box-sizing: border-box; }
+        .auth-card { background: rgba(20, 10, 35, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(157, 78, 221, 0.2); border-radius: 20px; padding: 40px 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); text-align: center; transition: opacity 0.4s ease, transform 0.4s ease; }
+        .hidden-card { display: none; opacity: 0; transform: scale(0.95); }
+        .auth-title { color: #fff; font-size: 1.8rem; letter-spacing: 3px; margin-bottom: 5px; margin-top: 0; }
+        .auth-subtitle { color: var(--primary-purple, #9d4edd); font-size: 0.9rem; margin-bottom: 30px; }
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { display: block; color: #aaa; font-size: 0.8rem; margin-bottom: 8px; }
+        .input-group input { width: 100%; padding: 12px 15px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #fff; font-size: 1rem; outline: none; transition: 0.3s; box-sizing: border-box; }
+        .input-group input:focus { border-color: var(--primary-purple, #9d4edd); box-shadow: 0 0 10px rgba(157, 78, 221, 0.3); }
+        .btn-auth { width: 100%; padding: 15px; background: var(--primary-purple, #9d4edd); color: #fff; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4); }
+        .btn-auth:hover { background: #7b2cbf; }
+        .auth-switch { margin-top: 25px; font-size: 0.85rem; color: #aaa; }
+        .auth-switch span { color: var(--primary-cyan, #00f5d4); cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .auth-switch span:hover { text-decoration: underline; text-shadow: 0 0 8px rgba(0, 245, 212, 0.5); }
     </style>
 </head>
 <body>
@@ -127,11 +32,11 @@
         
         <div class="auth-card" id="cardLogin">
             <h1 class="auth-title">GEMS ELITE</h1>
-            <p class="auth-subtitle">Acesse o império da família</p>
+            <p class="auth-subtitle">Acesso Restrito</p>
 
             <form id="loginForm">
                 <div class="input-group">
-                    <label>E-mail da Família</label>
+                    <label>E-mail</label>
                     <input type="email" id="loginEmail" placeholder="exemplo@gmail.com" required>
                 </div>
                 <div class="input-group">
@@ -139,11 +44,10 @@
                     <input type="password" id="loginPassword" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn-auth">ENTRAR NO SISTEMA</button>
-                <div id="loginMsg" class="msg-box"></div>
             </form>
 
             <div class="auth-switch">
-                Ainda não tem a chave? <span id="btnShowRegister">Criar conta</span>
+                Ainda não tem a chave? <span onclick="alternarAuth('registro')">Criar conta</span>
             </div>
         </div>
 
@@ -165,11 +69,10 @@
                     <input type="password" id="regConfirmPassword" placeholder="••••••••" required minlength="6">
                 </div>
                 <button type="submit" class="btn-auth" style="background: var(--primary-cyan, #00f5d4); color: #0d0221;">CRIAR CONTA</button>
-                <div id="regMsg" class="msg-box"></div>
             </form>
 
             <div class="auth-switch">
-                Já tem a chave? <span id="btnShowLogin">Entrar no sistema</span>
+                Já tem a chave? <span onclick="alternarAuth('login')">Entrar no sistema</span>
             </div>
         </div>
 
