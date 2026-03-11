@@ -21,15 +21,27 @@ window.db = getFirestore(app);
 // ==========================================
 // 🛡️ REGRA DE OURO: REDIRECIONAMENTO ÚNICO
 // ==========================================
+// ==========================================
+// 🛡️ REGRA DE OURO: REDIRECIONAMENTO E BLINDAGEM DE DADOS
+// ==========================================
 onAuthStateChanged(auth, (user) => {
     const url = window.location.href;
     const naLogin = url.includes('login.html');
     
     if (user) {
+        const usuarioAnterior = localStorage.getItem('gemsEliteLogin');
+        
+        // Se é um usuário diferente (ou novo login na mesma máquina), limpa o cache antigo
+        if (usuarioAnterior && usuarioAnterior !== user.email) {
+            localStorage.removeItem('gemsEliteData'); 
+        }
+        
         localStorage.setItem('gemsEliteLogin', user.email);
         if (naLogin) window.location.href = 'index.html';
     } else {
+        // Logout completo: destrói a sessão e os dados locais
         localStorage.removeItem('gemsEliteLogin');
+        localStorage.removeItem('gemsEliteData'); 
         if (!naLogin) window.location.href = 'login.html';
     }
 });
@@ -68,3 +80,4 @@ document.getElementById('registerForm')?.addEventListener('submit', (e) => {
 });
 
 export { auth };
+
