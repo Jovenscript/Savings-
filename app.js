@@ -26,47 +26,50 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// 💎 O NOVO MOTOR DE TEMA: Muda a cara do app INTEIRO baseado na cor 💎
+// 💎 O MOTOR DE TEMA DEFINITIVO (11 Combinações Imersivas) 💎
 function aplicarCoresGlobais() {
     const dados = getData();
     if (dados && dados.config && dados.config.corPreferida) {
-        const cor = dados.config.corPreferida;
-        document.documentElement.style.setProperty('--primary-cyan', cor);
-        document.documentElement.style.setProperty('--primary-purple', cor + '88');
+        const corEscolhida = dados.config.corPreferida;
         
-        // Mapeamento Inteligente: Cria um fundo ultra-dark da mesma família da cor escolhida
-        const fundosDark = {
-            '#00f5d4': '#001a16', // Dark Ciano
-            '#9d4edd': '#0d0221', // Dark Roxo (Original)
-            '#f15bb5': '#1a0513', // Dark Rosa
-            '#fee440': '#1a1702', // Dark Amarelo Ouro
-            '#57cc99': '#021a0f'  // Dark Verde Esmeralda
+        // Paletas de Cores Premium criadas para combinar perfeitamente
+        const paletas = {
+            // 1. Cyberpunk (O Padrão Original)
+            '#00f5d4': { bgDark: '#0d0221', baseColor: '#9d4edd', popColor: '#00f5d4', mutedText: '#e0aaff' },
+            // 2. Natureza
+            '#57cc99': { bgDark: '#031f16', baseColor: '#2a9d8f', popColor: '#57cc99', mutedText: '#b3f0d4' },
+            // 3. Ouro Imperial
+            '#fee440': { bgDark: '#1f1a04', baseColor: '#e6aa68', popColor: '#fee440', mutedText: '#ffea99' },
+            // 4. Miami Vice
+            '#f15bb5': { bgDark: '#1f0312', baseColor: '#b5179e', popColor: '#f15bb5', mutedText: '#ffb6e6' },
+            // 5. Fundo do Mar
+            '#00bbf9': { bgDark: '#01171f', baseColor: '#0077b6', popColor: '#00bbf9', mutedText: '#ade8f4' },
+            // 6. Drácula
+            '#ff0a54': { bgDark: '#1a0105', baseColor: '#9e0031', popColor: '#ff0a54', mutedText: '#ffb3c6' },
+            // 7. Vulcão
+            '#ff7f51': { bgDark: '#1c0a00', baseColor: '#9c6644', popColor: '#ff7f51', mutedText: '#ffcdb2' },
+            // 8. Galáxia
+            '#b14aed': { bgDark: '#0b0217', baseColor: '#3a0ca3', popColor: '#b14aed', mutedText: '#d9a5fa' },
+            // 9. Platina (Minimalista)
+            '#e0e1dd': { bgDark: '#0d131a', baseColor: '#415a77', popColor: '#e0e1dd', mutedText: '#778da9' },
+            // 10. Matrix (Hacker)
+            '#00ff00': { bgDark: '#001400', baseColor: '#004b23', popColor: '#00ff00', mutedText: '#b3ffb3' },
+            // 11. Bilionário (Ônix e Dourado)
+            '#ffd700': { bgDark: '#0a0a0a', baseColor: '#594a00', popColor: '#ffd700', mutedText: '#ffeca8' }
         };
+
+        // Pega a paleta da cor escolhida, ou volta pro Cyberpunk se der erro
+        const tema = paletas[corEscolhida] || paletas['#00f5d4'];
+
+        // Injeta as cores diretamente na raiz do CSS (O App inteiro muda de alma instantaneamente)
+        document.documentElement.style.setProperty('--bg-dark', tema.bgDark);
+        document.documentElement.style.setProperty('--primary-purple', tema.baseColor); 
+        document.documentElement.style.setProperty('--primary-cyan', tema.popColor);   
+        document.documentElement.style.setProperty('--text-muted', tema.mutedText);
         
-        const corFundo = fundosDark[cor] || '#0d0221'; // Se não achar, mantém o roxo
-        
-        // Injeta as regras de vidro e fundo no CSS dinamicamente
-        let themeStyle = document.getElementById('dynamic-theme');
-        if (!themeStyle) {
-            themeStyle = document.createElement('style');
-            themeStyle.id = 'dynamic-theme';
-            document.head.appendChild(themeStyle);
-        }
-        
-        themeStyle.innerHTML = `
-            body { background-color: ${corFundo} !important; }
-            .sidebar { background-color: ${corFundo} !important; border-right-color: ${cor}44 !important; }
-            .glass-panel { 
-                background-color: ${corFundo} !important; 
-                background-image: linear-gradient(135deg, ${cor}15, transparent) !important; 
-                border-color: ${cor}33 !important; 
-            }
-            .calendarSwiper .swiper-slide { 
-                background-color: ${corFundo} !important; 
-                background-image: linear-gradient(135deg, ${cor}15, transparent) !important; 
-            }
-            .card-header-glass { border-bottom-color: ${cor}44 !important; }
-        `;
+        // Garante o fundo físico
+        document.body.style.backgroundColor = tema.bgDark;
+        document.body.style.backgroundImage = "none"; 
     }
 }
 aplicarCoresGlobais();
