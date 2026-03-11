@@ -164,7 +164,6 @@ function renderizarMesAtual(diaAlvo = null) {
                     let corPago = item.pago ? 'var(--primary-cyan)' : 'var(--danger-red)';
                     let opacidade = item.pago ? 'opacity: 0.5;' : 'opacity: 1;';
                     
-                    // BOTAO PAGO/PAGAR ROXO/CYAN
                     let botaoPago = `<button onclick="alternarStatusPagamento(${item.id})" style="background: rgba(0,0,0,0.5); border: 1px solid ${corPago}; color: ${corPago}; font-size: 0.75rem; cursor: pointer; padding: 3px 8px; border-radius: 5px; margin-right: 8px; font-weight: bold;">${txtPago}</button>`;
 
                     htmlItens += `
@@ -181,7 +180,6 @@ function renderizarMesAtual(diaAlvo = null) {
                             </div>
                         </div>`;
                 } else {
-                    // ROTINA VISUAL ROXO
                     htmlItens += `
                         <div style="padding: 8px 10px; background: rgba(157, 78, 221, 0.15); border-left: 3px solid var(--primary-purple); border-radius: 6px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
                             <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 10px;">
@@ -197,7 +195,6 @@ function renderizarMesAtual(diaAlvo = null) {
         }
 
         const card = document.createElement('div');
-        // A classe swiper-slide garante que o CSS esconda o texto inativo
         card.className = 'swiper-slide glass-panel';
         card.dataset.diaReal = d;
         
@@ -205,7 +202,6 @@ function renderizarMesAtual(diaAlvo = null) {
         card.style.flexDirection = 'column';
         card.style.height = '100%'; 
 
-        // CABEÇALHO GIGANTE CYAN NEON
         card.innerHTML = `
             <div class="card-header-glass">
                 <h2>${d}</h2>
@@ -231,12 +227,14 @@ function renderizarMesAtual(diaAlvo = null) {
 function iniciarSwiper(diaAlvo) {
     if (typeof Swiper !== 'undefined') {
         calendarSwiper = new Swiper(".calendarSwiper", {
-            effect: "coverflow", 
-            grabCursor: true, 
-            touchRatio: 1.5, 
-            centeredSlides: true,
-            slidesPerView: "auto",
-            coverflowEffect: { rotate: 0, stretch: 30, depth: 100, modifier: 1, slideShadows: false },
+            effect: "cards", // MÁGICA DO BARALHO AQUI 🃏
+            grabCursor: true,
+            cardsEffect: {
+                slideShadows: false, // Sem sombra preta para manter o design clean
+                rotate: true,
+                perSlideRotate: 2,
+                perSlideOffset: 8
+            },
             initialSlide: diaAlvo - 1, 
             navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
             on: {
