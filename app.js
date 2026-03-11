@@ -1,4 +1,4 @@
-// js/app.js
+// app.js
 
 // 🛡️ IMPORTAÇÃO DA BIBLIOTECA DE CONFETES
 const confettiScript = document.createElement('script');
@@ -33,13 +33,24 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
+// ==========================================
+// ☁️ CLOUD SAAS - SINCRONIZAÇÃO POR USUÁRIO
+// ==========================================
 async function sincronizarComFirebase(data) {
     if (!window.db) return;
+    
+    // 🛡️ Identidade Suprema: Quem está logado?
+    const userEmail = localStorage.getItem('gemsEliteLogin');
+    if (!userEmail) return;
+
     try {
         const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
-        const docRef = doc(window.db, "sistema", "dados_casal"); 
+        
+        // 🚀 MÁGICA: A gaveta do banco de dados agora tem o nome do e-mail do usuário!
+        const docRef = doc(window.db, "usuarios", userEmail); 
+        
         await setDoc(docRef, { gemsEliteData: JSON.stringify(data) }, { merge: true });
-        console.log("☁️ Nuvem atualizada!");
+        console.log(`☁️ Nuvem atualizada para: ${userEmail}`);
     } catch (error) {
         console.error("Erro ao sincronizar:", error);
     }
@@ -49,9 +60,13 @@ async function ligarRadarEmTempoReal() {
     try {
         const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
         const aguardarBanco = setInterval(() => {
-            if (window.db) {
+            const userEmail = localStorage.getItem('gemsEliteLogin');
+            
+            if (window.db && userEmail) {
                 clearInterval(aguardarBanco);
-                const docRef = doc(window.db, "sistema", "dados_casal");
+                
+                // 🚀 Radar focado apenas no usuário logado
+                const docRef = doc(window.db, "usuarios", userEmail);
                 
                 onSnapshot(docRef, (snapshot) => {
                     if (snapshot.exists()) {
@@ -66,6 +81,7 @@ async function ligarRadarEmTempoReal() {
                             window.escudoAtivado = false;
                         }
                     } else {
+                        // Se não existe nada na nuvem (usuário novo), libera o escudo
                         window.escudoAtivado = false;
                     }
                 });
@@ -131,8 +147,21 @@ function injetarElementosGlobais() {
 
         sidebarElement.innerHTML = menuHTML;
         
+        // 🔒 INTEGRAÇÃO DE SAÍDA SEGURA
         const btnLogout = document.getElementById('btnLogout');
-        if(btnLogout) btnLogout.addEventListener('click', (e) => { e.preventDefault(); if(confirm("Tem certeza que deseja sair?")) { localStorage.removeItem('gemsEliteLogin'); window.location.href = 'login.html'; }});
+        if(btnLogout) btnLogout.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            // Chama a função global que está no auth.js!
+            if(typeof window.logoutDoSistema === 'function') {
+                window.logoutDoSistema();
+            } else {
+                // Prevenção caso o auth.js demore a carregar
+                if(confirm("Tem certeza que deseja sair?")) { 
+                    localStorage.removeItem('gemsEliteLogin'); 
+                    window.location.href = 'login.html'; 
+                }
+            }
+        });
 
         const resetBtn = document.getElementById('resetAppBtn');
         if (resetBtn) resetBtn.addEventListener('click', (e) => { e.preventDefault(); if(prompt("⚠️ Digite 'DESTRUIR':") === "DESTRUIR") { localStorage.removeItem('gemsEliteData'); alert("App resetado."); window.location.href = 'index.html'; }});
