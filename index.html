@@ -132,12 +132,6 @@
                 clearInterval(motorInterface);
                 const dados = getData();
                 
-                // 🛡️ FUNDADORES COMENTADOS PARA TESTE DE ISOLAMENTO
-                // const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
-                // if (fundadores.includes(userEmail)) {
-                //     liberarApp(dados, '#00f5d4', 'Marlon & Carol');
-                // } else 
-                
                 if (!dados.config || !dados.config.setupConcluido) {
                     document.getElementById('bloqueioTotal').style.display = 'none';
                     document.getElementById('onboardingModal').style.display = 'flex';
@@ -182,9 +176,7 @@
 
         dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
         
-        // 🛡️ FORMATADOR IMPLACÁVEL DE IMAGENS (Acento, Espaço e Seed)
         const formatarTermoIA = (txt) => {
-            // Remove acentos (ex: Mansão -> Mansao) e caracteres especiais
             let limpo = txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             limpo = limpo.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '');
             return encodeURIComponent(limpo + " photorealistic luxury real life architecture 8k");
@@ -195,10 +187,9 @@
         if(sonhos.length > 0) {
             dados.apresentacaoMetas = sonhos.map((s, i) => {
                 const termoTratado = formatarTermoIA(s);
-                const semente = Date.now() + i; // Tempo real + índice para garantir exclusividade
+                const semente = Math.floor(Math.random() * 9999999) + i; 
                 
-                // URL com cache buster total
-                const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}%20var${i}?width=1080&height=1920&nologo=true&seed=${semente}&cb=${semente}`;
+                const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}?width=1080&height=1920&nologo=true&seed=${semente}`;
                 
                 return {
                     id: `meta_${i}`, 
