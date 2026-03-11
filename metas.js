@@ -34,7 +34,7 @@ function initMetas() {
     if (dadosGerais.apresentacaoMetas && dadosGerais.apresentacaoMetas.length > 0) {
         baseMetas = dadosGerais.apresentacaoMetas;
     } else {
-        baseMetas = metasFundadores;
+        baseMetas = baseMetas = metasFundadores;
     }
 
     if (dadosGerais.valoresMetas) {
@@ -57,9 +57,6 @@ function renderizarCubo() {
 
     let html = '';
 
-    // Imagem Coringa universal (Mansão minimalista à noite) caso a IA trave feio.
-    const fotoSeguraGlobal = "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80";
-
     baseMetas.forEach((meta) => {
         const meusValores = valoresSalvos[meta.id] || { s1: meta.defaultS1 || "R$ 0", s2: meta.defaultS2 || "0%", s3: meta.defaultS3 || "Definir" };
 
@@ -70,8 +67,7 @@ function renderizarCubo() {
 
                 <img src="${meta.img}" 
                      alt="${meta.title}" 
-                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.85;" 
-                     onerror="this.onerror=null; this.src='${fotoSeguraGlobal}';">
+                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.85;">
                 
                 <div class="meta-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 5%, transparent 60%, rgba(13, 2, 33, 0.4) 100%); z-index: 2;"></div>
                 
