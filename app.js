@@ -26,9 +26,6 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// ==========================================
-// 🎨 MOTOR GLOBAL DE CORES (Resolve o bug do verde/roxo)
-// ==========================================
 function aplicarCoresGlobais() {
     const dados = getData();
     if (dados && dados.config && dados.config.corPreferida) {
@@ -37,12 +34,8 @@ function aplicarCoresGlobais() {
         document.documentElement.style.setProperty('--primary-purple', cor + '88');
     }
 }
-// Roda imediatamente para pintar a tela antes de você ver
 aplicarCoresGlobais();
 
-// ==========================================
-// ☁️ CLOUD SAAS - SINCRONIZAÇÃO
-// ==========================================
 async function sincronizarComFirebase(data) {
     if (!window.db) return;
     const userEmail = localStorage.getItem('gemsEliteLogin');
@@ -79,9 +72,6 @@ async function ligarRadarEmTempoReal() {
 }
 ligarRadarEmTempoReal();
 
-// ==========================================
-// 💾 A LÓGICA DE BACKUP GLOBAL
-// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const btnExportar = document.getElementById('btnExportar');
     if (btnExportar) {
@@ -92,65 +82,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const chave = localStorage.key(i);
                 todosOsDados[chave] = localStorage.getItem(chave);
             }
-            if (Object.keys(todosOsDados).length === 0) return alert("Você ainda não tem dados para exportar!");
-            
+            if (Object.keys(todosOsDados).length === 0) return alert("Sem dados!");
             const jsonString = JSON.stringify(todosOsDados, null, 2);
             const blob = new Blob([jsonString], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = `GemsElite_Backup_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         });
     }
-
-    const btnImportar = document.getElementById('btnImportar');
-    if (btnImportar) {
-        btnImportar.addEventListener('change', function(e) {
-            const arquivo = e.target.files[0];
-            if (!arquivo) return;
-            const leitor = new FileReader();
-            leitor.onload = function(event) {
-                try {
-                    const dadosImportados = JSON.parse(event.target.result); 
-                    if (confirm("Isso vai substituir TODOS os dados deste celular. Deseja continuar?")) {
-                        localStorage.clear();
-                        for (const chave in dadosImportados) {
-                            localStorage.setItem(chave, dadosImportados[chave]);
-                        }
-                        alert("Dados sincronizados com sucesso! O sistema vai reiniciar.");
-                        window.location.reload(); 
-                    }
-                } catch (erro) { alert("Erro: Arquivo de backup inválido."); }
-            };
-            leitor.readAsText(arquivo);
-        });
-    }
-
-    window.migrarParaNuvem = async function() {
-        if (!window.db) return alert("Banco não conectado.");
-        const todosOsDados = {};
-        for (let i = 0; i < localStorage.length; i++) {
-            const chave = localStorage.key(i);
-            todosOsDados[chave] = localStorage.getItem(chave);
-        }
-        if (Object.keys(todosOsDados).length === 0) return;
-
-        try {
-            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
-            const userEmail = localStorage.getItem('gemsEliteLogin');
-            const referenciaBanco = doc(window.db, "usuarios", userEmail);
-            await setDoc(referenciaBanco, todosOsDados);
-            alert("✅ SUCESSO! Dados migrados para a nuvem.");
-        } catch (erro) { console.error("Erro:", erro); }
-    };
 });
 
 // ==========================================
-// MENU INTELIGENTE
+// MENU LATERAL DINÂMICO
 // ==========================================
 function injetarElementosGlobais() {
     const sidebarElement = document.querySelector('.sidebar');
@@ -199,14 +143,18 @@ function injetarElementosGlobais() {
 
         sidebarElement.innerHTML = menuHTML;
         
+        // 🛡️ CORREÇÃO: Usa a função global para fechar o menu no mobile
         const links = sidebarElement.querySelectorAll('a');
         links.forEach(link => {
             link.addEventListener('click', (e) => {
                 const href = link.getAttribute('href');
                 if (href === paginaAtual) {
                     e.preventDefault(); 
-                    document.getElementById('appMainContainer').classList.remove('sidebar-active');
-                    if(document.getElementById('mobileOverlay')) document.getElementById('mobileOverlay').classList.remove('active');
+                    if(typeof window.toggleMenuGems === 'function') {
+                        // Se já está na página, apenas fecha o menu
+                        const sidebar = document.querySelector('.sidebar');
+                        if(sidebar && sidebar.classList.contains('active')) window.toggleMenuGems();
+                    }
                 }
             });
         });
