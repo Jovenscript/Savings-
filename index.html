@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 🛡️ PAREDE DE SEGURANÇA */
+        /* 🛡️ BLOQUEIO TOTAL (Evita o pisco) */
         #bloqueioTotal {
             position: fixed; inset: 0; background: #0d0221; z-index: 200000;
             display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
@@ -22,30 +22,27 @@
         }
         .ob-content { 
             background: #161b22; border: 1px solid var(--primary-cyan); border-radius: 24px; 
-            padding: 40px; width: 90%; max-width: 450px; text-align: center;
+            padding: 40px; width: 95%; max-width: 450px; text-align: center;
         }
         .ob-input, .ob-select {
             width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); 
             border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem; outline: none;
         }
-        .ob-input:focus { border-color: var(--primary-cyan); }
-        .color-preview { width: 30px; height: 30px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; }
+        .color-preview { width: 35px; height: 35px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; }
     </style>
 </head>
 <body>
 
     <div id="bloqueioTotal">
-        <div style="font-size: 1.5rem; letter-spacing: 5px; margin-bottom: 20px;">GEMSELITE</div>
-        <div class="loader-circle" style="width:30px; height:30px; border:3px solid var(--primary-cyan); border-top-color:transparent; border-radius:50%; animation: spin 1s linear infinite;"></div>
+        <div style="font-size: 2rem; letter-spacing: 5px; margin-bottom: 20px;">GEMSELITE</div>
+        <div style="width: 30px; height: 30px; border: 3px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
     </div>
 
     <div id="onboardingModal">
         <div class="ob-content" id="step1">
-            <h2 style="color:#fff; margin-bottom: 10px;">Boas-vindas! 💎</h2>
-            <p style="color: #8b949e; margin-bottom: 25px;">Personalize seu sistema Elite.</p>
-            
-            <input type="text" id="obName" class="ob-input" placeholder="Seu Nome">
-
+            <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 10px;">Gems Elite 💎</h2>
+            <p style="color: #8b949e; margin-bottom: 25px;">Configurando seu acesso exclusivo.</p>
+            <input type="text" id="obName" class="ob-input" placeholder="Como devemos te chamar?">
             <div style="display: flex; align-items: center; margin-bottom: 20px;">
                 <select id="obColor" class="ob-select" style="margin-bottom: 0;" onchange="document.getElementById('cp').style.background = this.value">
                     <option value="#00f5d4">Ciano Neon</option>
@@ -60,19 +57,19 @@
         </div>
 
         <div class="ob-content" id="step2" style="display:none;">
-            <h2 style="color:#fff; margin-bottom: 10px;">Sonhos em 4K</h2>
-            <p style="color: #8b949e; margin-bottom: 20px;">Diga 3 desejos para a IA gerar suas metas.</p>
-            <input type="text" id="dream1" class="ob-input" placeholder="Ex: Porsche 911" style="margin-bottom:10px;">
-            <input type="text" id="dream2" class="ob-input" placeholder="Ex: Mansão Moderna" style="margin-bottom:10px;">
-            <input type="text" id="dream3" class="ob-input" placeholder="Ex: Viagem Japão" style="margin-bottom:10px;">
-            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px; border-radius: 15px;">Gerar Meu Mundo ✨</button>
+            <h2 style="color:#fff; margin-bottom: 10px;">Seus Sonhos</h2>
+            <p style="color: #8b949e; margin-bottom: 20px;">Diga 3 metas para a IA gerar suas imagens 4K.</p>
+            <input type="text" id="dream1" class="ob-input" placeholder="Meta 1" style="margin-bottom:10px;">
+            <input type="text" id="dream2" class="ob-input" placeholder="Meta 2" style="margin-bottom:10px;">
+            <input type="text" id="dream3" class="ob-input" placeholder="Meta 3" style="margin-bottom:10px;">
+            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px; border-radius: 15px;">Ativar Gems Elite ✨</button>
         </div>
     </div>
 
     <div class="app-container" id="appMainContainer">
         <nav class="sidebar"></nav>
         <main class="main-content">
-            <header><h1 id="tituloBoasVindas" style="color:#fff; font-size: 2rem;">Olá!</h1></header>
+            <header><h1 id="tituloBoasVindas" style="color:#fff; font-size: 2rem;">Olá! 👋</h1></header>
             <div class="swiper superAppSwiper">
                 <div class="swiper-wrapper" id="wrapperDashboard"></div>
                 <div class="swiper-pagination"></div>
@@ -93,17 +90,17 @@
                 if (typeof getData === 'function' && userEmail) {
                     clearInterval(motorInterface);
                     const dados = getData();
-                    const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
                     
-                    if (fundadores.includes(userEmail)) {
-                        // VIP: Marlon e Carol entram direto sem perguntas
+                    // 👑 REGRA DE OURO: OS FUNDADORES
+                    const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
+                    const eFundador = fundadores.includes(userEmail);
+
+                    if (eFundador) {
                         liberarApp(dados, '#00f5d4', 'Marlon & Carol');
                     } else if (!dados.config || !dados.config.setupConcluido) {
-                        // NOVO: Abre o modal
                         document.getElementById('bloqueioTotal').style.display = 'none';
                         document.getElementById('onboardingModal').style.display = 'flex';
                     } else {
-                        // RETORNO: Carrega cores e nome salvos
                         liberarApp(dados, dados.config.corPreferida, dados.config.nomeUsuario);
                     }
                 }
@@ -112,7 +109,8 @@
 
         function liberarApp(dados, cor, nome) {
             aplicarCores(cor);
-            document.getElementById('tituloBoasVindas').innerText = `Olá, ${nome} 👋`;
+            const t = document.getElementById('tituloBoasVindas');
+            if(t) t.innerText = `Olá, ${nome} 👋`;
             document.getElementById('bloqueioTotal').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('bloqueioTotal').style.display = 'none';
@@ -135,15 +133,14 @@
             const nome = document.getElementById('obName').value;
             const cor = document.getElementById('obColor').value;
             const dados = getData() || {};
-            
             dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: ['financas', 'metas'] };
             
             const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
             if(sonhos.length > 0) {
                 dados.apresentacaoMetas = sonhos.map((s, i) => ({
                     id: `meta_${i}`, title: s, 
-                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " ultra luxury cinematic photography 8k glass texture")}?width=1080&height=1920&nologo=true`,
-                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Meta"
+                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury style cinematic 8k photorealistic glass texture")}?width=1080&height=1920&nologo=true`,
+                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                 }));
                 dados.valoresMetas = {};
                 sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
