@@ -39,7 +39,7 @@ body {
     padding: 2rem 1.5rem; 
     position: fixed; 
     height: 100vh; 
-    z-index: 10000; 
+    z-index: 10000; /* Alto, mas perde pro hambúrguer mobile */
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
     overflow-y: auto; 
 }
@@ -152,20 +152,9 @@ input, select, textarea {
 /* =========================================
    BOTÃO HAMBÚRGUER E OVERLAY (FUNDAMENTAL)
 ========================================= */
+/* Oculto por padrão no Desktop */
 #hamburgerBtn { 
     display: none; 
-    position: fixed; 
-    top: 15px; 
-    left: 15px; 
-    z-index: 11000; /* Acima da sidebar */
-    background: var(--primary-purple); 
-    color: white; 
-    border: none; 
-    border-radius: 8px; 
-    padding: 10px 15px; 
-    font-size: 1.5rem; 
-    cursor: pointer; 
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
 }
 
 #mobileOverlay { 
@@ -173,27 +162,56 @@ input, select, textarea {
     position: fixed; 
     inset: 0; 
     background: rgba(0, 0, 0, 0.7); 
-    z-index: 9998; 
+    z-index: 10500; /* Abaixo do botão, mas acima do resto */
     backdrop-filter: blur(5px); 
     opacity: 0; 
-    transition: 0.3s; 
+    transition: opacity 0.3s; 
     pointer-events: none; 
 }
-#mobileOverlay.active { opacity: 1; pointer-events: all; }
+
+#mobileOverlay.active { 
+    opacity: 1; 
+    pointer-events: all; 
+}
 
 /* =========================================
    MÍDIAS DE RESPONSIVIDADE (768px)
 ========================================= */
 @media (max-width: 768px) {
-    #hamburgerBtn { display: block !important; }
+    /* Mostra o botão e o overlay */
+    #hamburgerBtn { 
+        display: flex !important; /* Flex para centralizar o ícone */
+        align-items: center;
+        justify-content: center;
+        position: fixed; 
+        top: 15px; 
+        left: 15px; 
+        z-index: 12000 !important; /* SUPREMACIA ABSOLUTA DE Z-INDEX */
+        background: var(--primary-purple); 
+        color: white; 
+        border: 2px solid rgba(255,255,255,0.2); 
+        border-radius: 10px; 
+        width: 50px;
+        height: 50px;
+        font-size: 1.8rem; 
+        cursor: pointer; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+        transition: transform 0.2s;
+    }
+    
+    #hamburgerBtn:active { transform: scale(0.9); }
+
     #mobileOverlay { display: block; }
 
+    /* A sidebar fica escondida fora da tela e sobe o Z-index */
     .sidebar { 
         transform: translateX(-100%); 
         padding-top: 80px; 
-        border-right: 1px solid var(--primary-purple); 
-        box-shadow: 5px 0 15px rgba(0,0,0,0.5); 
+        border-right: 1px solid var(--primary-cyan); 
+        box-shadow: 5px 0 25px rgba(0,0,0,0.8); 
         visibility: visible;
+        z-index: 11000; /* Abaixo do hambúrguer, acima do overlay */
+        background: rgba(13, 2, 33, 1); /* Menos transparente no mobile */
     }
     
     /* Quando ativado pelo JS */
