@@ -16,7 +16,7 @@
             width: 320px;
             height: 480px;
             padding: 20px 0;
-            overflow: visible; /* Deixa vazar as bordas dos cards de trás */
+            overflow: visible; 
         }
 
         .calendarSwiper .swiper-slide {
@@ -28,18 +28,14 @@
             border: 1px solid rgba(0, 245, 212, 0.4) !important;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             border-radius: 20px;
-            display: flex;
-            flex-direction: column;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        /* Destaque para a carta da frente */
         .calendarSwiper .swiper-slide-active {
             border-color: rgba(0, 245, 212, 0.9) !important;
             box-shadow: 0 0 30px rgba(0, 245, 212, 0.2);
         }
 
-        /* Esconder as letras das cartas que estão atrás */
         .calendarSwiper .swiper-slide:not(.swiper-slide-active) .scroll-interno {
             opacity: 0 !important;
             visibility: hidden;
@@ -47,7 +43,6 @@
             transition: opacity 0.3s;
         }
 
-        /* A carta da frente mostra o texto suavemente */
         .calendarSwiper .swiper-slide-active .scroll-interno {
             opacity: 1 !important;
             visibility: visible;
@@ -59,7 +54,6 @@
             margin-bottom: 10px; 
             border-bottom: 1px dashed rgba(157, 78, 221, 0.3); 
             padding-bottom: 10px; 
-            padding-top: 10px;
             flex-shrink: 0;
         }
         .card-header-glass h2 {
@@ -67,6 +61,22 @@
             color: var(--primary-cyan); 
             margin: 0; 
             text-shadow: 0 0 15px rgba(0, 245, 212, 0.5);
+        }
+
+        /* 💥 CORREÇÃO DOS BOTÕES LATERAIS DO CALENDÁRIO (REDONDOS E BONITOS) */
+        .calendar-nav-btn {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--primary-cyan);
+            border-radius: 50%;
+            width: 45px !important;
+            height: 45px !important;
+            color: var(--primary-cyan) !important;
+            box-shadow: 0 4px 15px rgba(0, 245, 212, 0.2);
+        }
+        .calendar-nav-btn::after {
+            font-size: 1.2rem !important;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -99,14 +109,14 @@
                     </div>
 
                     <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
-                        <div class="swiper-button-prev calendar-nav-btn" style="color: var(--primary-cyan) !important;"></div>
+                        <div class="swiper-button-prev calendar-nav-btn"></div>
                         
                         <div class="swiper calendarSwiper">
                             <div class="swiper-wrapper" id="calendarWrapper">
                                 </div>
                         </div>
                         
-                        <div class="swiper-button-next calendar-nav-btn" style="color: var(--primary-cyan) !important;"></div>
+                        <div class="swiper-button-next calendar-nav-btn"></div>
                     </div>
                 </div>
 
