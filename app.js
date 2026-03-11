@@ -27,7 +27,21 @@ function formatCurrency(value) {
 }
 
 // ==========================================
-// ☁️ CLOUD SAAS - SINCRONIZAÇÃO POR USUÁRIO
+// 🎨 MOTOR GLOBAL DE CORES (Resolve o bug do verde/roxo)
+// ==========================================
+function aplicarCoresGlobais() {
+    const dados = getData();
+    if (dados && dados.config && dados.config.corPreferida) {
+        const cor = dados.config.corPreferida;
+        document.documentElement.style.setProperty('--primary-cyan', cor);
+        document.documentElement.style.setProperty('--primary-purple', cor + '88');
+    }
+}
+// Roda imediatamente para pintar a tela antes de você ver
+aplicarCoresGlobais();
+
+// ==========================================
+// ☁️ CLOUD SAAS - SINCRONIZAÇÃO
 // ==========================================
 async function sincronizarComFirebase(data) {
     if (!window.db) return;
@@ -66,10 +80,9 @@ async function ligarRadarEmTempoReal() {
 ligarRadarEmTempoReal();
 
 // ==========================================
-// 💾 A LÓGICA DE BACKUP ORIGINAL (RESTAURADA)
+// 💾 A LÓGICA DE BACKUP ORIGINAL
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Exportar JSON (Funciona no Dashboard, no Casamento, onde estiver o botão)
     const btnExportar = document.getElementById('btnExportar');
     if (btnExportar) {
         btnExportar.addEventListener('click', (e) => {
@@ -94,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Importar JSON
     const btnImportar = document.getElementById('btnImportar');
     if (btnImportar) {
         btnImportar.addEventListener('change', function(e) {
@@ -118,7 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Botão de Migrar para a Nuvem
     window.migrarParaNuvem = async function() {
         if (!window.db) return alert("Banco não conectado.");
         const todosOsDados = {};
@@ -139,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ==========================================
-// MENU INTELIGENTE (SEM REFRESH FANTASMA)
+// MENU INTELIGENTE
 // ==========================================
 function injetarElementosGlobais() {
     const sidebarElement = document.querySelector('.sidebar');
@@ -188,7 +199,6 @@ function injetarElementosGlobais() {
 
         sidebarElement.innerHTML = menuHTML;
         
-        // CORREÇÃO 5: Evita Refresh se clicar na página que já está!
         const links = sidebarElement.querySelectorAll('a');
         links.forEach(link => {
             link.addEventListener('click', (e) => {
