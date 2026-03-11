@@ -80,7 +80,7 @@ async function ligarRadarEmTempoReal() {
 ligarRadarEmTempoReal();
 
 // ==========================================
-// 💾 A LÓGICA DE BACKUP ORIGINAL
+// 💾 A LÓGICA DE BACKUP GLOBAL
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     const btnExportar = document.getElementById('btnExportar');
