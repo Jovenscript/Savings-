@@ -26,7 +26,9 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// ☁️ CLOUD SAAS
+// ==========================================
+// ☁️ CLOUD SAAS - SINCRONIZAÇÃO POR USUÁRIO
+// ==========================================
 async function sincronizarComFirebase(data) {
     if (!window.db) return;
     const userEmail = localStorage.getItem('gemsEliteLogin');
@@ -64,7 +66,80 @@ async function ligarRadarEmTempoReal() {
 ligarRadarEmTempoReal();
 
 // ==========================================
-// MENU INTELIGENTE
+// 💾 A LÓGICA DE BACKUP ORIGINAL (RESTAURADA)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Exportar JSON (Funciona no Dashboard, no Casamento, onde estiver o botão)
+    const btnExportar = document.getElementById('btnExportar');
+    if (btnExportar) {
+        btnExportar.addEventListener('click', (e) => {
+            e.preventDefault();
+            const todosOsDados = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const chave = localStorage.key(i);
+                todosOsDados[chave] = localStorage.getItem(chave);
+            }
+            if (Object.keys(todosOsDados).length === 0) return alert("Você ainda não tem dados para exportar!");
+            
+            const jsonString = JSON.stringify(todosOsDados, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `GemsElite_Backup_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+    }
+
+    // Importar JSON
+    const btnImportar = document.getElementById('btnImportar');
+    if (btnImportar) {
+        btnImportar.addEventListener('change', function(e) {
+            const arquivo = e.target.files[0];
+            if (!arquivo) return;
+            const leitor = new FileReader();
+            leitor.onload = function(event) {
+                try {
+                    const dadosImportados = JSON.parse(event.target.result); 
+                    if (confirm("Isso vai substituir TODOS os dados deste celular. Deseja continuar?")) {
+                        localStorage.clear();
+                        for (const chave in dadosImportados) {
+                            localStorage.setItem(chave, dadosImportados[chave]);
+                        }
+                        alert("Dados sincronizados com sucesso! O sistema vai reiniciar.");
+                        window.location.reload(); 
+                    }
+                } catch (erro) { alert("Erro: Arquivo de backup inválido."); }
+            };
+            leitor.readAsText(arquivo);
+        });
+    }
+
+    // Botão de Migrar para a Nuvem
+    window.migrarParaNuvem = async function() {
+        if (!window.db) return alert("Banco não conectado.");
+        const todosOsDados = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const chave = localStorage.key(i);
+            todosOsDados[chave] = localStorage.getItem(chave);
+        }
+        if (Object.keys(todosOsDados).length === 0) return;
+
+        try {
+            const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
+            const userEmail = localStorage.getItem('gemsEliteLogin');
+            const referenciaBanco = doc(window.db, "usuarios", userEmail);
+            await setDoc(referenciaBanco, todosOsDados);
+            alert("✅ SUCESSO! Dados migrados para a nuvem.");
+        } catch (erro) { console.error("Erro:", erro); }
+    };
+});
+
+// ==========================================
+// MENU INTELIGENTE (SEM REFRESH FANTASMA)
 // ==========================================
 function injetarElementosGlobais() {
     const sidebarElement = document.querySelector('.sidebar');
@@ -78,7 +153,6 @@ function injetarElementosGlobais() {
 
         let menuHTML = `<div class="logo">GEMSELITE</div><ul class="nav-links">`;
 
-        // Módulo 1: FINANÇAS
         menuHTML += `
             <li class="nav-category">📊 Rotina & Finanças</li>
             <li class="${paginaAtual === 'index.html' ? 'active' : ''}"><a href="index.html">🏠 Início (Visão Geral)</a></li>
@@ -87,15 +161,13 @@ function injetarElementosGlobais() {
             <li class="${paginaAtual === 'calendario-financeiro.html' ? 'active' : ''}"><a href="calendario-financeiro.html">📅 Calendário Completo</a></li>
         `;
 
-        // Módulo 2: METAS
         if (modulos.includes('metas')) {
             menuHTML += `
                 <li class="nav-category">🎯 Grandes Objetivos</li>
-                <li class="${paginaAtual === 'metas.html' ? 'active' : ''}"><a href="metas.html">🏡 Sonhos & Metas</a></li>
+                <li class="${paginaAtual === 'metas.html' ? 'active' : ''}"><a href="metas.html">🏡 Amortização & Metas</a></li>
             `;
         }
 
-        // Módulo 3: CASAMENTO
         if (modulos.includes('casamento')) {
             menuHTML += `
                 <li class="nav-category">💍 Projeto Casamento</li>
@@ -104,86 +176,40 @@ function injetarElementosGlobais() {
             `;
         }
 
-        // 💾 BACKUP E SISTEMA
         menuHTML += `
                 <li style="margin-top: 30px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px;">
-                    <a href="#" id="btnExportarSidebar" style="color: var(--primary-cyan); font-size: 0.85rem;"><span style="margin-right:8px;">💾</span> Fazer Backup (Download)</a>
-                </li>
-                <li>
-                    <label for="btnImportarSidebar" style="color: var(--primary-purple); cursor: pointer; display: block; padding: 10px 15px; font-size: 0.85rem;">
-                        <span style="margin-right:8px;">📂</span> Importar Backup
-                    </label>
-                    <input type="file" id="btnImportarSidebar" accept=".json" style="display: none;">
+                    <a href="#" id="btnLogout" style="color: #ff4b4b; text-align: center;">Sair do Sistema</a>
                 </li>
                 <li style="margin-top: 10px;">
-                    <a href="#" id="btnLogout" style="color: #ff4b4b; text-align: center;">Sair do Sistema</a>
+                    <a href="#" id="resetAppBtn" style="color: var(--danger-red); font-weight: bold; text-align: center;">🗑️ Resetar App</a>
                 </li>
             </ul>
         `;
 
         sidebarElement.innerHTML = menuHTML;
         
-        // 🛑 PREVENÇÃO DE REFRESH DESNECESSÁRIO
+        // CORREÇÃO 5: Evita Refresh se clicar na página que já está!
         const links = sidebarElement.querySelectorAll('a');
         links.forEach(link => {
             link.addEventListener('click', (e) => {
                 const href = link.getAttribute('href');
                 if (href === paginaAtual) {
-                    e.preventDefault(); // Se já está na página, não carrega de novo!
-                    // Apenas fecha o menu no celular
+                    e.preventDefault(); 
                     document.getElementById('appMainContainer').classList.remove('sidebar-active');
                     if(document.getElementById('mobileOverlay')) document.getElementById('mobileOverlay').classList.remove('active');
                 }
             });
         });
 
-        // LÓGICA DE BACKUP JSON
-        const btnExportar = document.getElementById('btnExportarSidebar');
-        if (btnExportar) {
-            btnExportar.addEventListener('click', (e) => {
-                e.preventDefault();
-                const todosOsDados = {};
-                for (let i = 0; i < localStorage.length; i++) {
-                    const chave = localStorage.key(i);
-                    todosOsDados[chave] = localStorage.getItem(chave);
-                }
-                const jsonString = JSON.stringify(todosOsDados, null, 2);
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = `GemsElite_Backup_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
-                a.click();
-            });
-        }
-
-        const btnImportar = document.getElementById('btnImportarSidebar');
-        if (btnImportar) {
-            btnImportar.addEventListener('change', function(e) {
-                const arquivo = e.target.files[0];
-                if (!arquivo) return;
-                const leitor = new FileReader();
-                leitor.onload = function(event) {
-                    try {
-                        const dadosImportados = JSON.parse(event.target.result); 
-                        if (confirm("Isso vai substituir TODOS os dados. Deseja continuar?")) {
-                            localStorage.clear();
-                            for (const chave in dadosImportados) localStorage.setItem(chave, dadosImportados[chave]);
-                            alert("Dados sincronizados com sucesso!");
-                            window.location.reload(); 
-                        }
-                    } catch (erro) { alert("Arquivo de backup inválido."); }
-                };
-                leitor.readAsText(arquivo);
-            });
-        }
-
-        // LÓGICA DE SAIR
         const btnLogout = document.getElementById('btnLogout');
         if(btnLogout) btnLogout.addEventListener('click', (e) => { 
             e.preventDefault(); 
             if(typeof window.logoutDoSistema === 'function') window.logoutDoSistema();
             else if(confirm("Sair?")) { localStorage.removeItem('gemsEliteLogin'); window.location.href = 'login.html'; }
         });
+
+        const resetBtn = document.getElementById('resetAppBtn');
+        if (resetBtn) resetBtn.addEventListener('click', (e) => { e.preventDefault(); if(prompt("⚠️ Digite 'DESTRUIR':") === "DESTRUIR") { localStorage.removeItem('gemsEliteData'); alert("App resetado."); window.location.href = 'index.html'; }});
     }
 
     if (window.location.pathname.indexOf('login.html') === -1) {
