@@ -1,6 +1,5 @@
 // metas.js
 
-// O "Plano B" (As metas originais da família fundadora, caso não tenha onboarding)
 const metasFundadores = [
     {
         id: "casa",
@@ -25,23 +24,19 @@ const metasFundadores = [
     }
 ];
 
-let baseMetas = []; // Agora isso começa vazio e será preenchido dinamicamente
+let baseMetas = []; 
 let valoresSalvos = {};
 let swiperMetas = null;
 
 function initMetas() {
     const dadosGerais = typeof getData === 'function' ? getData() : {};
     
-    // 🧠 MÁGICA: O SISTEMA DESCOBRE QUEM SÃO AS METAS DESSE USUÁRIO
     if (dadosGerais.apresentacaoMetas && dadosGerais.apresentacaoMetas.length > 0) {
-        // Se for um novo usuário, pega os sonhos gerados por IA no Onboarding
         baseMetas = dadosGerais.apresentacaoMetas;
     } else {
-        // Se for os fundadores e não tem metas configuradas, usa o Plano B
         baseMetas = metasFundadores;
     }
 
-    // Carrega ou inicializa os valores (Alvo, Progresso, Previsão)
     if (dadosGerais.valoresMetas) {
         valoresSalvos = dadosGerais.valoresMetas;
     } else {
@@ -63,20 +58,21 @@ function renderizarCubo() {
     let html = '';
 
     baseMetas.forEach((meta) => {
-        // Puxa o valor do banco de dados (ou o padrão se der erro)
         const meusValores = valoresSalvos[meta.id] || { s1: meta.defaultS1 || "R$ 0", s2: meta.defaultS2 || "0%", s3: meta.defaultS3 || "Definir" };
 
         html += `
             <div class="swiper-slide" style="background-color: #050110; position: relative;">
                 
+                <div style="position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, rgba(13,2,33,0.9), rgba(157,78,221,0.5)); z-index: 0;"></div>
+
                 <img src="${meta.img}" 
                      alt="${meta.title}" 
-                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.85;" 
-                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80';">
+                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; opacity: 0.85;" 
+                     onerror="this.style.display='none';">
                 
-                <div class="meta-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 5%, transparent 60%, rgba(13, 2, 33, 0.4) 100%); z-index: 1;"></div>
+                <div class="meta-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 5%, transparent 60%, rgba(13, 2, 33, 0.4) 100%); z-index: 2;"></div>
                 
-                <div class="meta-content" style="position: relative; z-index: 2; width: 100%;">
+                <div class="meta-content" style="position: relative; z-index: 3; width: 100%;">
                     <div>
                         <h1 class="meta-title">${meta.title}</h1>
                         <button class="btn-edit-meta" onclick="editarValoresCofre('${meta.id}')" title="Editar Valores">✏️</button>
@@ -104,7 +100,7 @@ function iniciarMotor3D() {
         cubeEffect: { shadow: true, slideShadows: true, shadowOffset: 40, shadowScale: 0.9 },
         pagination: { el: ".swiper-pagination", clickable: true },
         autoplay: { delay: 5000, disableOnInteraction: false },
-        loop: baseMetas.length > 1 // Só faz loop se tiver mais de 1 meta
+        loop: baseMetas.length > 1 
     });
 }
 
@@ -130,7 +126,6 @@ window.editarValoresCofre = function(idDaMeta) {
     renderizarCubo();
     iniciarMotor3D();
     
-    // Pequeno ajuste para evitar erro de loop se tiver poucas metas
     if(baseMetas.length > 1) {
         swiperMetas.slideToLoop(slideAtual, 0, false);
     }
