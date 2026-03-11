@@ -10,9 +10,39 @@ let isMonthView = false;
 const diasSemana = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
 const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-window.mudarMes = function(direcao) {
+// 🚀 NOVA INTELIGÊNCIA: Se diaDestino for 'ultimo', ele calcula o final do mês.
+window.mudarMes = function(direcao, diaDestino = 1) {
     dataNavegacao.setMonth(dataNavegacao.getMonth() + direcao);
-    renderizarMesAtual(1); 
+    
+    if (diaDestino === 'ultimo') {
+        const ano = dataNavegacao.getFullYear();
+        const mes = dataNavegacao.getMonth();
+        // O dia 0 do mês seguinte nos dá o último dia do mês atual
+        diaDestino = new Date(ano, mes + 1, 0).getDate();
+    }
+    
+    renderizarMesAtual(diaDestino); 
+};
+
+// 💥 SCROLL INFINITO DO BARALHO 💥
+window.voltarDia = function() {
+    if (!calendarSwiper) return;
+    if (calendarSwiper.activeIndex === 0) {
+        // Se está no dia 1 e clica pra voltar, vai pro último dia do mês anterior
+        window.mudarMes(-1, 'ultimo');
+    } else {
+        calendarSwiper.slidePrev();
+    }
+};
+
+window.avancarDia = function() {
+    if (!calendarSwiper) return;
+    if (calendarSwiper.activeIndex === calendarSwiper.slides.length - 1) {
+        // Se está no último dia e clica pra avançar, vai pro dia 1 do próximo mês
+        window.mudarMes(1, 1);
+    } else {
+        calendarSwiper.slideNext();
+    }
 };
 
 window.apagarEvento = function(id) {
@@ -76,9 +106,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 btnToggleView.innerHTML = '🃏 Voltar para as Cartas';
             } else {
                 if(monthGridView) monthGridView.style.display = 'none';
-                if(dayCarouselView) dayCarouselView.style.display = 'flex';
+                if(dayCarouselView) dayCarouselView.style.display = 'block';
                 btnToggleView.innerHTML = '📅 Abrir Visão do Mês Completo';
-                renderizarMesAtual(diaAtivoNoCard);
+                // Força o re-render para evitar que o CSS do Swiper quebre ao voltar
+                setTimeout(() => renderizarMesAtual(diaAtivoNoCard), 10);
             }
         });
     }
@@ -194,7 +225,6 @@ function renderizarMesAtual(diaAlvo = null) {
         }
 
         const card = document.createElement('div');
-        // O Swiper Cards exige que o slide seja puro, e o CSS gerencia o tamanho
         card.className = 'swiper-slide';
         card.dataset.diaReal = d;
         
@@ -232,7 +262,7 @@ function iniciarSwiper(diaAlvo) {
                 perSlideOffset: 8
             },
             initialSlide: diaAlvo - 1, 
-            navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
+            // 💥 NAVEGAÇÃO NATIVA REMOVIDA PARA NÃO CONFLITAR COM OS BOTÕES MANUAIS 💥
             on: {
                 slideChange: function () {
                     const slideAtual = this.slides[this.activeIndex];
@@ -267,7 +297,7 @@ function renderizarGradeMes(ano, mes, diasNoMes, contas) {
             diaAtivoNoCard = d;
             isMonthView = false;
             document.getElementById('monthGridView').style.display = 'none';
-            document.getElementById('dayCarouselView').style.display = 'flex';
+            document.getElementById('dayCarouselView').style.display = 'block';
             renderizarMesAtual(d);
         });
         monthGrid.appendChild(divDia);
