@@ -7,28 +7,21 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
     <style>
-        /* 🛡️ BLOQUEIO TOTAL (Evita o pisco) */
-        #bloqueioTotal {
-            position: fixed; inset: 0; background: #0d0221; z-index: 200000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
-        }
+        /* 🛡️ BLOQUEIO TOTAL */
+        #bloqueioTotal { position: fixed; inset: 0; background: #0d0221; z-index: 200000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
         #appMainContainer { opacity: 0; transition: opacity 1s; }
         #appMainContainer.liberado { opacity: 1; }
 
         /* MODAL DE ONBOARDING */
-        #onboardingModal {
-            position: fixed; inset: 0; background: rgba(13, 2, 33, 0.98); z-index: 150000;
-            display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px);
-        }
-        .ob-content { 
-            background: #161b22; border: 1px solid var(--primary-cyan); border-radius: 24px; 
-            padding: 40px; width: 95%; max-width: 450px; text-align: center;
-        }
-        .ob-input, .ob-select {
-            width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); 
-            border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem; outline: none;
-        }
-        .color-preview { width: 35px; height: 35px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; }
+        #onboardingModal { position: fixed; inset: 0; background: rgba(13, 2, 33, 0.98); z-index: 150000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px); }
+        .ob-content { background: #161b22; border: 1px solid var(--primary-cyan); border-radius: 24px; padding: 35px; width: 95%; max-width: 450px; text-align: center; max-height: 90vh; overflow-y: auto;}
+        .ob-input, .ob-select { width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem; outline: none; box-sizing: border-box;}
+        .ob-input:focus { border-color: var(--primary-cyan); }
+        .color-preview { width: 35px; height: 35px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; flex-shrink: 0;}
+        
+        /* BOTÕES DE MÓDULO */
+        .ob-module-btn { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #30363d; color: #fff; padding: 12px; border-radius: 10px; cursor: pointer; transition: 0.3s; margin-bottom: 8px; font-size: 1rem;}
+        .ob-module-btn.active { border-color: var(--primary-cyan); background: rgba(0, 245, 212, 0.1); font-weight: bold;}
     </style>
 </head>
 <body>
@@ -40,9 +33,11 @@
 
     <div id="onboardingModal">
         <div class="ob-content" id="step1">
-            <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 10px;">Gems Elite 💎</h2>
-            <p style="color: #8b949e; margin-bottom: 25px;">Configurando seu acesso exclusivo.</p>
+            <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 5px;">Gems Elite 💎</h2>
+            <p style="color: #8b949e; margin-bottom: 20px; font-size: 0.9rem;">Configurando seu acesso exclusivo.</p>
+            
             <input type="text" id="obName" class="ob-input" placeholder="Como devemos te chamar?">
+            
             <div style="display: flex; align-items: center; margin-bottom: 20px;">
                 <select id="obColor" class="ob-select" style="margin-bottom: 0;" onchange="document.getElementById('cp').style.background = this.value">
                     <option value="#00f5d4">Ciano Neon</option>
@@ -53,15 +48,21 @@
                 </select>
                 <div id="cp" class="color-preview" style="background: #00f5d4;"></div>
             </div>
-            <button class="btn-primary" onclick="irParaStep2()" style="width:100%; padding: 18px; border-radius: 15px;">Próximo ❯</button>
+
+            <p style="color: #8b949e; margin-bottom: 10px; text-align: left; font-size: 0.9rem;">O que você quer organizar?</p>
+            <button type="button" class="ob-module-btn active" style="pointer-events:none; opacity: 0.7;">📊 Finanças (Obrigatório)</button>
+            <button type="button" class="ob-module-btn active" id="btnModMetas" onclick="this.classList.toggle('active')">🎯 Sonhos & Metas</button>
+            <button type="button" class="ob-module-btn" id="btnModCasamento" onclick="this.classList.toggle('active')">💍 Meu Casamento</button>
+
+            <button class="btn-primary" onclick="irParaStep2()" style="width:100%; padding: 18px; border-radius: 15px; margin-top: 15px;">Próximo ❯</button>
         </div>
 
         <div class="ob-content" id="step2" style="display:none;">
             <h2 style="color:#fff; margin-bottom: 10px;">Seus Sonhos</h2>
-            <p style="color: #8b949e; margin-bottom: 20px;">Diga 3 metas para a IA gerar suas imagens.</p>
-            <input type="text" id="dream1" class="ob-input" placeholder="Meta 1" style="margin-bottom:10px;">
-            <input type="text" id="dream2" class="ob-input" placeholder="Meta 2" style="margin-bottom:10px;">
-            <input type="text" id="dream3" class="ob-input" placeholder="Meta 3" style="margin-bottom:10px;">
+            <p style="color: #8b949e; margin-bottom: 20px; font-size: 0.9rem;">Diga 3 metas para a IA gerar suas imagens.</p>
+            <input type="text" id="dream1" class="ob-input" placeholder="1. Ex: Porsche 911" style="margin-bottom:10px;">
+            <input type="text" id="dream2" class="ob-input" placeholder="2. Ex: Mansão Moderna" style="margin-bottom:10px;">
+            <input type="text" id="dream3" class="ob-input" placeholder="3. Ex: Viagem para o Japão" style="margin-bottom:10px;">
             <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px; border-radius: 15px;">Ativar Gems Elite ✨</button>
         </div>
     </div>
@@ -76,7 +77,6 @@
             
             <div class="swiper superAppSwiper">
                 <div class="swiper-wrapper" id="wrapperDashboard">
-                    
                     <div class="swiper-slide">
                         <div class="glass-panel" style="border-top: 4px solid var(--primary-cyan);">
                             <h3 style="text-align: center; color: var(--text-muted); font-size: 0.85rem; letter-spacing: 2px;">PATRIMÔNIO LÍQUIDO</h3>
@@ -115,7 +115,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
                 <div class="swiper-pagination"></div>
             </div>
@@ -157,7 +156,6 @@
             setTimeout(() => {
                 document.getElementById('bloqueioTotal').style.display = 'none';
                 document.getElementById('appMainContainer').classList.add('liberado');
-                // IMPORTANTE: Força o cubo a se renderizar após a tela aparecer
                 if (typeof inicializarCubo === 'function') inicializarCubo();
             }, 500);
         }
@@ -177,17 +175,33 @@
             const nome = document.getElementById('obName').value;
             const cor = document.getElementById('obColor').value;
             const dados = getData() || {};
-            dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: ['financas', 'metas'] };
             
+            // LÓGICA DE MÓDULOS
+            const modulosSelecionados = ['financas'];
+            if(document.getElementById('btnModMetas').classList.contains('active')) modulosSelecionados.push('metas');
+            if(document.getElementById('btnModCasamento').classList.contains('active')) modulosSelecionados.push('casamento');
+
+            dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
+            
+            // LÓGICA DE SONHOS E IMAGENS IA
             const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
             if(sonhos.length > 0) {
+                // Prepara as imagens 4K para a tela de Metas
                 dados.apresentacaoMetas = sonhos.map((s, i) => ({
                     id: `meta_${i}`, title: s, 
-                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury style cinematic 8k photorealistic glass texture")}?width=1080&height=1920&nologo=true`,
+                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " ultra luxury cinematic photography 8k")}?width=1080&height=1920&nologo=true`,
                     defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                 }));
-                dados.valoresMetas = {};
-                sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
+                
+                // CRIA A META PRINCIPAL NO COFRE DO DASHBOARD (O primeiro sonho)
+                dados.metas = [{
+                    id: Date.now(),
+                    nome: sonhos[0],
+                    meta: 10000,
+                    metaMensal: 500,
+                    guardado: 0,
+                    guardadoMes: 0
+                }];
             }
 
             window.escudoAtivado = false;
