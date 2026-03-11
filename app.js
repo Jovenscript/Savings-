@@ -26,13 +26,47 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// 💎 APENAS DEFINIÇÃO DAS VARIÁVEIS, SEM MEXER NO FUNDO
+// 💎 O NOVO MOTOR DE TEMA: Muda a cara do app INTEIRO baseado na cor 💎
 function aplicarCoresGlobais() {
     const dados = getData();
     if (dados && dados.config && dados.config.corPreferida) {
         const cor = dados.config.corPreferida;
         document.documentElement.style.setProperty('--primary-cyan', cor);
         document.documentElement.style.setProperty('--primary-purple', cor + '88');
+        
+        // Mapeamento Inteligente: Cria um fundo ultra-dark da mesma família da cor escolhida
+        const fundosDark = {
+            '#00f5d4': '#001a16', // Dark Ciano
+            '#9d4edd': '#0d0221', // Dark Roxo (Original)
+            '#f15bb5': '#1a0513', // Dark Rosa
+            '#fee440': '#1a1702', // Dark Amarelo Ouro
+            '#57cc99': '#021a0f'  // Dark Verde Esmeralda
+        };
+        
+        const corFundo = fundosDark[cor] || '#0d0221'; // Se não achar, mantém o roxo
+        
+        // Injeta as regras de vidro e fundo no CSS dinamicamente
+        let themeStyle = document.getElementById('dynamic-theme');
+        if (!themeStyle) {
+            themeStyle = document.createElement('style');
+            themeStyle.id = 'dynamic-theme';
+            document.head.appendChild(themeStyle);
+        }
+        
+        themeStyle.innerHTML = `
+            body { background-color: ${corFundo} !important; }
+            .sidebar { background-color: ${corFundo} !important; border-right-color: ${cor}44 !important; }
+            .glass-panel { 
+                background-color: ${corFundo} !important; 
+                background-image: linear-gradient(135deg, ${cor}15, transparent) !important; 
+                border-color: ${cor}33 !important; 
+            }
+            .calendarSwiper .swiper-slide { 
+                background-color: ${corFundo} !important; 
+                background-image: linear-gradient(135deg, ${cor}15, transparent) !important; 
+            }
+            .card-header-glass { border-bottom-color: ${cor}44 !important; }
+        `;
     }
 }
 aplicarCoresGlobais();
