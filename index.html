@@ -23,6 +23,9 @@
 </head>
 <body>
 
+    <button id="hamburgerBtn">☰</button>
+    <div id="mobileOverlay"></div>
+
     <div id="bloqueioTotal">
         <div style="font-size: 2rem; letter-spacing: 5px; margin-bottom: 20px;">GEMSELITE</div>
         <div style="width: 30px; height: 30px; border: 3px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
@@ -123,6 +126,8 @@
     <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     <script src="dashboard.js"></script>
+    
+    <script src="mobile.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -178,13 +183,12 @@
         
         const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
         
-        // Agora, em vez da IA, salvamos os títulos e colocamos uma foto padrão bonita (que ele pode trocar depois)
         if(sonhos.length > 0) {
             dados.apresentacaoMetas = sonhos.map((s, i) => {
                 return {
                     id: `meta_${i}`, 
                     title: s, 
-                    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80", // Imagem neutra padrão
+                    img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1920&q=80",
                     defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                 };
             });
@@ -198,7 +202,6 @@
         window.escudoAtivado = false;
         saveData(dados);
         
-        // Sem tempo de espera. Vai direto pro app.
         window.location.reload(); 
     }
   </script>
