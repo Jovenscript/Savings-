@@ -1,15 +1,8 @@
 // js/mobile.js
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Garante que o Botão Hambúrguer existe
-    let hamburgerBtn = document.getElementById('hamburgerBtn');
-    if (!hamburgerBtn) {
-        hamburgerBtn = document.createElement('button');
-        hamburgerBtn.id = 'hamburgerBtn';
-        hamburgerBtn.innerHTML = '☰';
-        document.body.appendChild(hamburgerBtn);
-    }
 
-    // 2. Garante que o Overlay existe
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. Garante que o Overlay sempre exista no Body
     let overlay = document.getElementById('mobileOverlay');
     if (!overlay) {
         overlay = document.createElement('div');
@@ -17,28 +10,43 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(overlay);
     }
 
-    // 3. Função Master de Abrir/Fechar (Puxa a classe 'active' da sidebar)
+    // 2. Função Blindada de Toggle
     window.toggleMenuGems = function() {
         const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('mobileOverlay');
+        const overlayBox = document.getElementById('mobileOverlay');
         
-        if (sidebar && overlay) {
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
+        if (sidebar) sidebar.classList.toggle('active');
+        if (overlayBox) overlayBox.classList.toggle('active');
     };
 
-    // 4. Ativa os eventos de clique
-    hamburgerBtn.addEventListener('click', window.toggleMenuGems);
-    overlay.addEventListener('click', window.toggleMenuGems);
-
-    // 5. Inteligência de Fechamento: Clica em qualquer link do menu e ele fecha
+    // 3. Event Delegation (A Grande Correção)
+    // Invés de tentar achar o botão na hora que a página carrega, 
+    // ele escuta qualquer clique no documento inteiro. Se o clique for no botão, ele age.
     document.addEventListener('click', (e) => {
+        // Se clicou no Botão Hambúrguer (ou dentro dele)
+        if (e.target.id === 'hamburgerBtn' || e.target.closest('#hamburgerBtn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            window.toggleMenuGems();
+            return; // Para a execução aqui
+        }
+
+        // Se clicou no Overlay Escuro (para fechar)
+        if (e.target.id === 'mobileOverlay') {
+            window.toggleMenuGems();
+            return;
+        }
+
+        // Se estiver no mobile e clicar em um link real do menu (para fechar e ir pra página)
         if (window.innerWidth <= 768) {
-            // Se clicou em um link dentro da sidebar
-            if (e.target.closest('.nav-links a')) {
+            const sidebarAtiva = document.querySelector('.sidebar.active');
+            const ehUmLinkDoMenu = e.target.closest('.nav-links a');
+            
+            if (sidebarAtiva && ehUmLinkDoMenu) {
+                // Não previne o default aqui, para a página poder carregar
                 window.toggleMenuGems();
             }
         }
     });
+
 });
