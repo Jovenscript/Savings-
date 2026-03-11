@@ -10,93 +10,48 @@
     <meta name="theme-color" content="#0d0221">
     <style>
         /* VISUAL CLEAN - ESTILO APPLE/NUBANK */
-        .budget-header {
-            margin-bottom: 30px;
-        }
-
+        .budget-header { margin-bottom: 30px; }
         .focus-island {
             background: linear-gradient(135deg, rgba(13, 2, 33, 0.9), rgba(157, 78, 221, 0.2));
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
-            position: relative;
-            overflow: hidden;
+            border: 1px solid var(--glass-border); border-radius: 24px; padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5); position: relative; overflow: hidden;
         }
-
-        /* Efeito de vidro brilhante no fundo da ilha */
         .focus-island::before {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: radial-gradient(circle, rgba(0, 245, 212, 0.1) 0%, transparent 60%);
             z-index: 0; pointer-events: none;
         }
-
         .focus-island-content { position: relative; z-index: 1; }
-
         .meta-mes-box {
-            background: rgba(0, 245, 212, 0.1);
-            border-left: 4px solid var(--primary-cyan);
-            padding: 15px 20px;
-            border-radius: 0 12px 12px 0;
-            margin-bottom: 25px;
+            background: rgba(0, 245, 212, 0.1); border-left: 4px solid var(--primary-cyan);
+            padding: 15px 20px; border-radius: 0 12px 12px 0; margin-bottom: 25px;
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-item {
-            display: flex; flex-direction: column;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
+        .stat-item { display: flex; flex-direction: column; }
         .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .stat-value { font-size: 1.8rem; font-weight: bold; color: #fff; }
         .stat-value.highlight { color: var(--primary-cyan); }
         .stat-value.danger { color: var(--danger-red); }
 
         /* LISTA CLEAN DE FORNECEDORES */
-        .supplier-list {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        .supplier-list { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; }
         .supplier-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.3s;
-            flex-wrap: wrap;
-            gap: 15px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--glass-border); border-radius: 16px;
+            padding: 20px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; flex-wrap: wrap; gap: 15px;
         }
         .supplier-card:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(157, 78, 221, 0.4); }
-
-        .supplier-card.quitado {
-            opacity: 0.6;
-            border-color: rgba(0, 245, 212, 0.3);
-            background: rgba(0, 245, 212, 0.05);
-        }
+        .supplier-card.quitado { opacity: 0.6; border-color: rgba(0, 245, 212, 0.3); background: rgba(0, 245, 212, 0.05); }
         .supplier-card.quitado .s-name { text-decoration: line-through; color: var(--text-muted); }
-
         .s-info { flex: 2; min-width: 200px; }
         .s-name { font-size: 1.1rem; font-weight: bold; color: #fff; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;}
         .s-cat { font-size: 0.8rem; color: var(--primary-purple); background: rgba(157, 78, 221, 0.1); padding: 3px 8px; border-radius: 6px; }
-
         .s-finance { flex: 1; min-width: 150px; text-align: right; }
         .s-total { font-size: 1.1rem; color: #fff; font-weight: bold; }
         .s-pendente { font-size: 0.85rem; color: var(--danger-red); margin-top: 2px; }
-
         .s-action { flex: 1; min-width: 150px; display: flex; align-items: center; justify-content: flex-end; gap: 10px;}
         
         .pay-input { background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); color: #fff; padding: 10px; width: 120px; border-radius: 8px; font-weight: bold; text-align: right; }
         .pay-input:focus { border-color: var(--primary-cyan); outline: none; }
-
         .btn-delete { background: none; border: none; color: var(--danger-red); font-size: 1.2rem; cursor: pointer; padding: 5px; opacity: 0.5; transition: 0.3s; }
         .btn-delete:hover { opacity: 1; transform: scale(1.2); }
 
@@ -128,7 +83,14 @@
                     <h1 style="color: #fff;">Orçamento Clean</h1>
                     <p style="color: var(--text-muted);">Faltam <strong style="color: var(--danger-red);" id="mesesRestantes">--</strong> meses para o Casamento.</p>
                 </div>
-                <button class="btn-primary" onclick="abrirModal()" style="width: auto; margin-top: 0; padding: 12px 25px; border-radius: 30px;">+ Novo Contrato</button>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label for="btnImportarCasamento" style="cursor: pointer; color: var(--primary-cyan); font-size: 0.85rem; padding: 10px; background: rgba(0, 245, 212, 0.1); border-radius: 10px; border: 1px solid var(--primary-cyan);">📂 Importar JSON</label>
+                    <input type="file" id="btnImportarCasamento" accept=".json" style="display: none;" onchange="importarCasamentoJSON(event)">
+                    
+                    <button onclick="exportarCasamentoJSON()" style="cursor: pointer; color: var(--primary-purple); font-size: 0.85rem; padding: 10px; background: rgba(157, 78, 221, 0.1); border-radius: 10px; border: 1px solid var(--primary-purple); outline: none;">💾 Exportar JSON</button>
+                    
+                    <button class="btn-primary" onclick="abrirModal()" style="width: auto; margin-top: 0; padding: 12px 25px; border-radius: 30px;">+ Novo Contrato</button>
+                </div>
             </header>
 
             <div class="focus-island">
@@ -137,7 +99,7 @@
                     <div class="meta-mes-box">
                         <div style="font-size: 0.85rem; color: var(--primary-cyan); font-weight: bold; margin-bottom: 5px;">🎯 META DE PAGAMENTO DO MÊS</div>
                         <div style="font-size: 1.5rem; color: #fff; font-weight: bold;" id="metaDoMes">R$ 0,00</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Pague este valor mensalmente para quitar tudo até agosto sem gerar dívidas.</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Pague este valor mensalmente para quitar tudo até o casamento sem gerar dívidas.</div>
                     </div>
 
                     <div class="stats-grid">
@@ -163,8 +125,7 @@
                 <span id="contadorQuitados" style="font-size: 0.85rem; color: var(--primary-cyan); background: rgba(0, 245, 212, 0.1); padding: 5px 10px; border-radius: 10px;">0 Quitados</span>
             </div>
 
-            <div class="supplier-list" id="supplierList">
-                </div>
+            <div class="supplier-list" id="supplierList"></div>
 
         </main>
     </div>
