@@ -66,8 +66,11 @@ function renderizarCubo() {
         // Puxa o valor do banco de dados (ou o padrão se der erro)
         const meusValores = valoresSalvos[meta.id] || { s1: meta.defaultS1 || "R$ 0", s2: meta.defaultS2 || "0%", s3: meta.defaultS3 || "Definir" };
 
+        // 🛡️ SOLUÇÃO DAS TELAS PRETAS: Fundo degradê seguro. Se a foto da IA falhar, fica um fundo lindo roxo com azul escuro!
+        const fundoSeguro = `background: linear-gradient(135deg, rgba(13, 2, 33, 0.8), rgba(157, 78, 221, 0.5)), url('${meta.img}'); background-size: cover; background-position: center;`;
+
         html += `
-            <div class="swiper-slide" style="background-image: url('${meta.img}');">
+            <div class="swiper-slide" style="${fundoSeguro}">
                 <div class="meta-overlay"></div>
                 
                 <div class="meta-content">
