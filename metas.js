@@ -80,7 +80,7 @@ function renderizarCubo() {
                         <h1 class="meta-title">${meta.title}</h1>
                         <button class="btn-edit-meta" onclick="editarValoresCofre('${meta.id}')" title="Editar Valores">✏️</button>
                     </div>
-                    <p class="meta-desc">${meta.desc || 'Objetivo Gems Elite'}</p>
+                    <p class="meta-desc">${meta.desc || 'Metas e Sonhos'}</p>
                     
                     <div class="meta-stats">
                         <div class="stat-box"><span class="stat-number">${meusValores.s1}</span><span class="stat-label">ALVO</span></div>
