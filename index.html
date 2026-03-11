@@ -195,8 +195,10 @@
         if(sonhos.length > 0) {
             dados.apresentacaoMetas = sonhos.map((s, i) => {
                 const termoTratado = formatarTermoIA(s);
-                const semente = Math.floor(Math.random() * 999999); // Seed maior
-                const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}?width=1080&height=1920&nologo=true&seed=${semente}`;
+                const semente = Date.now() + i; // Tempo real + índice para garantir exclusividade
+                
+                // URL com cache buster total
+                const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}%20var${i}?width=1080&height=1920&nologo=true&seed=${semente}&cb=${semente}`;
                 
                 return {
                     id: `meta_${i}`, 
@@ -226,8 +228,7 @@
         
         setTimeout(() => { window.location.reload(); }, 3000);
     }
-</script>
+  </script>
     <style> @keyframes spin { to { transform: rotate(360deg); } } </style>
 </body>
 </html>
-
