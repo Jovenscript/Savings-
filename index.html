@@ -40,11 +40,17 @@
             
             <div style="display: flex; align-items: center; margin-bottom: 20px;">
                 <select id="obColor" class="ob-select" style="margin-bottom: 0;" onchange="document.getElementById('cp').style.background = this.value">
-                    <option value="#00f5d4">Ciano Neon</option>
-                    <option value="#9d4edd">Roxo Royal</option>
-                    <option value="#f15bb5">Rosa Shock</option>
-                    <option value="#fee440">Amarelo Ouro</option>
-                    <option value="#57cc99">Verde Esmeralda</option>
+                    <option value="#00f5d4">Cyberpunk (Ciano & Roxo)</option>
+                    <option value="#57cc99">Natureza (Verde Esmeralda)</option>
+                    <option value="#fee440">Ouro Imperial (Amarelo & Bronze)</option>
+                    <option value="#f15bb5">Miami Vice (Rosa & Magenta)</option>
+                    <option value="#00bbf9">Fundo do Mar (Azul Oceano)</option>
+                    <option value="#ff0a54">Drácula (Vermelho Sangue)</option>
+                    <option value="#ff7f51">Vulcão (Laranja & Ferrugem)</option>
+                    <option value="#b14aed">Galáxia (Roxo & Índigo)</option>
+                    <option value="#e0e1dd">Platina (Prata & Cinza Escuro)</option>
+                    <option value="#00ff00">Matrix (Verde Hacker)</option>
+                    <option value="#ffd700">Bilionário (Dourado & Ônix)</option>
                 </select>
                 <div id="cp" class="color-preview" style="background: #00f5d4;"></div>
             </div>
@@ -126,7 +132,6 @@
     <script type="module" src="auth.js"></script>
     <script src="app.js"></script>
     <script src="dashboard.js"></script>
-    
     <script src="mobile.js"></script>
 
   <script>
@@ -148,7 +153,7 @@
     });
 
     function liberarApp(dados, cor, nome) {
-        aplicarCores(cor);
+        if(typeof aplicarCoresGlobais === 'function') aplicarCoresGlobais();
         const t = document.getElementById('tituloBoasVindas');
         if(t) t.innerText = `Olá, ${nome} 👋`;
         document.getElementById('bloqueioTotal').style.opacity = '0';
@@ -157,11 +162,6 @@
             document.getElementById('appMainContainer').classList.add('liberado');
             if (typeof inicializarCubo === 'function') inicializarCubo();
         }, 500);
-    }
-
-    function aplicarCores(cor) {
-        document.documentElement.style.setProperty('--primary-cyan', cor);
-        document.documentElement.style.setProperty('--primary-purple', cor + '88'); 
     }
 
     function irParaStep2() {
