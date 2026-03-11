@@ -26,12 +26,18 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
+// 💎 MAGIA DA COR DE FUNDO GLOBAL AQUI
 function aplicarCoresGlobais() {
     const dados = getData();
     if (dados && dados.config && dados.config.corPreferida) {
         const cor = dados.config.corPreferida;
         document.documentElement.style.setProperty('--primary-cyan', cor);
         document.documentElement.style.setProperty('--primary-purple', cor + '88');
+        
+        // Aplica o gradiente da cor escolhida no fundo do aplicativo inteiro
+        document.body.style.background = `radial-gradient(circle at top, ${cor}20 0%, #050110 100%)`;
+        document.body.style.minHeight = "100vh";
+        document.body.style.backgroundAttachment = "fixed";
     }
 }
 aplicarCoresGlobais();
@@ -119,7 +125,7 @@ function injetarElementosGlobais() {
         if (modulos.includes('metas')) {
             menuHTML += `
                 <li class="nav-category">🎯 Grandes Objetivos</li>
-                <li class="${paginaAtual === 'metas.html' ? 'active' : ''}"><a href="metas.html">🏡sSonhos & Metas</a></li>
+                <li class="${paginaAtual === 'metas.html' ? 'active' : ''}"><a href="metas.html">🏡 Sonhos & Metas</a></li>
             `;
         }
 
@@ -143,7 +149,6 @@ function injetarElementosGlobais() {
 
         sidebarElement.innerHTML = menuHTML;
         
-        // 🛡️ CORREÇÃO: Usa a função global para fechar o menu no mobile
         const links = sidebarElement.querySelectorAll('a');
         links.forEach(link => {
             link.addEventListener('click', (e) => {
@@ -151,7 +156,6 @@ function injetarElementosGlobais() {
                 if (href === paginaAtual) {
                     e.preventDefault(); 
                     if(typeof window.toggleMenuGems === 'function') {
-                        // Se já está na página, apenas fecha o menu
                         const sidebar = document.querySelector('.sidebar');
                         if(sidebar && sidebar.classList.contains('active')) window.toggleMenuGems();
                     }
@@ -180,4 +184,3 @@ function injetarElementosGlobais() {
     }
 }
 document.addEventListener('DOMContentLoaded', injetarElementosGlobais);
-
