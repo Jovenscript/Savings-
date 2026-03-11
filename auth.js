@@ -1,180 +1,66 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gems Elite - Super App</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    <link rel="stylesheet" href="style.css">
-    <style>
-        /* 🛡️ BLOQUEIO TOTAL */
-        #bloqueioTotal {
-            position: fixed; inset: 0; background: #0d0221; z-index: 200000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            color: #fff; font-family: sans-serif; transition: opacity 0.5s;
-        }
-        #appMainContainer { opacity: 0; transition: opacity 1s; }
-        #appMainContainer.liberado { opacity: 1; }
+// js/auth.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 
-        /* ESTILOS DO ONBOARDING */
-        #onboardingModal {
-            position: fixed; inset: 0; background: rgba(13, 2, 33, 0.98); z-index: 150000;
-            display: none; align-items: center; justify-content: center; backdrop-filter: blur(20px);
-        }
-        .ob-content { 
-            background: #161b22; border: 1px solid var(--primary-purple); border-radius: 24px; 
-            padding: 40px; width: 95%; max-width: 450px; text-align: center;
-        }
-        .ob-input, .ob-select {
-            width: 100%; padding: 15px; border-radius: 12px; background: rgba(0,0,0,0.3); 
-            border: 1px solid #30363d; color: #fff; margin-bottom: 20px; font-size: 1rem; outline: none;
-        }
-        .color-preview { width: 35px; height: 35px; border-radius: 50%; display: inline-block; vertical-align: middle; margin-left: 10px; border: 2px solid #fff; }
-    </style>
-</head>
-<body>
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-    <div id="bloqueioTotal">
-        <div class="logo" style="font-size: 2rem; margin-bottom: 20px; letter-spacing: 5px;">GEMSELITE</div>
-        <div style="width: 40px; height: 40px; border: 3px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-    </div>
+const firebaseConfig = {
+  apiKey: "AIzaSyCkm7cMFVbj-BpCJ8sz9SBnovui0bvfhfM",
+  authDomain: "savings-a0221.firebaseapp.com",
+  projectId: "savings-a0221",
+  storageBucket: "savings-a0221.firebasestorage.app",
+  messagingSenderId: "113856053059",
+  appId: "1:113856053059:web:8421389a991130582c79f6"
+};
 
-    <div id="onboardingModal">
-        <div class="ob-content" id="step1">
-            <h2 style="color:#fff; font-size: 1.8rem; margin-bottom: 10px;">Gems Elite 💎</h2>
-            <p style="color: #8b949e; margin-bottom: 25px;">Personalize sua experiência exclusiva.</p>
-            
-            <input type="text" id="obName" class="ob-input" placeholder="Como devemos te chamar?">
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+window.db = db;
 
-            <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                <select id="obColor" class="ob-select" style="margin-bottom: 0;" onchange="document.getElementById('cp').style.background = this.value">
-                    <option value="#00f5d4">Ciano Neon</option>
-                    <option value="#9d4edd">Roxo Royal</option>
-                    <option value="#f15bb5">Rosa Shock</option>
-                    <option value="#fee440">Amarelo Ouro</option>
-                    <option value="#57cc99">Verde Esmeralda</option>
-                </select>
-                <div id="cp" class="color-preview" style="background: #00f5d4;"></div>
-            </div>
+// ==========================================
+// 🛡️ A REGRA DE OURO: O PORTEIRO ÚNICO
+// ==========================================
+onAuthStateChanged(auth, (user) => {
+    const urlAtual = window.location.href;
+    const isPaginaLogin = urlAtual.includes('login.html');
+    
+    if (user) {
+        // Se logou, anota no caderninho e garante que está na index
+        localStorage.setItem('gemsEliteLogin', user.email);
+        if (isPaginaLogin) window.location.href = 'index.html';
+    } else {
+        // Se deslogou, limpa o caderninho e garante que está no login
+        localStorage.removeItem('gemsEliteLogin');
+        if (!isPaginaLogin) window.location.href = 'login.html';
+    }
+});
 
-            <button class="btn-primary" onclick="irParaStep2()" style="width:100%; padding: 18px; border-radius: 15px;">Próximo ❯</button>
-        </div>
+// FUNÇÃO DE LOGIN
+const loginForm = document.getElementById('loginForm');
+if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('loginEmail').value;
+        const pass = document.getElementById('loginPassword').value;
+        signInWithEmailAndPassword(auth, email, pass).catch(() => alert("E-mail ou senha incorretos."));
+    });
+}
 
-        <div class="ob-content" id="step2" style="display:none;">
-            <h2 style="color:#fff; margin-bottom: 10px;">Visão de Futuro</h2>
-            <p style="color: #8b949e; margin-bottom: 20px;">Quais são seus 3 maiores sonhos?</p>
-            <input type="text" id="dream1" class="ob-input" placeholder="Sonho 1" style="margin-bottom:10px;">
-            <input type="text" id="dream2" class="ob-input" placeholder="Sonho 2" style="margin-bottom:10px;">
-            <input type="text" id="dream3" class="ob-input" placeholder="Sonho 3" style="margin-bottom:10px;">
-            <button class="btn-primary" onclick="finalizarOnboarding()" style="width:100%; padding: 18px; border-radius: 15px;">Gerar Sistema ✨</button>
-        </div>
-    </div>
+// FUNÇÃO DE CADASTRO
+const registerForm = document.getElementById('registerForm');
+if (registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('regEmail').value;
+        const pass = document.getElementById('regPassword').value;
+        createUserWithEmailAndPassword(auth, email, pass).catch(() => alert("Erro ao criar conta."));
+    });
+}
 
-    <div class="app-container" id="appMainContainer">
-        <nav class="sidebar"></nav>
-        <main class="main-content">
-            <header><h1 id="tituloBoasVindas" style="color:#fff; font-size: 2rem;">Olá! 👋</h1></header>
-            <div class="swiper superAppSwiper" style="padding-bottom: 40px;">
-                <div class="swiper-wrapper" id="wrapperDashboard"></div>
-                <div class="swiper-pagination"></div>
-            </div>
-        </main>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="auth.js"></script>
-    <script src="app.js"></script>
-    <script src="dashboard.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Aguarda o Firebase respirar
-            setTimeout(() => {
-                const motorVerificacao = setInterval(() => {
-                    const userEmail = localStorage.getItem('gemsEliteLogin');
-                    const urlAtual = window.location.href;
-
-                    // 🛑 REGRA DE OURO: Se já estiver na página de login, NÃO faça nada.
-                    if (urlAtual.includes('login.html')) {
-                        clearInterval(motorVerificacao);
-                        return; 
-                    }
-
-                    // Se não tiver login e não estiver na login.html, redireciona UM VEZ
-                    if (!userEmail) {
-                        clearInterval(motorVerificacao);
-                        window.location.href = 'login.html';
-                        return;
-                    }
-
-                    if (typeof getData === 'function') {
-                        clearInterval(motorVerificacao);
-                        const dados = getData();
-                        const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
-                        
-                        if (fundadores.includes(userEmail)) {
-                            liberarApp(dados, '#00f5d4');
-                        } else if (!dados.config || !dados.config.setupConcluido) {
-                            document.getElementById('bloqueioTotal').style.display = 'none';
-                            document.getElementById('onboardingModal').style.display = 'flex';
-                        } else {
-                            liberarApp(dados, dados.config.corPreferida);
-                        }
-                    }
-                }, 400);
-            }, 500);
-        });
-
-        function liberarApp(dados, cor) {
-            if(cor) aplicarCores(cor);
-            document.getElementById('bloqueioTotal').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('bloqueioTotal').style.display = 'none';
-                document.getElementById('appMainContainer').classList.add('liberado');
-                atualizarTelaBaseadoNoUsuario(dados);
-            }, 500);
-        }
-
-        function aplicarCores(cor) {
-            document.documentElement.style.setProperty('--primary-cyan', cor);
-            document.documentElement.style.setProperty('--primary-purple', cor + 'aa'); 
-        }
-
-        function irParaStep2() {
-            if(!document.getElementById('obName').value.trim()) return alert("Diga seu nome!");
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
-        }
-
-        function finalizarOnboarding() {
-            const nome = document.getElementById('obName').value;
-            const cor = document.getElementById('obColor').value;
-            const dados = getData() || {};
-            dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: ['financas', 'metas'] };
-            
-            const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
-            if(sonhos.length > 0) {
-                dados.apresentacaoMetas = sonhos.map((s, i) => ({
-                    id: `meta_${i}`, title: s, 
-                    img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " luxury 8k")}?width=1080&height=1920&nologo=true`,
-                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Meta"
-                }));
-                dados.valoresMetas = {};
-                sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
-            }
-
-            window.escudoAtivado = false;
-            saveData(dados);
-            window.location.reload();
-        }
-
-        function atualizarTelaBaseadoNoUsuario(dados) {
-            const nome = dados.config?.nomeUsuario || 'Membro Elite';
-            const t = document.getElementById('tituloBoasVindas');
-            if(t) t.innerText = `Olá, ${nome} 👋`;
-        }
-    </script>
-    <style> @keyframes spin { to { transform: rotate(360deg); } } </style>
-</body>
-</html>
+export { auth };
