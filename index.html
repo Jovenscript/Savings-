@@ -58,7 +58,7 @@
 
         <div class="ob-content" id="step2" style="display:none;">
             <h2 style="color:#fff; margin-bottom: 10px;">Seus Sonhos</h2>
-            <p style="color: #8b949e; margin-bottom: 20px;">Diga 3 metas para a IA gerar suas imagens 4K.</p>
+            <p style="color: #8b949e; margin-bottom: 20px;">Diga 3 metas para a IA gerar suas imagens.</p>
             <input type="text" id="dream1" class="ob-input" placeholder="Meta 1" style="margin-bottom:10px;">
             <input type="text" id="dream2" class="ob-input" placeholder="Meta 2" style="margin-bottom:10px;">
             <input type="text" id="dream3" class="ob-input" placeholder="Meta 3" style="margin-bottom:10px;">
@@ -69,9 +69,54 @@
     <div class="app-container" id="appMainContainer">
         <nav class="sidebar"></nav>
         <main class="main-content">
-            <header><h1 id="tituloBoasVindas" style="color:#fff; font-size: 2rem;">Olá! 👋</h1></header>
+            <header>
+                <h1 id="tituloBoasVindas" style="color:#fff; font-size: 2rem;">Olá! 👋</h1>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Gire o cubo para navegar.</p>
+            </header>
+            
             <div class="swiper superAppSwiper">
-                <div class="swiper-wrapper" id="wrapperDashboard"></div>
+                <div class="swiper-wrapper" id="wrapperDashboard">
+                    
+                    <div class="swiper-slide">
+                        <div class="glass-panel" style="border-top: 4px solid var(--primary-cyan);">
+                            <h3 style="text-align: center; color: var(--text-muted); font-size: 0.85rem; letter-spacing: 2px;">PATRIMÔNIO LÍQUIDO</h3>
+                            <h2 id="totalBalance" style="font-size: 3rem; color: #fff; text-align: center; margin: 20px 0;">R$ 0,00</h2>
+                            <div style="display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">Entradas Mês: <strong id="resumoEntradas" style="color: var(--primary-cyan);">R$ 0,00</strong></span>
+                                <span style="font-size: 0.85rem; color: var(--text-muted);">Saídas Mês: <strong id="resumoSaidas" style="color: var(--danger-red);">R$ 0,00</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="glass-panel">
+                            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 1.1rem;">Análise de Gastos</h3>
+                            <div style="height: 200px; width: 100%; position: relative;">
+                                <canvas id="donutChart"></canvas>
+                                <div id="semGastosAviso" style="display:none; position: absolute; top:50%; left:50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-muted);">Sem dados.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="glass-panel" id="mainGoal">
+                            <p style="text-align: center; color: var(--text-muted);">Nenhuma meta definida.</p>
+                        </div>
+                    </div>
+
+                    <div class="swiper-slide">
+                        <div class="glass-panel">
+                            <h3 style="margin-top: 0; font-size: 1.1rem; color: var(--primary-cyan);">Agenda Rápida</h3>
+                            <div id="agendaRapida" style="margin-bottom: 20px;"></div>
+                            
+                            <h3 style="margin-top: 0; font-size: 1rem; color: var(--danger-red);">Radar de Alertas</h3>
+                            <div id="calendarAlerts" style="padding: 15px; border-left: 4px solid var(--primary-cyan); background: rgba(0, 245, 212, 0.1); border-radius: 0 10px 10px 0; font-size: 0.9rem;">
+                                Tudo tranquilo!
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
                 <div class="swiper-pagination"></div>
             </div>
         </main>
@@ -91,11 +136,8 @@
                     clearInterval(motorInterface);
                     const dados = getData();
                     
-                    // 👑 REGRA DE OURO: OS FUNDADORES
                     const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
-                    const eFundador = fundadores.includes(userEmail);
-
-                    if (eFundador) {
+                    if (fundadores.includes(userEmail)) {
                         liberarApp(dados, '#00f5d4', 'Marlon & Carol');
                     } else if (!dados.config || !dados.config.setupConcluido) {
                         document.getElementById('bloqueioTotal').style.display = 'none';
@@ -115,6 +157,8 @@
             setTimeout(() => {
                 document.getElementById('bloqueioTotal').style.display = 'none';
                 document.getElementById('appMainContainer').classList.add('liberado');
+                // IMPORTANTE: Força o cubo a se renderizar após a tela aparecer
+                if (typeof inicializarCubo === 'function') inicializarCubo();
             }, 500);
         }
 
