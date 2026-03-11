@@ -1,12 +1,8 @@
-// js/auth.js
+// auth.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword, 
-    onAuthStateChanged 
+    getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut 
 } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -20,47 +16,55 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-window.db = db;
+window.db = getFirestore(app);
 
-// ==========================================
-// 🛡️ A REGRA DE OURO: O PORTEIRO ÚNICO
-// ==========================================
+// 🛡️ A REGRA DE OURO: REDIRECIONAMENTO ÚNICO
 onAuthStateChanged(auth, (user) => {
-    const urlAtual = window.location.href;
-    const isPaginaLogin = urlAtual.includes('login.html');
-    
+    const naLogin = window.location.href.includes('login.html');
     if (user) {
-        // Se logou, anota no caderninho e garante que está na index
         localStorage.setItem('gemsEliteLogin', user.email);
-        if (isPaginaLogin) window.location.href = 'index.html';
+        if (naLogin) window.location.href = 'index.html';
     } else {
-        // Se deslogou, limpa o caderninho e garante que está no login
         localStorage.removeItem('gemsEliteLogin');
-        if (!isPaginaLogin) window.location.href = 'login.html';
+        if (!naLogin) window.location.href = 'login.html';
     }
 });
 
-// FUNÇÃO DE LOGIN
-const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('loginEmail').value;
-        const pass = document.getElementById('loginPassword').value;
-        signInWithEmailAndPassword(auth, email, pass).catch(() => alert("E-mail ou senha incorretos."));
-    });
-}
+// 🚀 FUNÇÃO GLOBAL DE SAIR (Para o app.js usar)
+window.logoutDoSistema = function() {
+    if(confirm("Deseja realmente sair do Império?")) {
+        signOut(auth).then(() => {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        });
+    }
+};
 
-// FUNÇÃO DE CADASTRO
-const registerForm = document.getElementById('registerForm');
-if (registerForm) {
-    registerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = document.getElementById('regEmail').value;
-        const pass = document.getElementById('regPassword').value;
-        createUserWithEmailAndPassword(auth, email, pass).catch(() => alert("Erro ao criar conta."));
-    });
-}
+// 🖱️ LÓGICA DE TROCA DE TELAS (LOGIN / CADASTRO)
+window.alternarAuth = function(tela) {
+    const cardLogin = document.getElementById('cardLogin');
+    const cardRegister = document.getElementById('cardRegister');
+    if (tela === 'registro') {
+        cardLogin.classList.add('hidden-card');
+        cardRegister.classList.remove('hidden-card');
+    } else {
+        cardRegister.classList.add('hidden-card');
+        cardLogin.classList.remove('hidden-card');
+    }
+};
 
-export { auth };
+// フォーム (FORMS)
+document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    signInWithEmailAndPassword(auth, document.getElementById('loginEmail').value, document.getElementById('loginPassword').value)
+        .catch(() => alert("E-mail ou senha incorretos."));
+});
+
+document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const p1 = document.getElementById('regPassword').value;
+    const p2 = document.getElementById('regConfirmPassword').value;
+    if(p1 !== p2) return alert("Senhas não conferem!");
+    createUserWithEmailAndPassword(auth, document.getElementById('regEmail').value, p1)
+        .catch(() => alert("Erro ao criar conta. Verifique o e-mail."));
+});
