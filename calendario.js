@@ -194,7 +194,7 @@ function renderizarMesAtual(diaAlvo = null) {
         }
 
         const card = document.createElement('div');
-        // O Swiper cuida da estrutura base e o nosso CSS do HTML cuida da largura
+        // O Swiper Cards exige que o slide seja puro, e o CSS gerencia o tamanho
         card.className = 'swiper-slide';
         card.dataset.diaReal = d;
         
@@ -223,8 +223,14 @@ function renderizarMesAtual(diaAlvo = null) {
 function iniciarSwiper(diaAlvo) {
     if (typeof Swiper !== 'undefined') {
         calendarSwiper = new Swiper(".calendarSwiper", {
-            effect: "cards", // 🃏 AGORA O BARALHO APARECE E FUNCIONA!
+            effect: "cards", 
             grabCursor: true,
+            cardsEffect: {
+                slideShadows: false, 
+                rotate: true,
+                perSlideRotate: 2,
+                perSlideOffset: 8
+            },
             initialSlide: diaAlvo - 1, 
             navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
             on: {
