@@ -98,9 +98,14 @@ function renderizarCubo() {
 
 function iniciarMotor3D() {
     swiperMetas = new Swiper(".metasSwiper", {
-        effect: "cube",
+        effect: "cards", // 🃏 MÁGICA DO BARALHO AQUI
         grabCursor: true,
-        cubeEffect: { shadow: true, slideShadows: true, shadowOffset: 40, shadowScale: 0.9 },
+        cardsEffect: {
+            perSlideOffset: 8,
+            perSlideRotate: 2,
+            rotate: true,
+            slideShadows: true,
+        },
         pagination: { el: ".swiper-pagination", clickable: true },
         autoplay: { delay: 5000, disableOnInteraction: false },
         loop: baseMetas.length > 1 
