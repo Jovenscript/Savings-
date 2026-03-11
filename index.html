@@ -176,37 +176,45 @@
             const cor = document.getElementById('obColor').value;
             const dados = getData() || {};
             
-            // LÓGICA DE MÓDULOS
+            // MÓDULOS
             const modulosSelecionados = ['financas'];
             if(document.getElementById('btnModMetas').classList.contains('active')) modulosSelecionados.push('metas');
             if(document.getElementById('btnModCasamento').classList.contains('active')) modulosSelecionados.push('casamento');
 
             dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
             
-            // LÓGICA DE SONHOS E IMAGENS IA
+            // SONHOS E IMAGENS IA
             const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
             if(sonhos.length > 0) {
-                // Prepara as imagens 4K para a tela de Metas
                 dados.apresentacaoMetas = sonhos.map((s, i) => ({
                     id: `meta_${i}`, title: s, 
                     img: `https://image.pollinations.ai/prompt/${encodeURIComponent(s + " ultra luxury cinematic photography 8k")}?width=1080&height=1920&nologo=true`,
                     defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
                 }));
                 
-                // CRIA A META PRINCIPAL NO COFRE DO DASHBOARD (O primeiro sonho)
-                dados.metas = [{
-                    id: Date.now(),
-                    nome: sonhos[0],
-                    meta: 10000,
-                    metaMensal: 500,
-                    guardado: 0,
-                    guardadoMes: 0
-                }];
+                dados.valoresMetas = {};
+                sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
+
+                dados.metas = [{ id: Date.now(), nome: sonhos[0], meta: 10000, metaMensal: 500, guardado: 0, guardadoMes: 0 }];
             }
 
             window.escudoAtivado = false;
             saveData(dados);
-            window.location.reload();
+            
+            // 🛡️ A CORREÇÃO DE OURO: ESPERA O BANCO DE DADOS SALVAR O PORSCHE
+            const modalStep2 = document.getElementById('step2');
+            modalStep2.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <div style="width: 50px; height: 50px; border: 4px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                    <h2 style="color:#fff; margin-bottom: 10px;">Gerando seu Império...</h2>
+                    <p style="color: var(--primary-cyan);">A IA está processando suas imagens 8K e enviando para a nuvem.</p>
+                </div>
+            `;
+            
+            // Espera 2.5 segundos para garantir o envio antes de piscar a tela
+            setTimeout(() => {
+                window.location.reload();
+            }, 2500);
         }
     </script>
     <style> @keyframes spin { to { transform: rotate(360deg); } } </style>
