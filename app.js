@@ -26,18 +26,13 @@ function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// 💎 MAGIA DA COR DE FUNDO GLOBAL AQUI
+// 💎 APENAS DEFINIÇÃO DAS VARIÁVEIS, SEM MEXER NO FUNDO
 function aplicarCoresGlobais() {
     const dados = getData();
     if (dados && dados.config && dados.config.corPreferida) {
         const cor = dados.config.corPreferida;
         document.documentElement.style.setProperty('--primary-cyan', cor);
         document.documentElement.style.setProperty('--primary-purple', cor + '88');
-        
-        // Aplica o gradiente da cor escolhida no fundo do aplicativo inteiro
-        document.body.style.background = `radial-gradient(circle at top, ${cor}20 0%, #050110 100%)`;
-        document.body.style.minHeight = "100vh";
-        document.body.style.backgroundAttachment = "fixed";
     }
 }
 aplicarCoresGlobais();
