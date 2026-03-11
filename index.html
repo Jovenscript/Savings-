@@ -124,108 +124,110 @@
     <script src="app.js"></script>
     <script src="dashboard.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const motorInterface = setInterval(() => {
-                const userEmail = localStorage.getItem('gemsEliteLogin');
-                if (typeof getData === 'function' && userEmail) {
-                    clearInterval(motorInterface);
-                    const dados = getData();
-                    
-                    const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
-                    if (fundadores.includes(userEmail)) {
-                        liberarApp(dados, '#00f5d4', 'Marlon & Carol');
-                    } else if (!dados.config || !dados.config.setupConcluido) {
-                        document.getElementById('bloqueioTotal').style.display = 'none';
-                        document.getElementById('onboardingModal').style.display = 'flex';
-                    } else {
-                        liberarApp(dados, dados.config.corPreferida, dados.config.nomeUsuario);
-                    }
-                }
-            }, 300);
-        });
-
-        function liberarApp(dados, cor, nome) {
-            aplicarCores(cor);
-            const t = document.getElementById('tituloBoasVindas');
-            if(t) t.innerText = `Olá, ${nome} 👋`;
-            document.getElementById('bloqueioTotal').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('bloqueioTotal').style.display = 'none';
-                document.getElementById('appMainContainer').classList.add('liberado');
-                if (typeof inicializarCubo === 'function') inicializarCubo();
-            }, 500);
-        }
-
-        function aplicarCores(cor) {
-            document.documentElement.style.setProperty('--primary-cyan', cor);
-            document.documentElement.style.setProperty('--primary-purple', cor + '88'); 
-        }
-
-        function irParaStep2() {
-            if(!document.getElementById('obName').value.trim()) return alert("Diga seu nome!");
-            document.getElementById('step1').style.display = 'none';
-            document.getElementById('step2').style.display = 'block';
-        }
-
-        function finalizarOnboarding() {
-            const nome = document.getElementById('obName').value;
-            const cor = document.getElementById('obColor').value;
-            const dados = getData() || {};
-            
-            const modulosSelecionados = ['financas'];
-            if(document.getElementById('btnModMetas').classList.contains('active')) modulosSelecionados.push('metas');
-            if(document.getElementById('btnModCasamento').classList.contains('active')) modulosSelecionados.push('casamento');
-
-            dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
-            
-            // 🛡️ NOVO: FORMATADOR IMPLACÁVEL DE IMAGENS
-            const formatarTermoIA = (txt) => {
-                // Troca espaços por %20, e adiciona palavras mágicas pra foto sair realista
-                let limpo = txt.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '');
-                return encodeURIComponent(limpo + " photorealistic luxury real life architecture 8k");
-            };
-
-            const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
-            
-            if(sonhos.length > 0) {
-                dados.apresentacaoMetas = sonhos.map((s, i) => {
-                    const termoTratado = formatarTermoIA(s);
-                    // Semente randômica para forçar a IA a gerar uma imagem nova e não puxar do cache
-                    const semente = Math.floor(Math.random() * 100000);
-                    const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}?width=1080&height=1920&nologo=true&seed=${semente}`;
-                    
-                    return {
-                        id: `meta_${i}`, 
-                        title: s, 
-                        img: urlPerfeita,
-                        defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
-                    };
-                });
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const motorInterface = setInterval(() => {
+            const userEmail = localStorage.getItem('gemsEliteLogin');
+            if (typeof getData === 'function' && userEmail) {
+                clearInterval(motorInterface);
+                const dados = getData();
                 
-                dados.valoresMetas = {};
-                sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
-
-                dados.metas = [{ id: Date.now(), nome: sonhos[0], meta: 10000, metaMensal: 500, guardado: 0, guardadoMes: 0 }];
+                // 🛡️ FUNDADORES COMENTADOS PARA TESTE DE ISOLAMENTO
+                // const fundadores = ['marlindo0951@gmail.com', 'carol18bistaffa@gmail.com'];
+                // if (fundadores.includes(userEmail)) {
+                //     liberarApp(dados, '#00f5d4', 'Marlon & Carol');
+                // } else 
+                
+                if (!dados.config || !dados.config.setupConcluido) {
+                    document.getElementById('bloqueioTotal').style.display = 'none';
+                    document.getElementById('onboardingModal').style.display = 'flex';
+                } else {
+                    liberarApp(dados, dados.config.corPreferida, dados.config.nomeUsuario);
+                }
             }
+        }, 300);
+    });
 
-            window.escudoAtivado = false;
-            saveData(dados);
+    function liberarApp(dados, cor, nome) {
+        aplicarCores(cor);
+        const t = document.getElementById('tituloBoasVindas');
+        if(t) t.innerText = `Olá, ${nome} 👋`;
+        document.getElementById('bloqueioTotal').style.opacity = '0';
+        setTimeout(() => {
+            document.getElementById('bloqueioTotal').style.display = 'none';
+            document.getElementById('appMainContainer').classList.add('liberado');
+            if (typeof inicializarCubo === 'function') inicializarCubo();
+        }, 500);
+    }
+
+    function aplicarCores(cor) {
+        document.documentElement.style.setProperty('--primary-cyan', cor);
+        document.documentElement.style.setProperty('--primary-purple', cor + '88'); 
+    }
+
+    function irParaStep2() {
+        if(!document.getElementById('obName').value.trim()) return alert("Diga seu nome!");
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+    }
+
+    function finalizarOnboarding() {
+        const nome = document.getElementById('obName').value;
+        const cor = document.getElementById('obColor').value;
+        const dados = getData() || {};
+        
+        const modulosSelecionados = ['financas'];
+        if(document.getElementById('btnModMetas').classList.contains('active')) modulosSelecionados.push('metas');
+        if(document.getElementById('btnModCasamento').classList.contains('active')) modulosSelecionados.push('casamento');
+
+        dados.config = { setupConcluido: true, nomeUsuario: nome, corPreferida: cor, modulosAtivos: modulosSelecionados };
+        
+        // 🛡️ FORMATADOR IMPLACÁVEL DE IMAGENS (Acento, Espaço e Seed)
+        const formatarTermoIA = (txt) => {
+            // Remove acentos (ex: Mansão -> Mansao) e caracteres especiais
+            let limpo = txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            limpo = limpo.trim().toLowerCase().replace(/[^a-z0-9 ]/g, '');
+            return encodeURIComponent(limpo + " photorealistic luxury real life architecture 8k");
+        };
+
+        const sonhos = [document.getElementById('dream1').value, document.getElementById('dream2').value, document.getElementById('dream3').value].filter(s => s.trim() !== '');
+        
+        if(sonhos.length > 0) {
+            dados.apresentacaoMetas = sonhos.map((s, i) => {
+                const termoTratado = formatarTermoIA(s);
+                const semente = Math.floor(Math.random() * 999999); // Seed maior
+                const urlPerfeita = `https://image.pollinations.ai/prompt/${termoTratado}?width=1080&height=1920&nologo=true&seed=${semente}`;
+                
+                return {
+                    id: `meta_${i}`, 
+                    title: s, 
+                    img: urlPerfeita,
+                    defaultS1: "R$ 0", defaultS2: "0%", defaultS3: "Definir"
+                };
+            });
             
-            const modalStep2 = document.getElementById('step2');
-            modalStep2.innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <div style="width: 50px; height: 50px; border: 4px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
-                    <h2 style="color:#fff; margin-bottom: 10px;">Gerando seu Império...</h2>
-                    <p style="color: var(--primary-cyan);">Criando imagens de alta definição e enviando para a nuvem.</p>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                window.location.reload();
-            }, 3000); // 3 segundos para garantir!
+            dados.valoresMetas = {};
+            sonhos.forEach((s, i) => { dados.valoresMetas[`meta_${i}`] = {s1: "R$ 0", s2: "0%", s3: "Definir"}; });
+
+            dados.metas = [{ id: Date.now(), nome: sonhos[0], meta: 10000, metaMensal: 500, guardado: 0, guardadoMes: 0 }];
         }
-    </script>
+
+        window.escudoAtivado = false;
+        saveData(dados);
+        
+        const modalStep2 = document.getElementById('step2');
+        modalStep2.innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                <div style="width: 50px; height: 50px; border: 4px solid var(--primary-cyan); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                <h2 style="color:#fff; margin-bottom: 10px;">Gerando seu Império...</h2>
+                <p style="color: var(--primary-cyan);">Criando imagens de alta definição e enviando para a nuvem.</p>
+            </div>
+        `;
+        
+        setTimeout(() => { window.location.reload(); }, 3000);
+    }
+</script>
     <style> @keyframes spin { to { transform: rotate(360deg); } } </style>
 </body>
 </html>
+
