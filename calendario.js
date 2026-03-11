@@ -10,10 +10,9 @@ let isMonthView = false;
 const diasSemana = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
 const mesesNomes = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
-// 🚀 FUNÇÃO GLOBAL BLINDADA PARA MUDAR O MÊS (Chamada direto do HTML)
 window.mudarMes = function(direcao) {
     dataNavegacao.setMonth(dataNavegacao.getMonth() + direcao);
-    renderizarMesAtual(1); // Sempre pula pro dia 1 do mês novo
+    renderizarMesAtual(1); 
 };
 
 window.apagarEvento = function(id) {
@@ -195,13 +194,10 @@ function renderizarMesAtual(diaAlvo = null) {
         }
 
         const card = document.createElement('div');
-        card.className = 'swiper-slide glass-panel';
+        // O Swiper cuida da estrutura base e o nosso CSS do HTML cuida da largura
+        card.className = 'swiper-slide';
         card.dataset.diaReal = d;
         
-        card.style.display = 'flex';
-        card.style.flexDirection = 'column';
-        card.style.height = '100%'; 
-
         card.innerHTML = `
             <div class="card-header-glass">
                 <h2>${d}</h2>
@@ -227,14 +223,8 @@ function renderizarMesAtual(diaAlvo = null) {
 function iniciarSwiper(diaAlvo) {
     if (typeof Swiper !== 'undefined') {
         calendarSwiper = new Swiper(".calendarSwiper", {
-            effect: "cards", // MÁGICA DO BARALHO AQUI 🃏
+            effect: "cards", // 🃏 AGORA O BARALHO APARECE E FUNCIONA!
             grabCursor: true,
-            cardsEffect: {
-                slideShadows: false, // Sem sombra preta para manter o design clean
-                rotate: true,
-                perSlideRotate: 2,
-                perSlideOffset: 8
-            },
             initialSlide: diaAlvo - 1, 
             navigation: { nextEl: ".calendar-nav-btn.swiper-button-next", prevEl: ".calendar-nav-btn.swiper-button-prev" },
             on: {
