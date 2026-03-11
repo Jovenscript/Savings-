@@ -119,7 +119,7 @@ function injetarElementosGlobais() {
         if (modulos.includes('metas')) {
             menuHTML += `
                 <li class="nav-category">🎯 Grandes Objetivos</li>
-                <li class="${paginaAtual === 'metas.html' ? 'active' : ''}"><a href="metas.html">🏡 Amortização & Metas</a></li>
+                <li class="${paginaAtual === 'metas.html' ? 'active' : ''}"><a href="metas.html">🏡sSonhos & Metas</a></li>
             `;
         }
 
@@ -180,3 +180,4 @@ function injetarElementosGlobais() {
     }
 }
 document.addEventListener('DOMContentLoaded', injetarElementosGlobais);
+
