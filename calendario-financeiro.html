@@ -11,7 +11,7 @@
     <style>
         /* 💎 DESIGN VIDRO ROXO/CYAN E ANTI-SOPA DE LETRINHAS 💎 */
         
-        /* 💥 O SEGREDO DO BARALHO: O Swiper precisa de tamanho fixo para o Cards Effect não sumir */
+        /* O SEGREDO DO BARALHO: O Swiper precisa de tamanho fixo para o Cards Effect não sumir */
         .calendarSwiper {
             width: 320px;
             height: 480px;
@@ -54,8 +54,10 @@
             margin-bottom: 10px; 
             border-bottom: 1px dashed rgba(157, 78, 221, 0.3); 
             padding-bottom: 10px; 
+            padding-top: 15px;
             flex-shrink: 0;
         }
+        
         .card-header-glass h2 {
             font-size: 3.8rem; 
             color: var(--primary-cyan); 
@@ -63,21 +65,35 @@
             text-shadow: 0 0 15px rgba(0, 245, 212, 0.5);
         }
 
-        /* 💥 CORREÇÃO DOS BOTÕES LATERAIS DO CALENDÁRIO (REDONDOS E BONITOS) */
-        .calendar-nav-btn {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            border: 1px solid var(--primary-cyan);
-            border-radius: 50%;
-            width: 45px !important;
-            height: 45px !important;
+        /* 💥 CORREÇÃO DEFINITIVA DOS BOTÕES LATERAIS DO CARROSSEL 💥 */
+        .custom-nav-btn {
+            background: rgba(13, 2, 33, 0.7) !important;
+            backdrop-filter: blur(8px);
+            border: 2px solid var(--primary-cyan) !important;
+            border-radius: 50% !important;
+            width: 50px !important;
+            height: 50px !important;
             color: var(--primary-cyan) !important;
-            box-shadow: 0 4px 15px rgba(0, 245, 212, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 245, 212, 0.3) !important;
+            transition: all 0.3s ease !important;
+            z-index: 100;
         }
-        .calendar-nav-btn::after {
-            font-size: 1.2rem !important;
+
+        .custom-nav-btn:hover {
+            background: var(--primary-cyan) !important;
+            color: #000 !important;
+            box-shadow: 0 0 25px var(--primary-cyan) !important;
+            transform: scale(1.1);
+        }
+
+        .custom-nav-btn::after {
+            font-size: 1.3rem !important;
             font-weight: bold;
         }
+
+        /* Posicionamento absoluto para ficar nas beiradas do baralho */
+        .swiper-button-prev.custom-nav-btn { left: -15px !important; }
+        .swiper-button-next.custom-nav-btn { right: -15px !important; }
     </style>
 </head>
 <body>
@@ -87,8 +103,7 @@
     <div class="app-container">
         
         <nav class="sidebar">
-            
-        </nav>
+            </nav>
 
         <main class="main-content">
             <header style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
@@ -102,21 +117,24 @@
             <div class="calendar-page-layout">
                 
                 <div class="calendar-left-side" id="dayCarouselView">
-                    <div class="month-controls" style="border-color: rgba(157, 78, 221, 0.3);">
-                        <button onclick="mudarMes(-1)" style="color: var(--primary-purple);">❮</button>
-                        <h2 id="mesAtualTitulo" style="color: #fff; margin: 0; font-size: 1.5rem; text-shadow: 0 0 10px rgba(157, 78, 221, 0.3);">Mês Ano</h2>
-                        <button onclick="mudarMes(1)" style="color: var(--primary-purple);">❯</button>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 320px; margin: 0 auto 20px auto; background: rgba(13, 2, 33, 0.6); backdrop-filter: blur(10px); padding: 12px 25px; border-radius: 30px; border: 1px solid rgba(157, 78, 221, 0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+                        <button onclick="mudarMes(-1)" style="background: transparent; border: none; color: var(--primary-cyan); font-size: 1.5rem; cursor: pointer; transition: 0.3s; padding: 0;">❮</button>
+                        <h2 id="mesAtualTitulo" style="color: #fff; margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0, 245, 212, 0.4);">Mês Ano</h2>
+                        <button onclick="mudarMes(1)" style="background: transparent; border: none; color: var(--primary-cyan); font-size: 1.5rem; cursor: pointer; transition: 0.3s; padding: 0;">❯</button>
                     </div>
 
-                    <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
-                        <div class="swiper-button-prev calendar-nav-btn"></div>
+                    <div style="position: relative; width: 100%; max-width: 380px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
+                        
+                        <div class="swiper-button-prev custom-nav-btn calendar-nav-btn"></div>
                         
                         <div class="swiper calendarSwiper">
                             <div class="swiper-wrapper" id="calendarWrapper">
                                 </div>
                         </div>
                         
-                        <div class="swiper-button-next calendar-nav-btn"></div>
+                        <div class="swiper-button-next custom-nav-btn calendar-nav-btn"></div>
+
                     </div>
                 </div>
 
