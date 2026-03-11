@@ -9,8 +9,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
     <style>
-        /* 💎 DESIGN VIDRO E ANTI-SOPA DE LETRINHAS 💎 */
-        
         .calendarSwiper {
             width: 320px;
             height: 480px;
@@ -65,7 +63,14 @@
             text-shadow: 0 0 15px rgba(0, 245, 212, 0.5);
         }
 
+        /* 💥 BOTÕES INDEPENDENTES DO SWIPER 💥 */
         .custom-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: rgba(13, 2, 33, 0.7) !important;
             backdrop-filter: blur(8px);
             border: 2px solid var(--primary-cyan) !important;
@@ -73,32 +78,30 @@
             width: 50px !important;
             height: 50px !important;
             color: var(--primary-cyan) !important;
+            font-size: 1.5rem;
+            font-weight: bold;
             box-shadow: 0 4px 15px rgba(0, 245, 212, 0.3) !important;
             transition: all 0.3s ease !important;
-            z-index: 100;
+            cursor: pointer;
+            z-index: 100; /* Ficam sempre acima do baralho */
         }
 
         .custom-nav-btn:hover {
             background: var(--primary-cyan) !important;
             color: #000 !important;
             box-shadow: 0 0 25px var(--primary-cyan) !important;
-            transform: scale(1.1);
+            transform: translateY(-50%) scale(1.1);
         }
 
-        .custom-nav-btn::after {
-            font-size: 1.3rem !important;
-            font-weight: bold;
-        }
+        #btnPrevCard { left: -10px; }
+        #btnNextCard { right: -10px; }
 
-        .swiper-button-prev.custom-nav-btn { left: -15px !important; }
-        .swiper-button-next.custom-nav-btn { right: -15px !important; }
-
-        /* 💥 CORREÇÃO: A GRADE DO MÊS COMPLETO (QUADRADINHOS ORGANIZADOS) 💥 */
+        /* GRADE DOS MESES CORRIGIDA */
         .month-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px; /* Espaço entre os dias */
-            justify-items: center; /* Centraliza os quadrados */
+            gap: 8px; 
+            justify-items: center; 
             margin-top: 10px;
         }
 
@@ -109,9 +112,9 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.05); /* Fundo de vidro fraquinho */
+            background: rgba(255, 255, 255, 0.05); 
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; /* Redondinho bonito */
+            border-radius: 12px; 
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
@@ -135,7 +138,6 @@
             z-index: 2;
         }
 
-        /* A bolinha que avisa que tem conta no dia */
         .indicador-ponto {
             width: 6px;
             height: 6px;
@@ -168,21 +170,21 @@
                 
                 <div class="calendar-left-side" id="dayCarouselView">
                     
-                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 320px; margin: 0 auto 20px auto; background: rgba(13, 2, 33, 0.6); backdrop-filter: blur(10px); padding: 12px 25px; border-radius: 30px; border: 1px solid rgba(157, 78, 221, 0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
-                        <button onclick="mudarMes(-1)" style="background: transparent; border: none; color: var(--primary-cyan); font-size: 1.5rem; cursor: pointer; transition: 0.3s; padding: 0;">❮</button>
-                        <h2 id="mesAtualTitulo" style="color: #fff; margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0, 245, 212, 0.4);">Mês Ano</h2>
-                        <button onclick="mudarMes(1)" style="background: transparent; border: none; color: var(--primary-cyan); font-size: 1.5rem; cursor: pointer; transition: 0.3s; padding: 0;">❯</button>
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 320px; margin: 0 auto 20px auto; background: rgba(13, 2, 33, 0.6); backdrop-filter: blur(10px); padding: 12px 20px; border-radius: 30px; border: 1px solid rgba(157, 78, 221, 0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+                        <button onclick="mudarMes(-1)" style="background: transparent; border: none; color: var(--primary-cyan); font-size: 1.5rem; cursor: pointer; transition: 0.3s; padding: 0; width: 30px;">❮</button>
+                        <h2 id="mesAtualTitulo" style="color: #fff; margin: 0; font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(0, 245, 212, 0.4); flex: 1; text-align: center;">Mês Ano</h2>
+                        <button onclick="mudarMes(1)" style="background: transparent; border: none; color: var(--primary-cyan); font-size: 1.5rem; cursor: pointer; transition: 0.3s; padding: 0; width: 30px;">❯</button>
                     </div>
 
                     <div style="position: relative; width: 100%; max-width: 380px; margin: 0 auto; display: flex; justify-content: center; align-items: center;">
                         
-                        <div class="swiper-button-prev custom-nav-btn calendar-nav-btn"></div>
+                        <div id="btnPrevCard" class="custom-nav-btn" onclick="voltarDia()">❮</div>
                         
                         <div class="swiper calendarSwiper">
                             <div class="swiper-wrapper" id="calendarWrapper"></div>
                         </div>
                         
-                        <div class="swiper-button-next custom-nav-btn calendar-nav-btn"></div>
+                        <div id="btnNextCard" class="custom-nav-btn" onclick="avancarDia()">❯</div>
 
                     </div>
                 </div>
@@ -197,8 +199,7 @@
                             <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
                         </div>
                         
-                        <div id="monthGrid" class="month-grid">
-                        </div>
+                        <div id="monthGrid" class="month-grid"></div>
                     </div>
                 </div>
 
