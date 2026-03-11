@@ -66,19 +66,22 @@ function renderizarCubo() {
         // Puxa o valor do banco de dados (ou o padrão se der erro)
         const meusValores = valoresSalvos[meta.id] || { s1: meta.defaultS1 || "R$ 0", s2: meta.defaultS2 || "0%", s3: meta.defaultS3 || "Definir" };
 
-        // 🛡️ SOLUÇÃO DAS TELAS PRETAS: Fundo degradê seguro. Se a foto da IA falhar, fica um fundo lindo roxo com azul escuro!
-        const fundoSeguro = `background: linear-gradient(135deg, rgba(13, 2, 33, 0.8), rgba(157, 78, 221, 0.5)), url('${meta.img}'); background-size: cover; background-position: center;`;
-
         html += `
-            <div class="swiper-slide" style="${fundoSeguro}">
-                <div class="meta-overlay"></div>
+            <div class="swiper-slide" style="background-color: #050110; position: relative;">
                 
-                <div class="meta-content">
+                <img src="${meta.img}" 
+                     alt="${meta.title}" 
+                     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; opacity: 0.85;" 
+                     onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1920&q=80';">
+                
+                <div class="meta-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.95) 5%, transparent 60%, rgba(13, 2, 33, 0.4) 100%); z-index: 1;"></div>
+                
+                <div class="meta-content" style="position: relative; z-index: 2; width: 100%;">
                     <div>
                         <h1 class="meta-title">${meta.title}</h1>
                         <button class="btn-edit-meta" onclick="editarValoresCofre('${meta.id}')" title="Editar Valores">✏️</button>
                     </div>
-                    <p class="meta-desc">${meta.desc || 'Gems Elite Dream'}</p>
+                    <p class="meta-desc">${meta.desc || 'Objetivo Gems Elite'}</p>
                     
                     <div class="meta-stats">
                         <div class="stat-box"><span class="stat-number">${meusValores.s1}</span><span class="stat-label">ALVO</span></div>
@@ -86,6 +89,7 @@ function renderizarCubo() {
                         <div class="stat-box"><span class="stat-number">${meusValores.s3}</span><span class="stat-label">PREVISÃO</span></div>
                     </div>
                 </div>
+
             </div>
         `;
     });
