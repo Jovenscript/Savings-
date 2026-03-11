@@ -1,6 +1,5 @@
-// app.js
+// js/app.js
 
-// 🛡️ IMPORTAÇÃO DA BIBLIOTECA DE CONFETES
 const confettiScript = document.createElement('script');
 confettiScript.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
 document.head.appendChild(confettiScript);
@@ -12,7 +11,6 @@ window.dispararConfetes = function() {
     }
 };
 
-// Tornando o escudo global para o index.html conseguir desativar depois do Onboarding
 window.escudoAtivado = !localStorage.getItem('gemsEliteData'); 
 
 function getData() {
@@ -21,39 +19,24 @@ function getData() {
 
 function saveData(data) {
     localStorage.setItem('gemsEliteData', JSON.stringify(data));
-    // Se o escudo não estiver ativo, despacha pra nuvem!
-    if (!window.escudoAtivado) {
-        sincronizarComFirebase(data);
-    } else {
-        console.log("🛡️ Upload bloqueado. Aguardando a nuvem...");
-    }
+    if (!window.escudoAtivado) sincronizarComFirebase(data);
 }
 
 function formatCurrency(value) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 }
 
-// ==========================================
-// ☁️ CLOUD SAAS - SINCRONIZAÇÃO POR USUÁRIO
-// ==========================================
+// ☁️ CLOUD SAAS
 async function sincronizarComFirebase(data) {
     if (!window.db) return;
-    
-    // 🛡️ Identidade Suprema: Quem está logado?
     const userEmail = localStorage.getItem('gemsEliteLogin');
     if (!userEmail) return;
 
     try {
         const { doc, setDoc } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
-        
-        // 🚀 MÁGICA: A gaveta do banco de dados agora tem o nome do e-mail do usuário!
         const docRef = doc(window.db, "usuarios", userEmail); 
-        
         await setDoc(docRef, { gemsEliteData: JSON.stringify(data) }, { merge: true });
-        console.log(`☁️ Nuvem atualizada para: ${userEmail}`);
-    } catch (error) {
-        console.error("Erro ao sincronizar:", error);
-    }
+    } catch (error) { console.error("Erro nuvem:", error); }
 }
 
 async function ligarRadarEmTempoReal() {
@@ -61,40 +44,27 @@ async function ligarRadarEmTempoReal() {
         const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js");
         const aguardarBanco = setInterval(() => {
             const userEmail = localStorage.getItem('gemsEliteLogin');
-            
             if (window.db && userEmail) {
                 clearInterval(aguardarBanco);
-                
-                // 🚀 Radar focado apenas no usuário logado
                 const docRef = doc(window.db, "usuarios", userEmail);
-                
                 onSnapshot(docRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const dadosNuvem = snapshot.data().gemsEliteData;
-                        const dadosLocais = localStorage.getItem('gemsEliteData');
-                        
-                        if (dadosNuvem && dadosNuvem !== dadosLocais) {
+                        if (dadosNuvem && dadosNuvem !== localStorage.getItem('gemsEliteData')) {
                             localStorage.setItem('gemsEliteData', dadosNuvem);
-                            if (window.escudoAtivado) window.escudoAtivado = false;
-                            window.location.reload(); 
-                        } else if (window.escudoAtivado && dadosNuvem) {
                             window.escudoAtivado = false;
-                        }
-                    } else {
-                        // Se não existe nada na nuvem (usuário novo), libera o escudo
-                        window.escudoAtivado = false;
-                    }
+                            window.location.reload(); 
+                        } else if (window.escudoAtivado && dadosNuvem) window.escudoAtivado = false;
+                    } else window.escudoAtivado = false;
                 });
             }
         }, 500);
-    } catch (error) {
-        console.error("Erro radar:", error);
-    }
+    } catch (error) { console.error("Erro radar:", error); }
 }
 ligarRadarEmTempoReal();
 
 // ==========================================
-// MENU INTELIGENTE (RENDERIZAÇÃO POR MÓDULOS)
+// MENU INTELIGENTE
 // ==========================================
 function injetarElementosGlobais() {
     const sidebarElement = document.querySelector('.sidebar');
@@ -108,7 +78,7 @@ function injetarElementosGlobais() {
 
         let menuHTML = `<div class="logo">GEMSELITE</div><ul class="nav-links">`;
 
-        // Módulo 1: FINANÇAS (Sempre ativo)
+        // Módulo 1: FINANÇAS
         menuHTML += `
             <li class="nav-category">📊 Rotina & Finanças</li>
             <li class="${paginaAtual === 'index.html' ? 'active' : ''}"><a href="index.html">🏠 Início (Visão Geral)</a></li>
@@ -134,37 +104,86 @@ function injetarElementosGlobais() {
             `;
         }
 
-        // Rodapé de Sistema
+        // 💾 BACKUP E SISTEMA
         menuHTML += `
                 <li style="margin-top: 30px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px;">
-                    <a href="#" id="btnLogout" style="color: #ff4b4b; text-align: center;">Sair do Sistema</a>
+                    <a href="#" id="btnExportarSidebar" style="color: var(--primary-cyan); font-size: 0.85rem;"><span style="margin-right:8px;">💾</span> Fazer Backup (Download)</a>
+                </li>
+                <li>
+                    <label for="btnImportarSidebar" style="color: var(--primary-purple); cursor: pointer; display: block; padding: 10px 15px; font-size: 0.85rem;">
+                        <span style="margin-right:8px;">📂</span> Importar Backup
+                    </label>
+                    <input type="file" id="btnImportarSidebar" accept=".json" style="display: none;">
                 </li>
                 <li style="margin-top: 10px;">
-                    <a href="#" id="resetAppBtn" style="color: var(--danger-red); font-weight: bold; text-align: center;">🗑️ Resetar App</a>
+                    <a href="#" id="btnLogout" style="color: #ff4b4b; text-align: center;">Sair do Sistema</a>
                 </li>
             </ul>
         `;
 
         sidebarElement.innerHTML = menuHTML;
         
-        // 🔒 INTEGRAÇÃO DE SAÍDA SEGURA
+        // 🛑 PREVENÇÃO DE REFRESH DESNECESSÁRIO
+        const links = sidebarElement.querySelectorAll('a');
+        links.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href === paginaAtual) {
+                    e.preventDefault(); // Se já está na página, não carrega de novo!
+                    // Apenas fecha o menu no celular
+                    document.getElementById('appMainContainer').classList.remove('sidebar-active');
+                    if(document.getElementById('mobileOverlay')) document.getElementById('mobileOverlay').classList.remove('active');
+                }
+            });
+        });
+
+        // LÓGICA DE BACKUP JSON
+        const btnExportar = document.getElementById('btnExportarSidebar');
+        if (btnExportar) {
+            btnExportar.addEventListener('click', (e) => {
+                e.preventDefault();
+                const todosOsDados = {};
+                for (let i = 0; i < localStorage.length; i++) {
+                    const chave = localStorage.key(i);
+                    todosOsDados[chave] = localStorage.getItem(chave);
+                }
+                const jsonString = JSON.stringify(todosOsDados, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `GemsElite_Backup_${new Date().toLocaleDateString('pt-BR').replace(/\//g, '-')}.json`;
+                a.click();
+            });
+        }
+
+        const btnImportar = document.getElementById('btnImportarSidebar');
+        if (btnImportar) {
+            btnImportar.addEventListener('change', function(e) {
+                const arquivo = e.target.files[0];
+                if (!arquivo) return;
+                const leitor = new FileReader();
+                leitor.onload = function(event) {
+                    try {
+                        const dadosImportados = JSON.parse(event.target.result); 
+                        if (confirm("Isso vai substituir TODOS os dados. Deseja continuar?")) {
+                            localStorage.clear();
+                            for (const chave in dadosImportados) localStorage.setItem(chave, dadosImportados[chave]);
+                            alert("Dados sincronizados com sucesso!");
+                            window.location.reload(); 
+                        }
+                    } catch (erro) { alert("Arquivo de backup inválido."); }
+                };
+                leitor.readAsText(arquivo);
+            });
+        }
+
+        // LÓGICA DE SAIR
         const btnLogout = document.getElementById('btnLogout');
         if(btnLogout) btnLogout.addEventListener('click', (e) => { 
             e.preventDefault(); 
-            // Chama a função global que está no auth.js!
-            if(typeof window.logoutDoSistema === 'function') {
-                window.logoutDoSistema();
-            } else {
-                // Prevenção caso o auth.js demore a carregar
-                if(confirm("Tem certeza que deseja sair?")) { 
-                    localStorage.removeItem('gemsEliteLogin'); 
-                    window.location.href = 'login.html'; 
-                }
-            }
+            if(typeof window.logoutDoSistema === 'function') window.logoutDoSistema();
+            else if(confirm("Sair?")) { localStorage.removeItem('gemsEliteLogin'); window.location.href = 'login.html'; }
         });
-
-        const resetBtn = document.getElementById('resetAppBtn');
-        if (resetBtn) resetBtn.addEventListener('click', (e) => { e.preventDefault(); if(prompt("⚠️ Digite 'DESTRUIR':") === "DESTRUIR") { localStorage.removeItem('gemsEliteData'); alert("App resetado."); window.location.href = 'index.html'; }});
     }
 
     if (window.location.pathname.indexOf('login.html') === -1) {
@@ -177,4 +196,3 @@ function injetarElementosGlobais() {
     }
 }
 document.addEventListener('DOMContentLoaded', injetarElementosGlobais);
-
