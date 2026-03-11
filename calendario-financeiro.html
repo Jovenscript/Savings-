@@ -11,24 +11,35 @@
     <style>
         /* 💎 DESIGN VIDRO ROXO/CYAN E ANTI-SOPA DE LETRINHAS 💎 */
         
-        /* 1. O Vidro Roxo Transparente Base */
+        /* 💥 O SEGREDO DO BARALHO: O Swiper precisa de tamanho fixo para o Cards Effect não sumir */
+        .calendarSwiper {
+            width: 320px;
+            height: 480px;
+            padding: 20px 0;
+            overflow: visible; /* Deixa vazar as bordas dos cards de trás */
+        }
+
         .calendarSwiper .swiper-slide {
-            background: rgba(13, 2, 33, 0.5) !important; /* Roxo escuro bem transparente */
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(13, 2, 33, 0.8) !important; 
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 245, 212, 0.2) !important; /* Borda Cyan suave */
+            border: 1px solid rgba(0, 245, 212, 0.4) !important;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
             border-radius: 20px;
+            display: flex;
+            flex-direction: column;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
 
         /* Destaque para a carta da frente */
         .calendarSwiper .swiper-slide-active {
-            border-color: rgba(0, 245, 212, 0.6) !important;
+            border-color: rgba(0, 245, 212, 0.9) !important;
             box-shadow: 0 0 30px rgba(0, 245, 212, 0.2);
         }
 
-        /* 2. O Segredo (z-index/visibility): Esconder as letras das cartas que estão atrás */
+        /* Esconder as letras das cartas que estão atrás */
         .calendarSwiper .swiper-slide:not(.swiper-slide-active) .scroll-interno {
             opacity: 0 !important;
             visibility: hidden;
@@ -36,24 +47,24 @@
             transition: opacity 0.3s;
         }
 
-        /* 3. A carta da frente mostra o texto suavemente */
+        /* A carta da frente mostra o texto suavemente */
         .calendarSwiper .swiper-slide-active .scroll-interno {
             opacity: 1 !important;
             visibility: visible;
             transition: opacity 0.5s ease-in-out;
         }
 
-        /* 4. Estilos do cabeçalho da carta */
         .card-header-glass {
             text-align: center; 
             margin-bottom: 10px; 
-            border-bottom: 1px dashed rgba(157, 78, 221, 0.3); /* Pontilhado Roxo */
+            border-bottom: 1px dashed rgba(157, 78, 221, 0.3); 
             padding-bottom: 10px; 
+            padding-top: 10px;
             flex-shrink: 0;
         }
         .card-header-glass h2 {
             font-size: 3.8rem; 
-            color: var(--primary-cyan); /* Cyan brilhante */
+            color: var(--primary-cyan); 
             margin: 0; 
             text-shadow: 0 0 15px rgba(0, 245, 212, 0.5);
         }
@@ -159,4 +170,3 @@
     <script src="pwa.js"></script>
 </body>
 </html>
-
