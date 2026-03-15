@@ -2,7 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Garante que o Overlay sempre exista no Body
     let overlay = document.getElementById('mobileOverlay');
     if (!overlay) {
         overlay = document.createElement('div');
@@ -10,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(overlay);
     }
 
-    // 2. Função Blindada de Toggle
     window.toggleMenuGems = function() {
         const sidebar = document.querySelector('.sidebar');
         const overlayBox = document.getElementById('mobileOverlay');
@@ -19,34 +17,91 @@ document.addEventListener('DOMContentLoaded', () => {
         if (overlayBox) overlayBox.classList.toggle('active');
     };
 
-    // 3. Event Delegation (A Grande Correção)
-    // Invés de tentar achar o botão na hora que a página carrega, 
-    // ele escuta qualquer clique no documento inteiro. Se o clique for no botão, ele age.
     document.addEventListener('click', (e) => {
-        // Se clicou no Botão Hambúrguer (ou dentro dele)
         if (e.target.id === 'hamburgerBtn' || e.target.closest('#hamburgerBtn')) {
             e.preventDefault();
             e.stopPropagation();
             window.toggleMenuGems();
-            return; // Para a execução aqui
+            return;
         }
 
-        // Se clicou no Overlay Escuro (para fechar)
         if (e.target.id === 'mobileOverlay') {
             window.toggleMenuGems();
             return;
         }
 
-        // Se estiver no mobile e clicar em um link real do menu (para fechar e ir pra página)
         if (window.innerWidth <= 768) {
             const sidebarAtiva = document.querySelector('.sidebar.active');
             const ehUmLinkDoMenu = e.target.closest('.nav-links a');
-            
             if (sidebarAtiva && ehUmLinkDoMenu) {
-                // Não previne o default aqui, para a página poder carregar
                 window.toggleMenuGems();
             }
         }
     });
 
+    // ==========================================
+    // 🚀 MAGIC NAVIGATION BAR (MOBILE)
+    // ==========================================
+    function criarMagicNav() {
+        if (document.getElementById('magicNavContainer') || window.innerWidth > 768) return;
+
+        const dados = JSON.parse(localStorage.getItem('gemsEliteData')) || {};
+        const modulos = (dados.config && dados.config.modulosAtivos) ? dados.config.modulosAtivos : ['financas', 'metas', 'casamento'];
+        
+        let paginaAtual = window.location.pathname.split('/').pop();
+        if (paginaAtual === '' || paginaAtual === '/') paginaAtual = 'index.html';
+
+        const navItems = [
+            { url: 'index.html', icon: '🏠', base: ['index.html', 'planejamento.html', 'calendario-financeiro.html'] },
+            { url: 'transacoes.html', icon: '💸', base: ['transacoes.html'] }
+        ];
+
+        if (modulos.includes('metas')) {
+            navItems.push({ url: 'metas.html', icon: '🎯', base: ['metas.html'] });
+        }
+        if (modulos.includes('casamento')) {
+            navItems.push({ url: 'orcamento-casamento.html', icon: '💍', base: ['orcamento-casamento.html', 'convidados.html'] });
+        }
+
+        const navContainer = document.createElement('div');
+        navContainer.className = 'magic-nav';
+        navContainer.id = 'magicNavContainer';
+
+        const ul = document.createElement('ul');
+        let activeIndex = 0;
+
+        navItems.forEach((item, index) => {
+            const li = document.createElement('li');
+            
+            if (item.base.includes(paginaAtual)) {
+                li.className = 'active';
+                activeIndex = index;
+            }
+
+            li.innerHTML = `<a href="${item.url}"><span class="icon">${item.icon}</span></a>`;
+            
+            li.addEventListener('click', function() {
+                document.querySelectorAll('.magic-nav li').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                const indicator = document.querySelector('.magic-indicator');
+                const liWidth = 100 / navItems.length;
+                indicator.style.left = `calc(${index * liWidth}% + ${liWidth / 2}% - 30px)`;
+            });
+
+            ul.appendChild(li);
+        });
+
+        const indicator = document.createElement('div');
+        indicator.className = 'magic-indicator';
+        ul.appendChild(indicator);
+        navContainer.appendChild(ul);
+        document.body.appendChild(navContainer);
+
+        setTimeout(() => {
+            const liWidth = 100 / navItems.length;
+            indicator.style.left = `calc(${activeIndex * liWidth}% + ${liWidth / 2}% - 30px)`;
+        }, 50);
+    }
+
+    criarMagicNav();
 });
